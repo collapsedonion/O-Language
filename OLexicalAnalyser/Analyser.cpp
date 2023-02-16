@@ -18,6 +18,7 @@ std::string O::Analyser::defaultServiceNames[] = {
     "void",
     "false",
     "true",
+    "return"
 };
 
 int O::Analyser::charNotInBrackets(std::string str, char c)

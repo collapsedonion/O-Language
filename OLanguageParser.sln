@@ -5,6 +5,13 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OLexicalAnalyser", "OLexicalAnalyser\OLexicalAnalyser.vcxproj", "{A92AEA8C-1868-45DB-903A-B16D318B2C7D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OLanguageSematicAnalyser", "OLanguageSematicAnalyser\OLanguageSematicAnalyser.vcxproj", "{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A92AEA8C-1868-45DB-903A-B16D318B2C7D} = {A92AEA8C-1868-45DB-903A-B16D318B2C7D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OCompilerBase", "OCompilerBase\OCompilerBase.vcxitems", "{59BCF715-442E-435A-827F-DAB9E0FEE01C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,11 +28,23 @@ Global
 		{A92AEA8C-1868-45DB-903A-B16D318B2C7D}.Release|x64.Build.0 = Release|x64
 		{A92AEA8C-1868-45DB-903A-B16D318B2C7D}.Release|x86.ActiveCfg = Release|Win32
 		{A92AEA8C-1868-45DB-903A-B16D318B2C7D}.Release|x86.Build.0 = Release|Win32
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Debug|x64.ActiveCfg = Debug|x64
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Debug|x64.Build.0 = Debug|x64
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Debug|x86.ActiveCfg = Debug|Win32
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Debug|x86.Build.0 = Debug|Win32
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Release|x64.ActiveCfg = Release|x64
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Release|x64.Build.0 = Release|x64
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Release|x86.ActiveCfg = Release|Win32
+		{BF145AD7-AF34-4BE7-B1D5-C9F947542EBF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF4E0467-B99B-4D40-8AEF-381B142949C3}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		OCompilerBase\OCompilerBase.vcxitems*{59bcf715-442e-435a-827f-dab9e0fee01c}*SharedItemsImports = 9
+		OCompilerBase\OCompilerBase.vcxitems*{bf145ad7-af34-4be7-b1d5-c9f947542ebf}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal
