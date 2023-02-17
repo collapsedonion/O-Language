@@ -1,5 +1,5 @@
 #pragma once
-#include "Analyser.h"
+#include <Analyser.h>
 #include <exception>
 #include <BaseTypes.h>
 
@@ -15,6 +15,7 @@ namespace O {
 		std::vector<Instruction> instructions;
 		std::vector<Function> functions;
 		std::vector<Operator> operators = {
+			Operator("?", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
 			Operator("+", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
 			Operator("-", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
 			Operator("*", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),

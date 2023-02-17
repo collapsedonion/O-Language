@@ -71,6 +71,7 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token)
 {
 	std::vector<DataTypes> dataTypes;
 	Instruction retInst;
+	retInst.IsFunction = true;
 
 	retInst.name = token.token;
 
@@ -291,6 +292,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token)
 {
 	Instruction toRet;
+	toRet.IsVariable = true;
 	
 	if (token.childToken.size() == 2) {
 		toRet.name = token.childToken[1].token;

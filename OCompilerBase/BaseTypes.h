@@ -113,6 +113,7 @@ struct Instruction {
 	DataTypes type = DataTypes::Error;
 	bool ArithmeticProccess = false;
 	bool IsVariable = false;
+	bool IsFunction = false;
 	std::vector<Instruction> Parameters;
 };
 
@@ -137,6 +138,8 @@ struct File {
 	std::vector<Function> functions;
 	std::vector<Instruction> instructions;
 };
+
+typedef std::string(__stdcall *TranslateFunction)(File);
 
 template <typename T>
 inline bool operator == (std::vector<T> v1, std::vector<T> v2) {
