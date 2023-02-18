@@ -10,6 +10,8 @@ namespace O {
 		int returnCalls = 0;
 		DataTypes returnType = DataTypes::Void;
 
+		AdditionalDataType adt;
+
 		std::vector<Variable> variables;
 		std::vector<Variable> variablesCreatedAtThatField;
 		std::vector<Instruction> instructions;
@@ -31,9 +33,13 @@ namespace O {
 
 		Instruction checkAndGetFunction(Analyser::Token token);
 
+		Instruction proccessPointerGet(Analyser::Token token);
+
 		Instruction getVariableAsInstruction(std::string name);
 
 		Instruction proccessInstCall(Analyser::Token token);
+
+		DataTypes getDataType(Analyser::Token token);
 	
 		Instruction proccessReturnCall(Analyser::Token token);
 		Instruction proccessIfInstruction(Analyser::TokenisedFile token);

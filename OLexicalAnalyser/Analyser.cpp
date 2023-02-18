@@ -11,6 +11,11 @@ char O::Analyser::mathOperators[] = {
     '/',
 };
 
+char O::Analyser::unarMathOperators[] = {
+    '@',
+    '!',
+};
+
 std::string O::Analyser::defaultServiceNames[] = {
     "int",
     "bool",
@@ -234,6 +239,16 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::string str)
         }
     }
 
+    for (int i = 0; i < sizeof(unarMathOperators); i++) {
+        auto op = charNotInFunction(str, unarMathOperators[i]);
+        if (op != -1) {
+            t.type = Type::MathematicalOperator;
+            t.token = unarMathOperators[i];
+            t.childToken = { StringToTree(str.substr(1, str.size() - 1))};
+            return t;
+        }
+    }
+
     return t;
 }
 
@@ -243,6 +258,14 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
     int idOfFunc = stringNotInFunction(str, "func");
 
     Token res;
+
+    if (*(str.end()-1) == '~') {
+        res.token = '~';
+        res.type = Type::ServiceName;
+        res.childToken = { StringToTree(str.substr(0, str.size() - 1)) };
+
+        return res;
+    }
     
     if (idOfVar == 0) {
         int idOfDoubleDot = charNotInFunction(str, ':');

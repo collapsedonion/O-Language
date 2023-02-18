@@ -46,6 +46,7 @@ namespace O {
 
 	private:
 		static char mathOperators[];
+		static char unarMathOperators[];
 		static std::string defaultServiceNames[];
 
 	private:

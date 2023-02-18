@@ -13,7 +13,13 @@ enum class DataTypes {
 	Error = 7
 };
 
-inline DataTypes stringToDataType(std::string str) {
+struct AdditionalDataType {
+	int lastId = 7;
+	std::vector<int> additionalNumber;
+	std::vector<std::string> additionalName;
+};
+
+inline DataTypes stringToDataType(std::string str, AdditionalDataType adt) {
 
 	if (str == "int") {
 		return DataTypes::Integer;
@@ -27,6 +33,13 @@ inline DataTypes stringToDataType(std::string str) {
 	else if (str == "float")
 	{
 		return DataTypes::FloatingPoint;
+	}
+	else {
+		for (int i = 0; i < adt.lastId - 7; i++) {
+			if (adt.additionalName[i] == str) {
+				return (DataTypes)adt.additionalNumber[i];
+			}
+		}
 	}
 
 	return DataTypes::Error;
@@ -61,7 +74,7 @@ inline DataTypes getTypeOfNumber(std::string str) {
 	return DataTypes::Integer;
 }
 
-inline std::string dataTypeToString(DataTypes dt) {
+inline std::string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType()) {
 	switch (dt)
 	{
 	case DataTypes::ServiceInstruction:
@@ -80,7 +93,24 @@ inline std::string dataTypeToString(DataTypes dt) {
 		return "char";
 	case DataTypes::Error:
 		return "ERROR";
+	default:
+		for (int i = 0; i < adt.lastId - 7; i++) {
+			if (adt.additionalNumber[i] == (int)dt) {
+				return adt.additionalName[i];
+			}
+		}
+		return "ERROR";
 	}
+}
+
+inline bool adtContains(std::string str, AdditionalDataType adt) {
+	for (auto elem : adt.additionalName) {
+		if (elem == str) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 struct Variable {
@@ -134,6 +164,7 @@ struct Function {
 };
 
 struct File {
+	AdditionalDataType adtTable;
 	std::vector<Variable> variables;
 	std::vector<Function> functions;
 	std::vector<Instruction> instructions;

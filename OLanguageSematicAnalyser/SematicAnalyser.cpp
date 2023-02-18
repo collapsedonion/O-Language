@@ -9,6 +9,9 @@
 
 #define RETURN_NAME "return"
 
+#define POINTER_GET_INSTRUCTION_TOKEN "@"
+#define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
+
 #define IF_NAME "if"
 #define ELSE_NAME "else"
 #define ELIF_NAME "else if"
@@ -93,6 +96,26 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token)
 	return retInst;
 }
 
+Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
+{
+	if (token.childToken.size() != 1) {
+		throw(std::exception("Invalid count of arguments ad pointer get operator"));
+	}
+	else {
+		Instruction inst = proccessInstCall(token.childToken[0]);
+		Analyser::Token typeToken;
+		typeToken.token = "~";
+		Analyser::Token instTypeToken;
+		instTypeToken.token = dataTypeToString(inst.type, adt);
+		typeToken.childToken.push_back(instTypeToken);
+		Instruction toRet;
+		toRet.name = POINTER_GET_INSTRUCTION_NAME;
+		toRet.type = getDataType(typeToken);
+		toRet.Parameters.push_back(inst);
+		return toRet;
+	}
+}
+
 Instruction O::SematicAnalyser::getVariableAsInstruction(std::string name)
 {
 	Variable v;
@@ -109,6 +132,27 @@ Instruction O::SematicAnalyser::getVariableAsInstruction(std::string name)
 	inst.IsVariable = true;
 
 	return inst;
+}
+
+DataTypes O::SematicAnalyser::getDataType(Analyser::Token token)
+{
+	if (token.token == "~") {
+		auto mydt = getDataType(token.childToken[0]);
+		std::string strRep = dataTypeToString(mydt, adt);
+		bool check = adtContains("~" + strRep, adt);
+		if (check) {
+			return stringToDataType("~" + strRep, adt);
+		}
+		else {
+			adt.lastId += 1;
+			adt.additionalNumber.push_back(adt.lastId);
+			adt.additionalName.push_back("~" + strRep);
+			return (DataTypes)adt.lastId;
+		}
+	}
+	else {
+		return stringToDataType(token.token, adt);
+	}
 }
 
 Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
@@ -216,7 +260,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 
 
 	if (token.name.childToken[0].type == Analyser::Type::ServiceName) {
-		auto type = stringToDataType(token.name.childToken[0].token);
+		auto type = getDataType(token.name.childToken[0]);
 
 		Function func;
 
@@ -236,7 +280,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 				if (funcArgName.childToken.size() != 1 || funcArgName.childToken[0].type != Analyser::Type::ServiceName) {
 					throw(std::exception("Invalid function argument type"));
 				}
-				auto funcArgType = stringToDataType(funcArgName.childToken[0].token);
+				auto funcArgType = getDataType(funcArgName.childToken[0]);
 				if (funcArgType == DataTypes::Error) {
 					std::string message = "Unrecognised data type at function argument \"" + funcArgName.childToken[0].token + "\"";
 					throw(std::exception(message.c_str()));
@@ -307,7 +351,7 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token)
 			throw exp;
 		}
 
-		auto getType = stringToDataType(token.childToken[0].token);
+		auto getType = getDataType(token.childToken[0]);
 
 		if (getType == DataTypes::Error) {
 			throw exp;
@@ -450,6 +494,7 @@ File O::SematicAnalyser::getFileRepresantation()
 	f.functions = std::vector<Function>(functions);
 	f.instructions = std::vector<Instruction>(instructions);
 	f.variables = std::vector<Variable>(variables);
+	f.adtTable = adt;
 
 	return f;
 }
@@ -474,6 +519,11 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 			}
 
 			res.type = getReturnDataTypeOfOperator(res.name, res.Parameters[0].type, res.Parameters[1].type);
+		}
+	}
+	else if (token.type == Analyser::Type::MathematicalOperator) {
+		if (token.token == POINTER_GET_INSTRUCTION_TOKEN) {
+			return proccessPointerGet(token);
 		}
 	}
 	else if (token.type == Analyser::Type::Number) {
