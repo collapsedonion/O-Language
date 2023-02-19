@@ -13,6 +13,7 @@ char O::Analyser::mathOperators[] = {
 
 char O::Analyser::unarMathOperators[] = {
     '@',
+    '~',
     '!',
 };
 
@@ -240,8 +241,7 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::string str)
     }
 
     for (int i = 0; i < sizeof(unarMathOperators); i++) {
-        auto op = charNotInFunction(str, unarMathOperators[i]);
-        if (op != -1) {
+        if (str[0] == unarMathOperators[i]) {
             t.type = Type::MathematicalOperator;
             t.token = unarMathOperators[i];
             t.childToken = { StringToTree(str.substr(1, str.size() - 1))};

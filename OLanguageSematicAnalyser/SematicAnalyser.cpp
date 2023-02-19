@@ -12,6 +12,9 @@
 #define POINTER_GET_INSTRUCTION_TOKEN "@"
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
 
+#define POINTER_ACCESS_INSTRUCTION_TOKEN "~"
+#define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
+
 #define IF_NAME "if"
 #define ELSE_NAME "else"
 #define ELIF_NAME "else if"
@@ -99,7 +102,7 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token)
 Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
 {
 	if (token.childToken.size() != 1) {
-		throw(std::exception("Invalid count of arguments ad pointer get operator"));
+		throw(std::exception("Invalid count of arguments at pointer get operator"));
 	}
 	else {
 		Instruction inst = proccessInstCall(token.childToken[0]);
@@ -153,6 +156,27 @@ DataTypes O::SematicAnalyser::getDataType(Analyser::Token token)
 	else {
 		return stringToDataType(token.token, adt);
 	}
+}
+
+Instruction O::SematicAnalyser::proccessPointerAccess(Analyser::Token token)
+{
+	if (token.childToken.size() != 1) {
+		throw(std::exception("Invalid count of arguments at pointer access operator"));
+	}
+
+	Instruction inst = proccessInstCall(token.childToken[0]);
+
+	std::string dtStrReprasentation = dataTypeToString(inst.type, adt);
+	if (dtStrReprasentation[0] != '~') {
+		throw(std::exception("Non pointer type at pointer access operator"));
+	}
+
+	Instruction retInst;
+	retInst.name = POINTER_ACCESS_INSTRUCTION_NAME;
+	retInst.type = stringToDataType(dtStrReprasentation.substr(1, dtStrReprasentation.size()-1), adt);
+	retInst.Parameters.push_back(inst);
+
+	return retInst;
 }
 
 Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
@@ -297,6 +321,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 			}
 			if (token.subToken.size() != 0) {
 				SematicAnalyser subSematicAnalyser;
+				subSematicAnalyser.adt = adt;
 				subSematicAnalyser.returnType = func.returnType;
 				subSematicAnalyser.variables = std::vector<Variable>(variables);
 				subSematicAnalyser.functions = std::vector<Function>(functions);
@@ -398,6 +423,9 @@ Instruction O::SematicAnalyser::proccessSetInstruction(Analyser::Token token)
 				}
 			}
 		}
+		else if (destination.token == POINTER_ACCESS_INSTRUCTION_TOKEN) {
+			destInstr = proccessPointerAccess(destination);
+		}
 		else {
 			throw(std::exception("Unexpected destination at \"=\" operator"));
 		}
@@ -407,6 +435,10 @@ Instruction O::SematicAnalyser::proccessSetInstruction(Analyser::Token token)
 	}
 	else {
 		throw(std::exception("Unexpected data at \"=\" operator"));
+	}
+
+	if (toRet.Parameters[0].type != toRet.Parameters[1].type) {
+		throw(std::exception("Type mismatch at set operator"));
 	}
 
 	return toRet;
@@ -524,6 +556,9 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 	else if (token.type == Analyser::Type::MathematicalOperator) {
 		if (token.token == POINTER_GET_INSTRUCTION_TOKEN) {
 			return proccessPointerGet(token);
+		}
+		else if(token.token == POINTER_ACCESS_INSTRUCTION_TOKEN) {
+			return proccessPointerAccess(token);
 		}
 	}
 	else if (token.type == Analyser::Type::Number) {

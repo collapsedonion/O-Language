@@ -1,6 +1,9 @@
 #include "Translator.h"
 #include "pch.h"
 
+#define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
+#define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
+
 std::string Translator::getPrefix()
 {
     std::string toRet;
@@ -19,19 +22,19 @@ std::string Translator::getDefaultInitialisator(DataTypes t)
     case DataTypes::MathematicalOperator:
         return "";
     case DataTypes::Void:
-        return "";
+        return "[]";
     case DataTypes::Integer:
-        return "0";
+        return "[0]";
     case DataTypes::FloatingPoint:
-        return "0.0";
+        return "[0.0]";
     case DataTypes::Boolean:
-        return "false";
+        return "[false]";
     case DataTypes::Character:
-        return "A";
+        return "[\"A\"]";
     case DataTypes::Error:
         return "";
     default:
-        return "";
+        return "[0]";
     }
 }
 
@@ -48,13 +51,13 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
         }
     }
     else if (inst.IsVariable) {
-        return inst.name;
+        return inst.name + "[0]";
     }
     else {
         if (inst.IsFunction) {
             std::string toRet = inst.name + "(";
             for (auto v : inst.Parameters) {
-                toRet += proccessInstruction(v);
+                toRet += "[" + proccessInstruction(v) + "]";
                 toRet += ",";
             }
             if (inst.Parameters.size() != 0) {
@@ -123,6 +126,23 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
         }
         else if (inst.name == "FALSE") {
             return "False";
+        }
+        else if (inst.name == POINTER_GET_INSTRUCTION_NAME) {
+            std::string r = proccessInstruction(inst.Parameters[0]);
+            if (inst.Parameters[0].IsVariable) {
+                r = r.substr(0, r.size() - 3);
+                return r;
+            }
+            else if (inst.Parameters[0].IsFunction) {
+                return r;
+            }
+            else {
+                return "[" + r + "]";
+            }
+
+        }
+        else if (inst.name == POINTER_ACCESS_INSTRUCTION_NAME) {
+            return proccessInstruction(inst.Parameters[0]) + "[0]";
         }
         else {
             return inst.name;

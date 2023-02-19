@@ -41,6 +41,8 @@ namespace O {
 
 		DataTypes getDataType(Analyser::Token token);
 	
+		Instruction proccessPointerAccess(Analyser::Token token);
+
 		Instruction proccessReturnCall(Analyser::Token token);
 		Instruction proccessIfInstruction(Analyser::TokenisedFile token);
 		Instruction proccessElseIfInstruction(Analyser::TokenisedFile token);
