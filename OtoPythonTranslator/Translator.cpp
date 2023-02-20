@@ -3,6 +3,8 @@
 
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
+#define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
+#define ARRAY_CREATION_NAME "ARRAY_INIT"
 
 std::string Translator::getPrefix()
 {
@@ -143,6 +145,20 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
         }
         else if (inst.name == POINTER_ACCESS_INSTRUCTION_NAME) {
             return proccessInstruction(inst.Parameters[0]) + "[0]";
+        }
+        else if (inst.name == ARRAY_CREATION_NAME) {
+            std::string toRet = "[";
+            for (int i = 1; i < inst.Parameters.size(); i++) {
+                toRet += proccessInstruction(inst.Parameters[i]);
+
+                if (i != inst.Parameters.size() - 1) {
+                    toRet += ",";
+                }
+            }
+            return toRet + "]";
+        }
+        else if (inst.name == ARRAY_ELEMENT_ACCESS_NAME) {
+            return proccessInstruction(inst.Parameters[1]) + "[" + proccessInstruction(inst.Parameters[0]) + "]";
         }
         else {
             return inst.name;

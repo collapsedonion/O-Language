@@ -70,11 +70,20 @@ int O::Analyser::charNotInQuets(std::string str, char c)
 int O::Analyser::charNotInFunction(std::string str, char c)
 {
     int level = -1;
+    int levelInCube = -1;
     bool inQuets = false;
 
     for (int i = 0; i < str.size(); i++) {
         if (str[i] == '\"') {
             inQuets = !inQuets;
+        }
+
+        if (str[i] == '[' && !inQuets) {
+            levelInCube++;
+        }
+
+        if (str[i] == ']' && !inQuets) {
+            levelInCube--;
         }
 
         if (str[i] == '(' && !inQuets) {
@@ -87,11 +96,44 @@ int O::Analyser::charNotInFunction(std::string str, char c)
             continue;
         }
 
-        if (str[i] == c && level == -1 && !inQuets) {
+        if (str[i] == c && level == -1 && !inQuets && levelInCube == -1) {
             return i;
         }
     }
     return -1;
+}
+
+std::pair<bool, std::pair<std::string, std::string>> O::Analyser::doubleBracketOperator(std::string str, char left, char right)
+{
+    int level = -1;
+    if ((*(str.end() - 1)) != right || str[0] == left) {
+        return { false, {"", ""} };
+    }
+
+    std::string operatorContent = "";
+    std::string leftPart;
+
+    std::string operatorContentRight = "";
+
+    for (int i = str.size() - 1; i >= 0; i--) {
+        if (str[i] == right) {
+            level++;
+        }
+        else if (str[i] == left) {
+            level--;
+        }
+        if (level == -1) {
+            leftPart = str.substr(0, i);
+            break;
+        }
+        operatorContent += str[i];
+    }
+
+    for (int i = operatorContent.size() - 1; i >= 0; i--) {
+        operatorContentRight += operatorContent[i];
+    }
+
+    return { true, {leftPart, operatorContentRight.substr(0, operatorContentRight.size() - 1)} };
 }
 
 int O::Analyser::stringNotInFunction(std::string str, std::string toFind)
@@ -240,6 +282,14 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::string str)
         }
     }
 
+    auto isOp = doubleBracketOperator(str, '[', ']');
+    if (isOp.first) {
+        t.type = Type::MathematicalOperator;
+        t.token = "[]a";
+        t.childToken = { StringToTree(isOp.second.first), StringToTree(isOp.second.second) };
+        return t;
+    }
+
     for (int i = 0; i < sizeof(unarMathOperators); i++) {
         if (str[0] == unarMathOperators[i]) {
             t.type = Type::MathematicalOperator;
@@ -331,6 +381,27 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         }
         Func.childToken.push_back(nameAndAntherData);
         return Func;
+    }
+    else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
+        res.token = "a[]";
+        res.type = Type::ServiceName;
+        res.forward = true;
+        std::string leftPart = str.substr(1, str.size() - 2);
+        if (leftPart != " ") {
+            leftPart = removeSpaceBars(leftPart);
+            auto isHaveNewElem = charNotInFunction(leftPart, ',');
+            while (isHaveNewElem != -1)
+            {
+                auto splited = sliceString(leftPart, isHaveNewElem);
+                res.childToken.push_back(StringToTree(splited.first));
+                leftPart = splited.second;
+                isHaveNewElem = charNotInFunction(leftPart, ',');
+            }
+
+            if (leftPart.size() != 0) {
+                res.childToken.push_back(StringToTree(leftPart));
+            }
+        }
     }
     else {
         if (isDefaultServiceName(str)) {

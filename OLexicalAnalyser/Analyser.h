@@ -53,6 +53,7 @@ namespace O {
 		static int charNotInBrackets(std::string str, char c);
 		static int charNotInQuets(std::string str, char c);
 		static int charNotInFunction(std::string str, char c);
+		static std::pair<bool, std::pair<std::string, std::string>> doubleBracketOperator(std::string str, char left, char right);
 		static int stringNotInFunction(std::string str, std::string toFind);
 		static bool isDefaultServiceName(std::string str);
 		static bool isNumber(std::string str);

@@ -15,6 +15,12 @@
 #define POINTER_ACCESS_INSTRUCTION_TOKEN "~"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 
+#define ARRAY_CREATION_TOKEN "a[]"
+#define ARRAY_CREATION_NAME "ARRAY_INIT"
+
+#define ARRAY_ELEMENT_ACCESS_TOKEN "[]a"
+#define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
+
 #define IF_NAME "if"
 #define ELSE_NAME "else"
 #define ELIF_NAME "else if"
@@ -177,6 +183,71 @@ Instruction O::SematicAnalyser::proccessPointerAccess(Analyser::Token token)
 	retInst.Parameters.push_back(inst);
 
 	return retInst;
+}
+
+Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token token)
+{
+	if (token.childToken.size() != 2) {
+		throw(std::exception("Invalid data at array access token"));
+	}
+
+	Instruction index = proccessInstCall(token.childToken[1]);
+	if (index.type != DataTypes::Integer) {
+		throw(std::exception("Array access operator only accepts integer values"));
+	}
+
+	Instruction dataSource = proccessInstCall(token.childToken[0]);
+
+	std::string reprasentation = dataTypeToString(dataSource.type, adt);
+	if (reprasentation[0] != '~') {
+		throw(std::exception("Array access operator can be only applied to pointer type values"));
+	}
+
+	reprasentation = reprasentation.substr(1, reprasentation.size() - 1);
+
+	Instruction toRet;
+	toRet.type = stringToDataType(reprasentation, adt);
+	toRet.name = ARRAY_ELEMENT_ACCESS_NAME;
+	toRet.Parameters.push_back(index);
+	toRet.Parameters.push_back(dataSource);
+
+
+	return toRet;
+}
+
+Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token token)
+{
+	if (token.forward) {
+		if (token.childToken.size() == 0) {
+			throw(std::exception("Creating array with zero elemnts is prohibited"));
+		}
+
+		Instruction toRet;
+		toRet.name = ARRAY_CREATION_NAME;
+		Instruction instSize;
+		instSize.name = token.childToken.size();
+		instSize.type = DataTypes::Integer;
+		toRet.Parameters.push_back(instSize);
+
+		for (int i = 0; i < token.childToken.size(); i++) {
+			toRet.Parameters.push_back(proccessInstCall(token.childToken[i]));
+			if (i != 0) {
+				if (toRet.Parameters[i - 1].type != toRet.Parameters[i].type) {
+					throw(std::exception("Array can contain only elements of one type"));
+				}
+			}
+		}
+		Analyser::Token typeToken;
+		typeToken.token = "~";
+		Analyser::Token instTypeToken;
+		instTypeToken.token = dataTypeToString(toRet.Parameters[0].type, adt);
+		typeToken.childToken.push_back(instTypeToken);
+		toRet.type = getDataType(typeToken);
+		return toRet;
+	}
+	else {
+		throw(std::exception("Invalid data at array initialisator"));
+	}
 }
 
 Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
@@ -426,6 +497,9 @@ Instruction O::SematicAnalyser::proccessSetInstruction(Analyser::Token token)
 		else if (destination.token == POINTER_ACCESS_INSTRUCTION_TOKEN) {
 			destInstr = proccessPointerAccess(destination);
 		}
+		else if (destination.token == ARRAY_ELEMENT_ACCESS_TOKEN) {
+			destInstr = proccessArrayAccessInstruction(destination);
+		}
 		else {
 			throw(std::exception("Unexpected destination at \"=\" operator"));
 		}
@@ -560,6 +634,9 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 		else if(token.token == POINTER_ACCESS_INSTRUCTION_TOKEN) {
 			return proccessPointerAccess(token);
 		}
+		else if (token.token == ARRAY_ELEMENT_ACCESS_TOKEN) {
+			return proccessArrayAccessInstruction(token);
+		}
 	}
 	else if (token.type == Analyser::Type::Number) {
 		res.name = token.token;
@@ -590,6 +667,10 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 						res.name = TRUE_NAME;
 						res.type = DataTypes::Boolean;
 					}
+		}
+		// обработка создания массива
+		if (token.token == ARRAY_CREATION_TOKEN) {
+			return proccessArrayCreationInstruction(token);
 		}
 	}
 			else if (token.type == Analyser::Type::Name) {
