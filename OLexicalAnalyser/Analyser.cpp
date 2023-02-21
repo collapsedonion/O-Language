@@ -24,6 +24,7 @@ std::string O::Analyser::defaultServiceNames[] = {
     "void",
     "false",
     "true",
+    "while",
     "return"
 };
 

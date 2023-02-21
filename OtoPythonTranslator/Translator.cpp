@@ -5,6 +5,7 @@
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
 #define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
 #define ARRAY_CREATION_NAME "ARRAY_INIT"
+#define WHILE_CYCLE_NAME "WHILE_CYCLE"
 
 std::string Translator::getPrefix()
 {
@@ -159,6 +160,20 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
         }
         else if (inst.name == ARRAY_ELEMENT_ACCESS_NAME) {
             return proccessInstruction(inst.Parameters[1]) + "[" + proccessInstruction(inst.Parameters[0]) + "]";
+        }
+        else if (inst.name == WHILE_CYCLE_NAME) {
+            std::string toRet = "while " + proccessInstruction(inst.Parameters[0]) + ":\n";
+            level += 1;
+            if (inst.Parameters.size() == 1) {
+                toRet += getPrefix() + "pass\n";
+            }
+            else {
+                for (int i = 1; i < inst.Parameters.size(); i++) {
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i]);
+                }
+            }
+            level -= 1;
+            return toRet;
         }
         else {
             return inst.name;

@@ -17,6 +17,8 @@ namespace O {
 		std::vector<Instruction> instructions;
 		std::vector<Function> functions;
 		std::vector<Operator> operators = {
+			Operator("<", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
+			Operator(">", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
 			Operator("?", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
 			Operator("+", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
 			Operator("-", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
@@ -43,6 +45,7 @@ namespace O {
 	
 		Instruction proccessPointerAccess(Analyser::Token token);
 
+		Instruction proccessWhileCycleInstruction(Analyser::TokenisedFile token);
 		Instruction proccessArrayAccessInstruction(Analyser::Token token);
 		Instruction proccessArrayCreationInstruction(Analyser::Token token);
 		Instruction proccessReturnCall(Analyser::Token token);

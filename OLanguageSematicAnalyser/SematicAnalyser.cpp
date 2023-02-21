@@ -15,6 +15,9 @@
 #define POINTER_ACCESS_INSTRUCTION_TOKEN "~"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 
+#define WHILE_CYCLE_TOKEN "while"
+#define WHILE_CYCLE_NAME "WHILE_CYCLE"
+
 #define ARRAY_CREATION_TOKEN "a[]"
 #define ARRAY_CREATION_NAME "ARRAY_INIT"
 
@@ -183,6 +186,30 @@ Instruction O::SematicAnalyser::proccessPointerAccess(Analyser::Token token)
 	retInst.Parameters.push_back(inst);
 
 	return retInst;
+}
+
+Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::TokenisedFile token)
+{
+	if (token.name.childToken.size() != 1) {
+		throw(std::exception("While instrucion require at least one argument"));
+	}
+
+	Instruction inst = proccessInstCall(token.name.childToken[0]);
+
+	if (inst.type != DataTypes::Boolean) {
+		throw(std::exception("While instruction only works with boolean values"));
+	}
+
+	Instruction toRet;
+	toRet.name = WHILE_CYCLE_NAME;
+	toRet.type = DataTypes::Void;
+	toRet.Parameters.push_back(inst);
+
+	for (int i = 0; i < token.subToken.size(); i++) {
+		toRet.Parameters.push_back(ProcessToken(token.subToken[i], false));
+	}
+
+	return toRet;
 }
 
 Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token token)
@@ -568,6 +595,15 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 			if (add) {
 				instructions.push_back(inst);
 			}
+			return inst;
+		}
+		else if (token.name.token == WHILE_CYCLE_TOKEN) {
+			inst = proccessWhileCycleInstruction(token);
+
+			if (add) {
+				instructions.push_back(inst);
+			}
+
 			return inst;
 		}
 		else {
