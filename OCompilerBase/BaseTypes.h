@@ -34,6 +34,9 @@ inline DataTypes stringToDataType(std::string str, AdditionalDataType adt) {
 	{
 		return DataTypes::FloatingPoint;
 	}
+	else if (str == "char") {
+		return DataTypes::Character;
+	}
 	else {
 		for (int i = 0; i < adt.lastId - 7; i++) {
 			if (adt.additionalName[i] == str) {

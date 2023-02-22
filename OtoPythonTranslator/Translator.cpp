@@ -176,6 +176,9 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
             return toRet;
         }
         else {
+            if (inst.type == DataTypes::Character) {
+                return "\'" + inst.name + "\'";
+            }
             return inst.name;
         }
     }

@@ -188,6 +188,30 @@ Instruction O::SematicAnalyser::proccessPointerAccess(Analyser::Token token)
 	return retInst;
 }
 
+Instruction O::SematicAnalyser::proccessString(Analyser::Token token)
+{
+	Analyser::Token t;
+	t.token = ARRAY_CREATION_TOKEN;
+	t.forward = true;
+	for (int i = 1; i < token.token.size() - 1; i++) {
+		Analyser::Token newC;
+		newC.type = Analyser::Type::Char;
+		if (token.token[i] == '\\'){
+			newC.token = "\\" + token.token[i + 1];
+			i++;
+		}
+		else {
+			newC.token = token.token[i];
+		}
+		t.childToken.push_back(newC);
+	}
+	Analyser::Token newC;
+	newC.type = Analyser::Type::Char;
+	newC.token= "\\0";
+	t.childToken.push_back(newC);
+	return proccessArrayCreationInstruction(t);
+}
+
 Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::TokenisedFile token)
 {
 	if (token.name.childToken.size() != 1) {
@@ -258,7 +282,7 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 
 		for (int i = 0; i < token.childToken.size(); i++) {
 			toRet.Parameters.push_back(proccessInstCall(token.childToken[i]));
-			if (i != 0) {
+			if (i != 0 && i != 1) {
 				if (toRet.Parameters[i - 1].type != toRet.Parameters[i].type) {
 					throw(std::exception("Array can contain only elements of one type"));
 				}
@@ -267,7 +291,7 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 		Analyser::Token typeToken;
 		typeToken.token = "~";
 		Analyser::Token instTypeToken;
-		instTypeToken.token = dataTypeToString(toRet.Parameters[0].type, adt);
+		instTypeToken.token = dataTypeToString(toRet.Parameters[1].type, adt);
 		typeToken.childToken.push_back(instTypeToken);
 		toRet.type = getDataType(typeToken);
 		return toRet;
@@ -673,6 +697,14 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 		else if (token.token == ARRAY_ELEMENT_ACCESS_TOKEN) {
 			return proccessArrayAccessInstruction(token);
 		}
+	}
+	else if (token.type == Analyser::Type::StringLiteral) {
+		return proccessString(token);
+	}
+	else if (token.type == Analyser::Type::Char) {
+		res.name = token.token;
+		res.type = DataTypes::Character;
+		return res;
 	}
 	else if (token.type == Analyser::Type::Number) {
 		res.name = token.token;

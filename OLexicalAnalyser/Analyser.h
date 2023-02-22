@@ -21,7 +21,8 @@ namespace O {
 			MathematicalOperator,
 			Number,
 			Name,
-			StringLiteral
+			StringLiteral,
+			Char,
 		};
 
 		struct Token {
