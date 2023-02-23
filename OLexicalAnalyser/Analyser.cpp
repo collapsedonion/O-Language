@@ -353,7 +353,24 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         Token nameAndAntherData;
         nameAndAntherData.token = "name";
         nameAndAntherData.type = Type::ServiceName;
-        nameAndAntherData.childToken.push_back(StringToTree(sliced.first));
+        sliced.first = removeSpaceBars(sliced.first);
+        int idOfSp = charNotInQuets(sliced.first, ' ');
+        if (idOfSp != -1) {
+            auto nameAndSL = sliceString(sliced.first, idOfSp);
+            nameAndAntherData.childToken.push_back(StringToTree(nameAndSL.first));
+            
+            if (nameAndAntherData.childToken[0].token == "operator") {
+                nameAndAntherData.childToken[0].type = Type::ServiceName;
+            }
+
+            Token nt;
+            nt.type = Type::MathematicalOperator;
+            nt.token = nameAndSL.second;
+            nameAndAntherData.childToken.push_back(nt);
+        }
+        else {
+            nameAndAntherData.childToken.push_back(StringToTree(sliced.first));
+        }
         leftFunctionPart = sliced.second;
         if (leftFunctionPart.size() > 1) {
             leftFunctionPart = leftFunctionPart.substr(0, leftFunctionPart.size() - 1);
