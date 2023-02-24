@@ -3,6 +3,8 @@ project(OLanguageSematicAnalyser)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include(../OLexicalAnalyser/CMakeLists.txt)
+
 include_directories(../OCompilerBase)
 include_directories(../OLexicalAnalyser)
 
