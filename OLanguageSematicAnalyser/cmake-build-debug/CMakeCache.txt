@@ -219,6 +219,15 @@ OLanguageSematicAnalyser_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 OLanguageSematicAnalyser_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser
 
+//Value Computed by CMake
+OLexicalAnalyser_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/cmake-build-debug
+
+//Value Computed by CMake
+OLexicalAnalyser_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OLexicalAnalyser_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser
+
 //Path to a library.
 SyntaxTreeBuilder:FILEPATH=SyntaxTreeBuilder-NOTFOUND
 

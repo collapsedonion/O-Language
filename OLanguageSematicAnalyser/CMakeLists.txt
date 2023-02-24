@@ -1,14 +1,12 @@
 cmake_minimum_required(VERSION 3.25)
+include(../OLexicalAnalyser/CMakeLists.txt)
 project(OLanguageSematicAnalyser)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include(../OLexicalAnalyser/CMakeLists.txt)
+add_library(OLanguageSematicAnalyser STATIC ../OLanguageSematicAnalyser/SematicAnalyser.cpp)
 
-include_directories(../OCompilerBase)
-include_directories(../OLexicalAnalyser)
+target_include_directories(OLanguageSematicAnalyser PRIVATE ../OCompilerBase)
+target_include_directories(OLanguageSematicAnalyser PRIVATE ../OLexicalAnalyser)
 
-add_library(OLanguageSematicAnalyser STATIC SematicAnalyser.cpp)
-
-find_library(SyntaxTreeBuilder ../OLexicalAnalyser/cmake-build-debug/libOLexicalAnalyser.a lib)
-target_link_libraries(OLanguageSematicAnalyser LINK_PUBLIC SyntaxTreeBuilder)
+target_link_libraries(OLanguageSematicAnalyser LINK_PUBLIC OLexicalAnalyser)

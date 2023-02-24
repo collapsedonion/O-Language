@@ -222,6 +222,33 @@ OCompilerMACOS_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 OCompilerMACOS_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
 
+//Value Computed by CMake
+OLanguageSematicAnalyser_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
+
+//Value Computed by CMake
+OLanguageSematicAnalyser_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OLanguageSematicAnalyser_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
+
+//Value Computed by CMake
+OLexicalAnalyser_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
+
+//Value Computed by CMake
+OLexicalAnalyser_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OLexicalAnalyser_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
+
+//Value Computed by CMake
+OtoPythonTranslator_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
+
+//Value Computed by CMake
+OtoPythonTranslator_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OtoPythonTranslator_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
+
 //Path to a library.
 SEMAN:FILEPATH=SEMAN-NOTFOUND
 

@@ -1,4 +1,7 @@
 # ninja log v5
-0	625	1677225904191268164	CMakeFiles/OLanguageSematicAnalyser.dir/SematicAnalyser.cpp.o	465d6d706c5e968b
-2	29	1677228055124905000	libOLanguageSematicAnalyser.a	b5e18e972fcde969
-2	24	1677228964905506000	libOLanguageSematicAnalyser.a	b5e18e972fcde969
+495	514	1677244498715063000	libOLanguageSematicAnalyser.a	b5e18e972fcde969
+0	54	1677244893984734758	build.ninja	617d51964b6ad702
+0	495	1677244498691800283	CMakeFiles/OLanguageSematicAnalyser.dir/SematicAnalyser.cpp.o	465d6d706c5e968b
+3	186	1677244963335420765	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/pch.cpp.o	ddb1a84a37ad985c
+3	265	1677244963414468571	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/Analyser.cpp.o	aebada8f6ba4dd95
+265	281	1677244963432613000	libOLexicalAnalyser.a	36dff39ae2096dd1

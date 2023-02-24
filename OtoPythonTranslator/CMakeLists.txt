@@ -3,6 +3,6 @@ project(OtoPythonTranslator)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(OtoPythonTranslator STATIC pch.cpp Call.cpp Translator.cpp)
+add_library(OtoPythonTranslator STATIC ../OtoPythonTranslator/pch.cpp ../OtoPythonTranslator/Call.cpp ../OtoPythonTranslator/Translator.cpp)
 
 target_include_directories(OtoPythonTranslator PUBLIC ../OCompilerBase)

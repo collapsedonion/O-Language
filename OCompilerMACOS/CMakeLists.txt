@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.25)
+
+include(../OLanguageSematicAnalyser/CMakeLists.txt)
+include(../OtoPythonTranslator/CMakeLists.txt)
+
 project(OCompilerMACOS)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(../OLanguageSematicAnalyser)
-include_directories(../OCompilerBase)
-include_directories(../OtoPythonTranslator)
-include_directories(../OLexicalAnalyser)
-
-link_directories(../OLexicalAnalyser/cmake-build-debug)
-link_directories(../OLanguageSematicAnalyser/cmake-build-debug)
-link_directories(../OtoPythonTranslator/cmake-build-debug)
-
 add_executable(OCompilerMAC main.cpp)
 
+target_include_directories(OCompilerMAC PRIVATE ../OLanguageSematicAnalyser)
+target_include_directories(OCompilerMAC PRIVATE ../OCompilerBase)
+target_include_directories(OCompilerMAC PRIVATE ../OtoPythonTranslator)
+target_include_directories(OCompilerMAC PRIVATE ../OLexicalAnalyser)
+/Users/romantimofeev/Documents/CodingProjects/OTest/main.olf
 target_link_libraries(OCompilerMAC LINK_PUBLIC OLexicalAnalyser)
 
 target_link_libraries(OCompilerMAC LINK_PUBLIC OLanguageSematicAnalyser)
