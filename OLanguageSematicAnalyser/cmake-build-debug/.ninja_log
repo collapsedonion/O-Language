@@ -1,0 +1,4 @@
+# ninja log v5
+0	625	1677225904191268164	CMakeFiles/OLanguageSematicAnalyser.dir/SematicAnalyser.cpp.o	465d6d706c5e968b
+2	29	1677228055124905000	libOLanguageSematicAnalyser.a	b5e18e972fcde969
+2	24	1677228964905506000	libOLanguageSematicAnalyser.a	b5e18e972fcde969

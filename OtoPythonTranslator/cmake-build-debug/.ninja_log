@@ -1,0 +1,10 @@
+# ninja log v5
+479	525	1677231079204957386	libOtoPythonTranslator.dylib	32db2989bb6c30b6
+1	479	1677231079157173172	CMakeFiles/OtoPythonTranslator.dir/Translator.cpp.o	89e2184c00ec7c9f
+0	477	1677231079155323256	CMakeFiles/OtoPythonTranslator.dir/Call.cpp.o	1ef6aca71a834f9a
+0	436	1677231079113205160	CMakeFiles/OtoPythonTranslator.dir/pch.cpp.o	6960626198696f8
+1	49	1677231356853674593	build.ninja	e4a5d780767a88db
+2	456	1677231357314029617	CMakeFiles/OtoPythonTranslator.dir/pch.cpp.o	26bf3ad907dc6878
+3	497	1677231357355927719	CMakeFiles/OtoPythonTranslator.dir/Call.cpp.o	7a3c6deee0930d8d
+3	498	1677231357357757886	CMakeFiles/OtoPythonTranslator.dir/Translator.cpp.o	aa95f6d83e517021
+498	519	1677231357380211000	libOtoPythonTranslator.a	18c500984ad2b24c

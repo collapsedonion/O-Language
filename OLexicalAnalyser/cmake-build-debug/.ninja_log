@@ -1,0 +1,5 @@
+# ninja log v5
+0	218	1677223846261757849	CMakeFiles/OLexicalAnalyser.dir/pch.cpp.o	b88921b3c8f2b170
+298	316	1677223910499065000	libOLexicalAnalyser.a	797da01086f9fca1
+3	298	1677223910479140926	CMakeFiles/OLexicalAnalyser.dir/Analyser.cpp.o	188a707e6099348d
+4	36	1677228960989887000	libOLexicalAnalyser.a	797da01086f9fca1
