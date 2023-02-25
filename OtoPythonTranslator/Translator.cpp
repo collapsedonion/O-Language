@@ -204,10 +204,28 @@ std::string Translator::proccessFunction(Function f, AdditionalDataType adt)
                 break;
             case '+':
                 functionName += "add";
+                break;
             case '-':
                 functionName += "minus";
+                break;
             case '/':
                 functionName += "div";
+                break;
+            case '&':
+                functionName += "and";
+                break;
+            case '|':
+                functionName += "or";
+                break;
+            case '<':
+                functionName += "less";
+                break;
+            case '>':
+                functionName += "greater";
+            case '?':
+                functionName += "equal";
+            default:
+                functionName += f.name;
         }
     }else {
         functionName += f.name;

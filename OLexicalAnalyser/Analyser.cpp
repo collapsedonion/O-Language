@@ -9,6 +9,8 @@ char O::Analyser::mathOperators[] = {
     '+',
     '*',
     '/',
+    '|',
+    '&'
 };
 
 char O::Analyser::unarMathOperators[] = {
