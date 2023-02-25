@@ -419,9 +419,19 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 
 		if (token.name.childToken[1].type == Analyser::Type::ServiceName && token.name.childToken[1].token == "name" && token.name.childToken[1].childToken.size() >= 1) {
 			auto nameField = token.name.childToken[1];
-			func.name = nameField.childToken[0].token;
-			std::vector<DataTypes> dt;
-			for (int i = 1; i < nameField.childToken.size(); i++) {
+            int argOffset = 1;
+            if(nameField.type == O::Analyser::Type::ServiceName
+                && nameField.childToken.size() >= 2
+                && nameField.childToken[0].token == "operator"){
+                std::string resultToken = nameField.childToken[1].token.substr(1, 1);
+                func.name = resultToken;
+                argOffset = 2;
+            }else {
+                func.name = nameField.childToken[0].token;
+            }
+            std::vector<DataTypes> dt;
+
+			for (int i = argOffset; i < nameField.childToken.size(); i++) {
 				auto funcArgName = nameField.childToken[i];
 				if (funcArgName.childToken.size() != 1 || funcArgName.childToken[0].type != Analyser::Type::ServiceName) {
 					throw(std::exception());
@@ -465,6 +475,13 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 				std::string message = "Function redefinition \"" + func.name + "\"";
 				throw(std::exception());
 			}
+            if (argOffset == 2){
+                if(func.arguments.size() != 2){
+                    throw(std::exception());
+                }
+                auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
+                operators.push_back(newOp);
+            }
 			functions.push_back(func);
 		}
 		else {
@@ -660,6 +677,7 @@ File O::SematicAnalyser::getFileRepresantation()
 	f.functions = std::vector<Function>(functions);
 	f.instructions = std::vector<Instruction>(instructions);
 	f.variables = std::vector<Variable>(variables);
+    f.operators = std::vector<Operator>(operators);
 	f.adtTable = adt;
 
 	return f;
@@ -711,10 +729,8 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 		res.type = getTypeOfNumber(token.token);
 	}
 	else if (token.type == Analyser::Type::ServiceName) {
-		// обработка логических имён
 		if (true)
 		{
-			// обработка ключевых слов для лжи
 #ifdef FALSE_LITERAL_SECONDARY_ACTIVE 
 			if (token.token == FALSE_LITERAL_DEFAULT_NAME || token.token == FALSE_LITERAL_SECONDARY_NAME) {
 #endif // FALSE_LITERAL_SECONDARY_ACTIVE 
@@ -725,7 +741,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 					res.type = DataTypes::Boolean;
 				}
 
-				// обработка ключевых слов для истины
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 #ifdef TRUE_LITERAL_SECONDARY_ACTIVE 
 				if (token.token == TRUE_LITERAL_DEFAULT_NAME || token.token == TRUE_LITERAL_SECONDARY_NAME) {
 #endif // TRUE_LITERAL_SECONDARY_ACTIVE 
@@ -736,7 +752,6 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 						res.type = DataTypes::Boolean;
 					}
 		}
-		// обработка создания массива
 		if (token.token == ARRAY_CREATION_TOKEN) {
 			return proccessArrayCreationInstruction(token);
 		}

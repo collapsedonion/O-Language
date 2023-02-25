@@ -58,23 +58,29 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
     }
     else {
         if (inst.IsFunction) {
-            std::string toRet = inst.name + "(";
-            for (auto v : inst.Parameters) {
-                toRet += "[" + proccessInstruction(v) + "]";
-                toRet += ",";
-            }
-            if (inst.Parameters.size() != 0) {
-                toRet = toRet.substr(0, toRet.size() - 1);
-            }
-            toRet += ")";
+            std::string toRet = generateFunctionCall(inst.name, inst.Parameters);
             toRet = funcAdd ? toRet + "\n" : toRet;
             return toRet;
         }
         else if (inst.ArithmeticProccess) {
-            if (inst.name == "?") {
-                inst.name = "==";
+            std::vector<DataTypes> argumentsDataTypes;
+
+            for(auto elem : inst.Parameters){
+                argumentsDataTypes.push_back(elem.type);
             }
-            return "(" + proccessInstruction(inst.Parameters[0]) + ")" + inst.name + "(" + proccessInstruction(inst.Parameters[1]) + ")";
+
+            auto getName = getOperatorFunction(inst.name, argumentsDataTypes);
+
+            if(getName == "") {
+                if (inst.name == "?") {
+                    inst.name = "==";
+                }
+
+                return "(" + proccessInstruction(inst.Parameters[0]) + ")" + inst.name + "(" +
+                       proccessInstruction(inst.Parameters[1]) + ")";
+            }else{
+                return generateFunctionCall(inst.name, inst.Parameters);
+            }
         }
         else if (inst.name == "if") {
             std::string toRet;
@@ -185,9 +191,33 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
     return std::string();
 }
 
-std::string Translator::proccessFunction(Function f)
+std::string Translator::proccessFunction(Function f, AdditionalDataType adt)
 {
-    std::string ret = "def " + f.name + "(";
+    std::string functionName;
+
+    functionName += dataTypeToString(f.returnType, adt);
+
+    if(f.name.size() == 1){
+        switch (f.name[0]) {
+            case '*':
+                functionName += "mul";
+                break;
+            case '+':
+                functionName += "add";
+            case '-':
+                functionName += "minus";
+            case '/':
+                functionName += "div";
+        }
+    }else {
+        functionName += f.name;
+    }
+
+    for(auto elem : f.arguments){
+        functionName += dataTypeToString(elem.type, adt);
+    }
+
+    std::string ret = "def " + functionName + "(";
 
     for (auto v : f.arguments) {
         ret += v.name;
@@ -210,17 +240,28 @@ std::string Translator::proccessFunction(Function f)
 
     level -= 1;
 
+    RegisteredFunction rf;
+    rf.Oname = f.name;
+    rf.compiledName = functionName;
+    for(auto elem : f.arguments){
+        rf.argumentsDT.push_back(elem.type);
+    }
+
+    registeredFunctions.push_back(rf);
+
     return ret;
 }
 
 void Translator::TranslateFile(File f)
 {
+    registeredOperators = std::vector<Operator>(f.operators);
+
     for (auto var : f.variables) {
         file += handleVarCreation(var);
     }
 
     for (auto func : f.functions) {
-        file += proccessFunction(func);
+        file += proccessFunction(func, f.adtTable);
     }
 
     for (auto inst : f.instructions) {
@@ -231,4 +272,49 @@ void Translator::TranslateFile(File f)
 std::string Translator::getF()
 {
     return file;
+}
+
+std::string Translator::getRegisteredFunctionName(std::string name, std::vector<DataTypes> argDt) {
+
+    for(auto elem : registeredFunctions){
+        if(elem.Oname == name && elem.argumentsDT == argDt){
+            return  elem.compiledName;
+        }
+    }
+
+    return "";
+}
+
+std::string Translator::getOperatorFunction(std::string name, std::vector<DataTypes> argDt) {
+    if(argDt.size() != 2){
+        return "";
+    }
+
+    for(auto op : registeredOperators){
+        if(op.op == name && op.left == argDt[0] && op.right == argDt[1]){
+            return getRegisteredFunctionName(name, argDt);
+        }
+    }
+
+    return "";
+}
+
+std::string Translator::generateFunctionCall(std::string name, std::vector<Instruction> argumnets) {
+    std::vector<DataTypes> argTypes;
+
+    for(auto elem : argumnets){
+        argTypes.push_back(elem.type);
+    }
+
+    std::string toRet = getRegisteredFunctionName(name, argTypes) + "(";
+
+    for (auto v : argumnets) {
+        toRet += "[" + proccessInstruction(v) + "]";
+        toRet += ",";
+    }
+    if (argumnets.size() != 0) {
+        toRet = toRet.substr(0, toRet.size() - 1);
+    }
+    toRet += ")";
+    return toRet;
 }

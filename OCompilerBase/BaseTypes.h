@@ -171,6 +171,7 @@ struct File {
 	std::vector<Variable> variables;
 	std::vector<Function> functions;
 	std::vector<Instruction> instructions;
+    std::vector<Operator> operators;
 };
 
 typedef std::string(__stdcall *TranslateFunction)(File);
