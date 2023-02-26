@@ -16,6 +16,8 @@ namespace O {
 		std::vector<Variable> variablesCreatedAtThatField;
 		std::vector<Instruction> instructions;
 		std::vector<Function> functions;
+        std::vector<Function> functionsCreatedAtThatField;
+        std::vector<Function> exportedFunctions;
 		std::vector<Operator> operators = {
 			Operator("<", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
 			Operator(">", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
@@ -53,8 +55,8 @@ namespace O {
 		Instruction proccessIfInstruction(Analyser::TokenisedFile token);
 		Instruction proccessElseIfInstruction(Analyser::TokenisedFile token);
 		Instruction proccessElseInstruction(Analyser::TokenisedFile token);
-		Instruction proccessFuncInstrucion(Analyser::TokenisedFile token);
-		Instruction proccessVarInstruction(Analyser::Token token);
+		Instruction proccessFuncInstrucion(Analyser::TokenisedFile token, bool isExtern = false);
+		Instruction proccessVarInstruction(Analyser::Token token, bool isExtern = false);
 		Instruction proccessSetInstruction(Analyser::Token token);
 
 		Instruction ProcessToken(Analyser::TokenisedFile token, bool add = true);

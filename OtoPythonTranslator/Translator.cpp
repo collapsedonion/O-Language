@@ -31,7 +31,7 @@ std::string Translator::getDefaultInitialisator(DataTypes t)
     case DataTypes::FloatingPoint:
         return "[0.0]";
     case DataTypes::Boolean:
-        return "[false]";
+        return "[False]";
     case DataTypes::Character:
         return "[\"A\"]";
     case DataTypes::Error:
@@ -41,24 +41,24 @@ std::string Translator::getDefaultInitialisator(DataTypes t)
     }
 }
 
-std::string Translator::handleVarCreation(Variable v)
+std::string Translator::handleVarCreation(Variable v, AdditionalDataType adt)
 {
-    return v.name + "=" + getDefaultInitialisator(v.type) + "\n";
+    return "VV" + getType(dataTypeToString(v.type, adt)) + v.name + "=" + getDefaultInitialisator(v.type) + "\n";
 }
 
-std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
+std::string Translator::proccessInstruction(Instruction inst, AdditionalDataType adt, bool funcAdd)
 {
     if (inst.type == DataTypes::ServiceInstruction) {
         if (inst.name == "SET_VALUE") {
-            return proccessInstruction(inst.Parameters[0]) + "=" + proccessInstruction(inst.Parameters[1]) + "\n";
+            return proccessInstruction(inst.Parameters[0], adt) + "=" + proccessInstruction(inst.Parameters[1], adt) + "\n";
         }
     }
     else if (inst.IsVariable) {
-        return inst.name + "[0]";
+        return "VV" + getType(dataTypeToString(inst.type, adt)) + inst.name + "[0]";
     }
     else {
         if (inst.IsFunction) {
-            std::string toRet = generateFunctionCall(inst.name, inst.Parameters);
+            std::string toRet = generateFunctionCall(inst.name, inst.Parameters, adt);
             toRet = funcAdd ? toRet + "\n" : toRet;
             return toRet;
         }
@@ -76,41 +76,41 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
                     inst.name = "==";
                 }
 
-                return "(" + proccessInstruction(inst.Parameters[0]) + ")" + inst.name + "(" +
-                       proccessInstruction(inst.Parameters[1]) + ")";
+                return "(" + proccessInstruction(inst.Parameters[0], adt) + ")" + inst.name + "(" +
+                       proccessInstruction(inst.Parameters[1], adt) + ")";
             }else{
-                return generateFunctionCall(inst.name, inst.Parameters);
+                return generateFunctionCall(inst.name, inst.Parameters, adt);
             }
         }
         else if (inst.name == "if") {
             std::string toRet;
-            toRet += "if " + proccessInstruction(inst.Parameters[0]) + ":\n";
+            toRet += "if " + proccessInstruction(inst.Parameters[0], adt) + ":\n";
             level += 1;
             if (inst.Parameters.size() == 1) {
                 toRet += getPrefix() + "pass\n";
             }
             else {
                 for (int i = 1; i < inst.Parameters.size(); i++) {
-                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i]);
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt);
                 }
             }
             level -= 1;
-            return toRet;
+            return toRet + "\n";
         }
         else if (inst.name == "else if") {
             std::string toRet;
-            toRet += "elif " + proccessInstruction(inst.Parameters[0]) + ":\n";
+            toRet += "elif " + proccessInstruction(inst.Parameters[0], adt) + ":\n";
             level += 1;
             if (inst.Parameters.size() == 1) {
                 toRet += getPrefix() + "pass\n";
             }
             else {
                 for (int i = 1; i < inst.Parameters.size(); i++) {
-                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i]);
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt);
                 }
             }
             level -= 1;
-            return toRet;
+            return toRet + "\n";
         }
         else if (inst.name == "else") {
             std::string toRet;
@@ -121,14 +121,14 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
             }
             else {
                 for (int i = 0; i < inst.Parameters.size(); i++) {
-                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i]);
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt);
                 }
             }
             level -= 1;
-            return toRet;
+            return toRet + "\n";
         }
         else if (inst.name == "return") {
-            return "return " + proccessInstruction(inst.Parameters[0]) + "\n";
+            return "return " + proccessInstruction(inst.Parameters[0], adt) + "\n";
         }
         else if (inst.name == "TRUE") {
             return "True";
@@ -137,7 +137,7 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
             return "False";
         }
         else if (inst.name == POINTER_GET_INSTRUCTION_NAME) {
-            std::string r = proccessInstruction(inst.Parameters[0]);
+            std::string r = proccessInstruction(inst.Parameters[0], adt);
             if (inst.Parameters[0].IsVariable) {
                 r = r.substr(0, r.size() - 3);
                 return r;
@@ -151,12 +151,12 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
 
         }
         else if (inst.name == POINTER_ACCESS_INSTRUCTION_NAME) {
-            return proccessInstruction(inst.Parameters[0]) + "[0]";
+            return proccessInstruction(inst.Parameters[0], adt) + "[0]";
         }
         else if (inst.name == ARRAY_CREATION_NAME) {
             std::string toRet = "[";
             for (int i = 1; i < inst.Parameters.size(); i++) {
-                toRet += proccessInstruction(inst.Parameters[i]);
+                toRet += proccessInstruction(inst.Parameters[i], adt);
 
                 if (i != inst.Parameters.size() - 1) {
                     toRet += ",";
@@ -165,21 +165,21 @@ std::string Translator::proccessInstruction(Instruction inst, bool funcAdd)
             return toRet + "]";
         }
         else if (inst.name == ARRAY_ELEMENT_ACCESS_NAME) {
-            return proccessInstruction(inst.Parameters[1]) + "[" + proccessInstruction(inst.Parameters[0]) + "]";
+            return proccessInstruction(inst.Parameters[1], adt) + "[" + proccessInstruction(inst.Parameters[0], adt) + "]";
         }
         else if (inst.name == WHILE_CYCLE_NAME) {
-            std::string toRet = "while " + proccessInstruction(inst.Parameters[0]) + ":\n";
+            std::string toRet = "while " + proccessInstruction(inst.Parameters[0], adt) + ":\n";
             level += 1;
             if (inst.Parameters.size() == 1) {
                 toRet += getPrefix() + "pass\n";
             }
             else {
                 for (int i = 1; i < inst.Parameters.size(); i++) {
-                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i]);
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt);
                 }
             }
             level -= 1;
-            return toRet;
+            return toRet + "\n";
         }
         else {
             if (inst.type == DataTypes::Character) {
@@ -195,7 +195,7 @@ std::string Translator::proccessFunction(Function f, AdditionalDataType adt)
 {
     std::string functionName;
 
-    functionName += dataTypeToString(f.returnType, adt);
+    functionName += getType(dataTypeToString(f.returnType, adt));
 
     if(f.name.size() == 1){
         switch (f.name[0]) {
@@ -232,7 +232,7 @@ std::string Translator::proccessFunction(Function f, AdditionalDataType adt)
     }
 
     for(auto elem : f.arguments){
-        functionName += dataTypeToString(elem.type, adt);
+        functionName += getType(dataTypeToString(elem.type, adt));
     }
 
     std::string ret = "def " + functionName + "(";
@@ -249,11 +249,11 @@ std::string Translator::proccessFunction(Function f, AdditionalDataType adt)
     level += 1;
 
     for (auto var : f.variables) {
-        ret += getPrefix() + handleVarCreation(var);
+        ret += getPrefix() + handleVarCreation(var, adt);
     }
 
     for (auto inst : f.body) {
-        ret += getPrefix() + proccessInstruction(inst, true);
+        ret += getPrefix() + proccessInstruction(inst, adt, true);
     }
 
     level -= 1;
@@ -275,7 +275,7 @@ void Translator::TranslateFile(File f)
     registeredOperators = std::vector<Operator>(f.operators);
 
     for (auto var : f.variables) {
-        file += handleVarCreation(var);
+        file += handleVarCreation(var, f.adtTable);
     }
 
     for (auto func : f.functions) {
@@ -283,7 +283,7 @@ void Translator::TranslateFile(File f)
     }
 
     for (auto inst : f.instructions) {
-        file += proccessInstruction(inst, true);
+        file += proccessInstruction(inst,f.adtTable, true);
     }
 }
 
@@ -317,7 +317,7 @@ std::string Translator::getOperatorFunction(std::string name, std::vector<DataTy
     return "";
 }
 
-std::string Translator::generateFunctionCall(std::string name, std::vector<Instruction> argumnets) {
+std::string Translator::generateFunctionCall(std::string name, std::vector<Instruction> argumnets, AdditionalDataType adt) {
     std::vector<DataTypes> argTypes;
 
     for(auto elem : argumnets){
@@ -327,7 +327,7 @@ std::string Translator::generateFunctionCall(std::string name, std::vector<Instr
     std::string toRet = getRegisteredFunctionName(name, argTypes) + "(";
 
     for (auto v : argumnets) {
-        toRet += "[" + proccessInstruction(v) + "]";
+        toRet += "[" + proccessInstruction(v, adt) + "]";
         toRet += ",";
     }
     if (argumnets.size() != 0) {
@@ -335,4 +335,27 @@ std::string Translator::generateFunctionCall(std::string name, std::vector<Instr
     }
     toRet += ")";
     return toRet;
+}
+
+std::string Translator::getType(std::string type) {
+    std::string toRet;
+    for(auto c : type){
+        if(c == '~'){
+            toRet += "PP";
+        }else{
+            toRet += c;
+        }
+    }
+
+    return toRet;
+}
+
+Translator::RegisteredFunction::RegisteredFunction() {
+
+}
+
+Translator::RegisteredFunction::RegisteredFunction(std::string name, std::string OName, std::vector<DataTypes> argsDt) {
+    this->Oname = OName;
+    this->compiledName = name;
+    this->argumentsDT = argsDt;
 }

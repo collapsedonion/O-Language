@@ -23,6 +23,7 @@ std::string O::Analyser::defaultServiceNames[] = {
     "int",
     "bool",
     "float",
+    "char",
     "void",
     "false",
     "true",
@@ -319,6 +320,14 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
 
         return res;
     }
+    if (str & "extern:"){
+        res.token = "extern";
+        res.type = Type::ServiceName;
+        int idOfSpace = charNotInFunction(str, ':');
+        auto splited = sliceString(str, idOfSpace);
+        res.childToken.push_back(StringToTree(splited.second));
+        return res;
+    }
     
     if (idOfVar == 0) {
         int idOfDoubleDot = charNotInFunction(str, ':');
@@ -435,6 +444,10 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         else if (isString(str)) {
             res.token = str;
             res.type = Type::StringLiteral;
+        }
+        else if ((str.size() == 3 || str.size() == 4) && str[0] == '\'' && ((str.size() == 3 && str[2] == '\'') || (str.size() == 4 && str[3] == '\''))){
+            res.token = str.substr(1, str.size()-2);
+            res.type = Type::Char;
         }
         else {
             int idOfBracket = charNotInQuets(str, '(');

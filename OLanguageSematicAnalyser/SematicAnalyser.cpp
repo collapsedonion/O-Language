@@ -15,6 +15,8 @@
 #define POINTER_ACCESS_INSTRUCTION_TOKEN "~"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 
+#define EXTERN_DEFINITION_TOKEN "extern"
+
 #define WHILE_CYCLE_TOKEN "while"
 #define WHILE_CYCLE_NAME "WHILE_CYCLE"
 
@@ -229,8 +231,20 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 	toRet.type = DataTypes::Void;
 	toRet.Parameters.push_back(inst);
 
-	for (int i = 0; i < token.subToken.size(); i++) {
-		toRet.Parameters.push_back(ProcessToken(token.subToken[i], false));
+	if(token.subToken.size() != 0) {
+		SematicAnalyser sa;
+		sa.adt = adt;
+		sa.operators = std::vector<Operator>(operators);
+		sa.functions = std::vector<Function>(functions);
+		sa.variables = std::vector<Variable>(variables);
+
+		for(auto elem : token.subToken){
+			sa.ProcessToken(elem);
+		}
+
+		for (int i = 0; i < sa.instructions.size(); i++) {
+			toRet.Parameters.push_back(sa.instructions[i]);
+		}
 	}
 
 	return toRet;
@@ -395,7 +409,7 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
 	return toRet;
 }
 
-Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile token)
+Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile token, bool isExtern)
 {
 	
 	Instruction toRet;
@@ -451,12 +465,31 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 				dt.push_back(v.type);
 				func.arguments.push_back(v);
 			}
+
+            if (isExtern){
+                toRet.name = func.name;
+                toRet.type = func.returnType;
+                functions.push_back(func);
+                if(argOffset == 2) {
+                    if (func.arguments.size() != 2) {
+                        throw (std::exception());
+                    }
+                    auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
+                    operators.push_back(newOp);
+                }
+
+                if(token.subToken.size() == 0){
+                    return toRet;
+                }
+            }
+
 			if (token.subToken.size() != 0) {
 				SematicAnalyser subSematicAnalyser;
 				subSematicAnalyser.adt = adt;
 				subSematicAnalyser.returnType = func.returnType;
 				subSematicAnalyser.variables = std::vector<Variable>(variables);
 				subSematicAnalyser.functions = std::vector<Function>(functions);
+				subSematicAnalyser.operators = std::vector<Operator>(operators);
 				for (auto elem : func.arguments) {
 					subSematicAnalyser.variables.push_back(elem);
 				}
@@ -465,7 +498,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 				}
 
 				if (func.returnType != DataTypes::Void && subSematicAnalyser.returnCalls == 0) {
-					std::string message = "Reqire at leas one return call at \"" + func.name + "\" function";
+					std::string message = "Require at leas one return call at \"" + func.name + "\" function";
 				}
 
 				func.variables = subSematicAnalyser.variablesCreatedAtThatField;
@@ -475,14 +508,21 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 				std::string message = "Function redefinition \"" + func.name + "\"";
 				throw(std::exception());
 			}
-            if (argOffset == 2){
-                if(func.arguments.size() != 2){
-                    throw(std::exception());
+            if(!isExtern) {
+                if (argOffset == 2){
+                    if(func.arguments.size() != 2){
+                        throw(std::exception());
+                    }
+                    auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
+                    operators.push_back(newOp);
                 }
-                auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
-                operators.push_back(newOp);
+
+                functions.push_back(func);
             }
-			functions.push_back(func);
+            else{
+                exportedFunctions.push_back(func);
+            }
+            functionsCreatedAtThatField.push_back(func);
 		}
 		else {
 			throw(std::exception());
@@ -497,7 +537,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 	return toRet;
 }
 
-Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token)
+Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bool isExtern)
 {
 	Instruction toRet;
 	toRet.IsVariable = true;
@@ -527,7 +567,9 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token)
 		v.name = toRet.name;
 		v.type = toRet.type;
 		variables.push_back(v);
-		variablesCreatedAtThatField.push_back(v);
+        if(!isExtern) {
+            variablesCreatedAtThatField.push_back(v);
+        }
 	}
 	else {
 		throw(std::exception());
@@ -604,6 +646,20 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 		else if (token.name.token == FUNC_CREATION_NAME) {
 			proccessFuncInstrucion(token);
 		}
+        else if (token.name.token == EXTERN_DEFINITION_TOKEN){
+            if(token.name.childToken.size() != 1){
+                throw std::exception();
+            }
+            if(token.name.childToken[0].token == VAR_CREATION_NAME){
+                proccessVarInstruction(token.name.childToken[0], true);
+            }
+            else if(token.name.childToken[0].token == FUNC_CREATION_NAME){
+                Analyser::TokenisedFile f;
+                f.name = token.name.childToken[0];
+                f.subToken = token.subToken;
+                proccessFuncInstrucion(f, true);
+            }
+        }
 	}
 	else {
 		if (token.name.token == IF_NAME) {
@@ -614,7 +670,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 				instructions.push_back(inst);
 			}
 			return inst;
-		} else if (token.name.token == ELIF_NAME) {
+		}
+        else if (token.name.token == ELIF_NAME) {
 			inst = proccessElseIfInstruction(token);
 
 			if (add) {
@@ -674,9 +731,9 @@ void O::SematicAnalyser::ProccessTokenisedFile(Analyser::TokenisedFile tf)
 File O::SematicAnalyser::getFileRepresantation()
 {
 	File f;
-	f.functions = std::vector<Function>(functions);
+	f.functions = std::vector<Function>(functionsCreatedAtThatField);
 	f.instructions = std::vector<Instruction>(instructions);
-	f.variables = std::vector<Variable>(variables);
+	f.variables = std::vector<Variable>(variablesCreatedAtThatField);
     f.operators = std::vector<Operator>(operators);
 	f.adtTable = adt;
 
