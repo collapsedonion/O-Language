@@ -328,6 +328,15 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         res.childToken.push_back(StringToTree(splited.second));
         return res;
     }
+
+    if (str & "struct:"){
+        res.token = "structure";
+        res.type = Type::ServiceName;
+        int idOfSeparator = charNotInFunction(str, ':');
+        auto splited = sliceString(str, idOfSeparator);
+        res.childToken.push_back(StringToTree(splited.second));
+        return res;
+    }
     
     if (idOfVar == 0) {
         int idOfDoubleDot = charNotInFunction(str, ':');
@@ -473,8 +482,15 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
                 }
             }
             else {
-                res.token = str;
-                res.type = Type::Name;
+                auto idOfSeparator = charNotInFunction(str, ' ');
+                if(idOfSeparator != -1){
+                    res.token = "__init__";
+                    auto splited = sliceString(str, idOfSeparator);
+                    res.childToken = {StringToTree(splited.first), StringToTree(splited.second)};
+                }else {
+                    res.token = str;
+                    res.type = Type::Name;
+                }
             }
         }
         

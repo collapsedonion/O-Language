@@ -91,3 +91,12 @@
 5	552	1677392463661538378	CMakeFiles/OtoPythonTranslator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/Translator.cpp.o	6c1ab52bd9a96d7e
 552	574	1677392463687054000	libOtoPythonTranslator.a	c8cb7533e67c8a3d
 574	627	1677392463739850267	OCompilerMAC	58d6890ca364275b
+4	606	1677413128946623549	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/Analyser.cpp.o	3771a3b45a95f38c
+606	627	1677413128971950000	libOLexicalAnalyser.a	36dff39ae2096dd1
+627	820	1677413129164659707	OCompilerMAC	58d6890ca364275b
+19	558	1677413557654909591	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/Analyser.cpp.o	3771a3b45a95f38c
+558	579	1677413557677872000	libOLexicalAnalyser.a	36dff39ae2096dd1
+579	619	1677413557717835451	OCompilerMAC	58d6890ca364275b
+6	697	1677413600121612458	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/Analyser.cpp.o	3771a3b45a95f38c
+697	724	1677413600152530000	libOLexicalAnalyser.a	36dff39ae2096dd1
+724	771	1677413600198778870	OCompilerMAC	58d6890ca364275b
