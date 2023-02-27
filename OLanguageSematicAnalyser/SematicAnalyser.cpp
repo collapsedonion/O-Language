@@ -17,6 +17,9 @@
 
 #define EXTERN_DEFINITION_TOKEN "extern"
 
+#define STRUCTURE_DEFINITION_TOKEN "structure"
+#define UNIT_DEFINITION_TOKEN "__init__"
+
 #define WHILE_CYCLE_TOKEN "while"
 #define WHILE_CYCLE_NAME "WHILE_CYCLE"
 
@@ -25,6 +28,7 @@
 
 #define ARRAY_ELEMENT_ACCESS_TOKEN "[]a"
 #define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
+#define STRUCTURE_ELEMENT_ACCESS_NAME "STRUCTURE_ACCESS"
 
 #define IF_NAME "if"
 #define ELSE_NAME "else"
@@ -237,6 +241,7 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 		sa.operators = std::vector<Operator>(operators);
 		sa.functions = std::vector<Function>(functions);
 		sa.variables = std::vector<Variable>(variables);
+        sa.definedStructures = std::vector<Structure>(definedStructures);
 
 		for(auto elem : token.subToken){
 			sa.ProcessToken(elem);
@@ -256,12 +261,30 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
 		throw(std::exception());
 	}
 
-	Instruction index = proccessInstCall(token.childToken[1]);
-	if (index.type != DataTypes::Integer) {
-		throw(std::exception());
-	}
+    Instruction dataSource = proccessInstCall(token.childToken[0]);
 
-	Instruction dataSource = proccessInstCall(token.childToken[0]);
+    auto structureTest = containsStructureByDataType(dataSource.type);
+
+    if(structureTest.first){
+        Variable destInfo;
+        for(auto v : structureTest.second.variables){
+            if(v.name == token.childToken[1].token){
+                destInfo = v;
+                break;
+            }
+        }
+        Instruction toRet;
+        toRet.type = destInfo.type;
+        toRet.name = STRUCTURE_ELEMENT_ACCESS_NAME;
+        Instruction ind;
+        ind.name = destInfo.name;
+        ind.type = DataTypes::Void;
+        toRet.Parameters.push_back(ind);
+        toRet.Parameters.push_back(dataSource);
+        return toRet;
+    }
+
+	Instruction index = proccessInstCall(token.childToken[1]);
 
 	std::string reprasentation = dataTypeToString(dataSource.type, adt);
 	if (reprasentation[0] != '~') {
@@ -270,12 +293,11 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
 
 	reprasentation = reprasentation.substr(1, reprasentation.size() - 1);
 
-	Instruction toRet;
-	toRet.type = stringToDataType(reprasentation, adt);
-	toRet.name = ARRAY_ELEMENT_ACCESS_NAME;
-	toRet.Parameters.push_back(index);
-	toRet.Parameters.push_back(dataSource);
-
+    Instruction toRet;
+    toRet.type = stringToDataType(reprasentation, adt);
+    toRet.name = ARRAY_ELEMENT_ACCESS_NAME;
+    toRet.Parameters.push_back(index);
+    toRet.Parameters.push_back(dataSource);
 
 	return toRet;
 }
@@ -409,132 +431,129 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
 	return toRet;
 }
 
-Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile token, bool isExtern)
-{
-	
-	Instruction toRet;
+Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile token, bool isExtern) {
 
-	if (token.name.childToken.size() != 2) {
-		throw(std::exception());
-	}
+    Instruction toRet;
+
+    if (token.name.childToken.size() != 2) {
+        throw (std::exception());
+    }
 
 
-	if (token.name.childToken[0].type == Analyser::Type::ServiceName) {
-		auto type = getDataType(token.name.childToken[0]);
+    auto type = getDataType(token.name.childToken[0]);
 
-		Function func;
+    Function func;
 
-		if (type == DataTypes::Error) {
-			std::string exceptionMessage = "Unexpected return type at function definition \"" + token.name.childToken[0].token + "\"";
-			throw(std::exception());
-		}
+    if (type == DataTypes::Error) {
+        std::string exceptionMessage =
+                "Unexpected return type at function definition \"" + token.name.childToken[0].token + "\"";
+        throw (std::exception());
+    }
 
-		func.returnType = type;
+    func.returnType = type;
 
-		if (token.name.childToken[1].type == Analyser::Type::ServiceName && token.name.childToken[1].token == "name" && token.name.childToken[1].childToken.size() >= 1) {
-			auto nameField = token.name.childToken[1];
-            int argOffset = 1;
-            if(nameField.type == O::Analyser::Type::ServiceName
-                && nameField.childToken.size() >= 2
-                && nameField.childToken[0].token == "operator"){
-                std::string resultToken = nameField.childToken[1].token.substr(1, 1);
-                func.name = resultToken;
-                argOffset = 2;
-            }else {
-                func.name = nameField.childToken[0].token;
+    if (token.name.childToken[1].type == Analyser::Type::ServiceName && token.name.childToken[1].token == "name" &&
+        token.name.childToken[1].childToken.size() >= 1) {
+        auto nameField = token.name.childToken[1];
+        int argOffset = 1;
+        if (nameField.type == O::Analyser::Type::ServiceName
+            && nameField.childToken.size() >= 2
+            && nameField.childToken[0].token == "operator") {
+            std::string resultToken = nameField.childToken[1].token.substr(1, 1);
+            func.name = resultToken;
+            argOffset = 2;
+        } else {
+            func.name = nameField.childToken[0].token;
+        }
+        std::vector<DataTypes> dt;
+
+        for (int i = argOffset; i < nameField.childToken.size(); i++) {
+            auto funcArgName = nameField.childToken[i];
+            if (funcArgName.childToken.size() != 1 || funcArgName.childToken[0].type != Analyser::Type::ServiceName) {
+                throw (std::exception());
             }
-            std::vector<DataTypes> dt;
+            auto funcArgType = getDataType(funcArgName.childToken[0]);
+            if (funcArgType == DataTypes::Error) {
+                std::string message =
+                        "Unrecognised data type at function argument \"" + funcArgName.childToken[0].token + "\"";
+                throw (std::exception());
+            }
+            Variable v;
+            v.name = funcArgName.token;
+            v.type = funcArgType;
 
-			for (int i = argOffset; i < nameField.childToken.size(); i++) {
-				auto funcArgName = nameField.childToken[i];
-				if (funcArgName.childToken.size() != 1 || funcArgName.childToken[0].type != Analyser::Type::ServiceName) {
-					throw(std::exception());
-				}
-				auto funcArgType = getDataType(funcArgName.childToken[0]);
-				if (funcArgType == DataTypes::Error) {
-					std::string message = "Unrecognised data type at function argument \"" + funcArgName.childToken[0].token + "\"";
-					throw(std::exception());
-				}
-				Variable v;
-				v.name = funcArgName.token;
-				v.type = funcArgType;
-				
-				if (contains(func.arguments, v)) {
-					throw(std::exception());
-				}
-				dt.push_back(v.type);
-				func.arguments.push_back(v);
-			}
+            if (contains(func.arguments, v)) {
+                throw (std::exception());
+            }
+            dt.push_back(v.type);
+            func.arguments.push_back(v);
+        }
 
-            if (isExtern){
-                toRet.name = func.name;
-                toRet.type = func.returnType;
-                functions.push_back(func);
-                if(argOffset == 2) {
-                    if (func.arguments.size() != 2) {
-                        throw (std::exception());
-                    }
-                    auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
-                    operators.push_back(newOp);
+        if (isExtern) {
+            toRet.name = func.name;
+            toRet.type = func.returnType;
+            functions.push_back(func);
+            if (argOffset == 2) {
+                if (func.arguments.size() != 2) {
+                    throw (std::exception());
                 }
+                auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
+                operators.push_back(newOp);
+            }
 
-                if(token.subToken.size() == 0){
-                    return toRet;
+            if (token.subToken.size() == 0) {
+                return toRet;
+            }
+        }
+
+        if (token.subToken.size() != 0) {
+            SematicAnalyser subSematicAnalyser;
+            subSematicAnalyser.adt = adt;
+            subSematicAnalyser.returnType = func.returnType;
+            subSematicAnalyser.variables = std::vector<Variable>(variables);
+            subSematicAnalyser.functions = std::vector<Function>(functions);
+            subSematicAnalyser.operators = std::vector<Operator>(operators);
+            subSematicAnalyser.definedStructures = std::vector<Structure>(definedStructures);
+            for (auto elem: func.arguments) {
+                subSematicAnalyser.variables.push_back(elem);
+            }
+            for (auto elem: token.subToken) {
+                subSematicAnalyser.ProcessToken(elem);
+            }
+
+            if (func.returnType != DataTypes::Void && subSematicAnalyser.returnCalls == 0) {
+                std::string message = "Require at leas one return call at \"" + func.name + "\" function";
+            }
+
+            func.variables = subSematicAnalyser.variablesCreatedAtThatField;
+            func.body = subSematicAnalyser.instructions;
+        }
+        if (containsFunction(func.name, dt) != DataTypes::Error) {
+            std::string message = "Function redefinition \"" + func.name + "\"";
+            throw (std::exception());
+        }
+        if (!isExtern) {
+            if (argOffset == 2) {
+                if (func.arguments.size() != 2) {
+                    throw (std::exception());
                 }
+                auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
+                operators.push_back(newOp);
             }
 
-			if (token.subToken.size() != 0) {
-				SematicAnalyser subSematicAnalyser;
-				subSematicAnalyser.adt = adt;
-				subSematicAnalyser.returnType = func.returnType;
-				subSematicAnalyser.variables = std::vector<Variable>(variables);
-				subSematicAnalyser.functions = std::vector<Function>(functions);
-				subSematicAnalyser.operators = std::vector<Operator>(operators);
-				for (auto elem : func.arguments) {
-					subSematicAnalyser.variables.push_back(elem);
-				}
-				for (auto elem : token.subToken) {
-					subSematicAnalyser.ProcessToken(elem);
-				}
+            functions.push_back(func);
+        } else {
+            exportedFunctions.push_back(func);
+        }
+        functionsCreatedAtThatField.push_back(func);
+    } else {
+        throw (std::exception());
+    }
+    toRet.name = func.name;
+    toRet.type = func.returnType;
 
-				if (func.returnType != DataTypes::Void && subSematicAnalyser.returnCalls == 0) {
-					std::string message = "Require at leas one return call at \"" + func.name + "\" function";
-				}
 
-				func.variables = subSematicAnalyser.variablesCreatedAtThatField;
-				func.body = subSematicAnalyser.instructions;
-			}
-			if (containsFunction(func.name, dt) != DataTypes::Error) {
-				std::string message = "Function redefinition \"" + func.name + "\"";
-				throw(std::exception());
-			}
-            if(!isExtern) {
-                if (argOffset == 2){
-                    if(func.arguments.size() != 2){
-                        throw(std::exception());
-                    }
-                    auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
-                    operators.push_back(newOp);
-                }
-
-                functions.push_back(func);
-            }
-            else{
-                exportedFunctions.push_back(func);
-            }
-            functionsCreatedAtThatField.push_back(func);
-		}
-		else {
-			throw(std::exception());
-		}
-		toRet.name = func.name;
-		toRet.type = func.returnType;
-	}
-	else {
-		throw(std::exception());
-	}
-
-	return toRet;
+    return toRet;
 }
 
 Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bool isExtern)
@@ -550,10 +569,6 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
 		}
 		std::string invalidDatatype = "Invalid data type name " + token.childToken[0].token;
 		auto exp = std::exception();
-
-		if (token.childToken[0].type != Analyser::Type::ServiceName) {
-			throw exp;
-		}
 
 		auto getType = getDataType(token.childToken[0]);
 
@@ -660,6 +675,9 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
                 proccessFuncInstrucion(f, true);
             }
         }
+        else if (token.name.token == STRUCTURE_DEFINITION_TOKEN){
+            inst = proccessStructureCreation(token);
+        }
 	}
 	else {
 		if (token.name.token == IF_NAME) {
@@ -728,6 +746,17 @@ void O::SematicAnalyser::ProccessTokenisedFile(Analyser::TokenisedFile tf)
 	throw(std::exception());
 }
 
+
+std::pair<bool, Structure> O::SematicAnalyser::containsStructureByDataType(DataTypes dt) {
+    for(auto s : definedStructures){
+        if(s.myDt == dt){
+            return {true, s};
+        }
+    }
+
+    return {false, Structure()};
+}
+
 File O::SematicAnalyser::getFileRepresantation()
 {
 	File f;
@@ -736,8 +765,45 @@ File O::SematicAnalyser::getFileRepresantation()
 	f.variables = std::vector<Variable>(variablesCreatedAtThatField);
     f.operators = std::vector<Operator>(operators);
 	f.adtTable = adt;
+    f.structures = std::vector<Structure>(definedStructures);
 
 	return f;
+}
+
+Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::TokenisedFile token) {
+    Structure newStruct;
+
+    newStruct.name = token.name.childToken[0].token;
+
+    if(stringToDataType(newStruct.name, adt) != DataTypes::Error){
+        throw std::exception();
+    }
+
+    for(auto elem : token.subToken){
+        if(elem.name.token == UNIT_DEFINITION_TOKEN){
+            Variable v;
+            if(elem.name.childToken.size() != 2){
+                throw std::exception();
+            }
+            v.type = getDataType(elem.name.childToken[0]);
+            v.name = elem.name.childToken[1].token;
+            newStruct.variables.push_back(v);
+        }
+    }
+
+    adt.lastId += 1;
+    adt.additionalNumber.push_back(adt.lastId);
+    adt.additionalName.push_back(newStruct.name);
+    newStruct.myDt = stringToDataType(newStruct.name, adt);
+
+    definedStructures.push_back(newStruct);
+
+    Instruction toRet;
+
+    toRet.name = newStruct.name;
+    toRet.type = newStruct.myDt;
+
+    return toRet;
 }
 
 Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)

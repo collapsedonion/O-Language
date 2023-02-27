@@ -18,6 +18,7 @@ namespace O {
 		std::vector<Function> functions;
         std::vector<Function> functionsCreatedAtThatField;
         std::vector<Function> exportedFunctions;
+        std::vector<Structure> definedStructures;
 		std::vector<Operator> operators = {
 			Operator("<", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
 			Operator(">", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
@@ -33,6 +34,7 @@ namespace O {
 		DataTypes containsFunction(std::string name, std::vector<DataTypes> dt);
 		bool containsVariable(std::string name);
 		bool containsOperator(std::string op, DataTypes left, DataTypes right);
+        std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
 		DataTypes getReturnDataTypeOfOperator(std::string op, DataTypes left, DataTypes right);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
@@ -48,6 +50,7 @@ namespace O {
 		Instruction proccessPointerAccess(Analyser::Token token);
 
 		Instruction proccessString(Analyser::Token token);
+        Instruction proccessStructureCreation(Analyser::TokenisedFile token);
 		Instruction proccessWhileCycleInstruction(Analyser::TokenisedFile token);
 		Instruction proccessArrayAccessInstruction(Analyser::Token token);
 		Instruction proccessArrayCreationInstruction(Analyser::Token token);

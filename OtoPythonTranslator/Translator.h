@@ -21,11 +21,14 @@ private:
 			})
 	};
     std::vector<Operator> registeredOperators;
+    std::vector<Structure> structures;
 	int level = 0;
 
 private:
 
     std::string getRegisteredFunctionName(std::string name, std::vector<DataTypes> argDt);
+
+    int getIndexOfElementInStructure(DataTypes structDt, std::string name);
 
 	std::string getType(std::string type);
 

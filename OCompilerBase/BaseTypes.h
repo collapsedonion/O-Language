@@ -141,6 +141,12 @@ struct Operator {
 	}
 };
 
+struct Structure{
+    std::string name;
+    DataTypes myDt;
+    std::vector<Variable> variables;
+};
+
 struct Instruction {
 	std::string name = "UNSIGNED_TOKEN";
 	DataTypes type = DataTypes::Error;
@@ -172,6 +178,7 @@ struct File {
 	std::vector<Function> functions;
 	std::vector<Instruction> instructions;
     std::vector<Operator> operators;
+    std::vector<Structure> structures;
 };
 
 typedef std::string(__stdcall *TranslateFunction)(File);

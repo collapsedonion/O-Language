@@ -5,6 +5,7 @@
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
 #define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
 #define ARRAY_CREATION_NAME "ARRAY_INIT"
+#define STRUCTURE_ELEMENT_ACCESS_NAME "STRUCTURE_ACCESS"
 #define WHILE_CYCLE_NAME "WHILE_CYCLE"
 
 std::string Translator::getPrefix()
@@ -37,6 +38,22 @@ std::string Translator::getDefaultInitialisator(DataTypes t)
     case DataTypes::Error:
         return "";
     default:
+        for(auto elem : structures){
+            if(elem.myDt == t){
+                std::string toRet = "[[";
+
+                for(int i = 0; i < elem.variables.size(); i++){
+                    auto newI = getDefaultInitialisator(elem.variables[i].type);
+                    toRet += newI.substr(1, newI.size() - 2);
+                    if(i != elem.variables.size() - 1){
+                        toRet += ",";
+                    }
+                }
+
+                return toRet + "]]";
+            }
+        }
+
         return "[0]";
     }
 }
@@ -180,6 +197,10 @@ std::string Translator::proccessInstruction(Instruction inst, AdditionalDataType
             }
             level -= 1;
             return toRet + "\n";
+        }else if (inst.name == STRUCTURE_ELEMENT_ACCESS_NAME){
+            int indexOfElement = getIndexOfElementInStructure(inst.Parameters[1].type, inst.Parameters[0].name);
+
+            return proccessInstruction(inst.Parameters[1], adt) + "[" + std::to_string(indexOfElement) + "]";
         }
         else {
             if (inst.type == DataTypes::Character) {
@@ -273,6 +294,7 @@ std::string Translator::proccessFunction(Function f, AdditionalDataType adt)
 void Translator::TranslateFile(File f)
 {
     registeredOperators = std::vector<Operator>(f.operators);
+    structures = std::vector<Structure>(f.structures);
 
     for (auto var : f.variables) {
         file += handleVarCreation(var, f.adtTable);
@@ -348,6 +370,20 @@ std::string Translator::getType(std::string type) {
     }
 
     return toRet;
+}
+
+int Translator::getIndexOfElementInStructure(DataTypes structDt, std::string name) {
+    for(auto structu: structures){
+        if(structu.myDt == structDt){
+            for(int i = 0; i < structu.variables.size(); i++){
+                if(structu.variables[i].name == name){
+                    return i;
+                }
+            }
+        }
+    }
+
+    return -1;
 }
 
 Translator::RegisteredFunction::RegisteredFunction() {
