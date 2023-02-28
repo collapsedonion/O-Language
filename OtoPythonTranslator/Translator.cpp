@@ -108,7 +108,7 @@ std::string Translator::proccessInstruction(Instruction inst, AdditionalDataType
             }
             else {
                 for (int i = 1; i < inst.Parameters.size(); i++) {
-                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt);
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt) + "\n";
                 }
             }
             level -= 1;
@@ -192,7 +192,7 @@ std::string Translator::proccessInstruction(Instruction inst, AdditionalDataType
             }
             else {
                 for (int i = 1; i < inst.Parameters.size(); i++) {
-                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt);
+                    toRet += getPrefix() + proccessInstruction(inst.Parameters[i], adt) + "\n";
                 }
             }
             level -= 1;

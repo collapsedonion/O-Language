@@ -6,7 +6,14 @@ class Translator
 private:
 	std::string file =
 			"def voidputCharchar(x):\n"
-			"\tprint(x[0], end=\'\')\n";
+			"\tprint(x[0], end=\'\')\n"
+            "def ppcharintToCharint(x):\n"
+            "\ta = str(x[0])\n"
+            "\ttoRet = []\n"
+            "\tfor i in a:\n"
+            "\t\ttoRet.append(i)\n"
+            "\ttoRet.append(\"\\0\")\n"
+            "\treturn toRet\n";
     struct RegisteredFunction{
         std::string Oname;
         std::string compiledName;
@@ -18,7 +25,10 @@ private:
     std::vector<RegisteredFunction> registeredFunctions = {
 			RegisteredFunction("voidputCharchar", "putChar", {
 				DataTypes::Character
-			})
+			}),
+            RegisteredFunction("ppcharintToCharint", "intToChar", {
+                DataTypes::Integer
+            })
 	};
     std::vector<Operator> registeredOperators;
     std::vector<Structure> structures;

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <Call.h>
+#include <Preproccesor.h>
 
 int main() {
 
@@ -25,6 +26,10 @@ int main() {
     f.close();
     filesource = inBuffer.str();
     inBuffer.clear();
+
+    O::Preproccesor pp(filepath);
+
+    filesource = pp.proccess(filesource);
 
     auto AnalisedFile = O::Analyser::StructuriseFile(filesource);
     auto TokenisedFile = O::Analyser::TokeniseFile(AnalisedFile);

@@ -247,6 +247,8 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 			sa.ProcessToken(elem);
 		}
 
+        variablesCreatedAtThatField.insert(variablesCreatedAtThatField.end(), sa.variablesCreatedAtThatField.begin(), sa.variablesCreatedAtThatField.end());
+
 		for (int i = 0; i < sa.instructions.size(); i++) {
 			toRet.Parameters.push_back(sa.instructions[i]);
 		}

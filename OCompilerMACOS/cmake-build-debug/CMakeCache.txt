@@ -250,6 +250,15 @@ OLexicalAnalyser_IS_TOP_LEVEL:STATIC=ON
 OLexicalAnalyser_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
 
 //Value Computed by CMake
+OPreProccessor_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
+
+//Value Computed by CMake
+OPreProccessor_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OPreProccessor_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
+
+//Value Computed by CMake
 OtoPythonTranslator_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
 
 //Value Computed by CMake
