@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <Call.h>
+#include <OtoOTranslator.h>
 #include <Preproccesor.h>
 
 int main() {
@@ -36,11 +37,16 @@ int main() {
     O::SematicAnalyser sematiser;
     sematiser.ProccessTokenisedFile(TokenisedFile);
 
-    std::string result = Translate(sematiser.getFileRepresantation());
-
-    std::ofstream of(outfilepath);
-    of << result;
-    of.close();
+    if(outfilepath[outfilepath.size() - 1] == 'y' && outfilepath[outfilepath.size() - 2] == 'p') {
+        std::string result = Translate(sematiser.getFileRepresantation());
+        std::ofstream of(outfilepath);
+        of << result;
+        of.close();
+    }else{
+        O::OtoOTranslator translator;
+        translator.Build(sematiser.getFileRepresantation());
+        translator.WriteResulToFile(outfilepath);
+    }
 
     return 0;
 }

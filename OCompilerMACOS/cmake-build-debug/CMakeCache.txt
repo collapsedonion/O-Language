@@ -259,6 +259,24 @@ OPreProccessor_IS_TOP_LEVEL:STATIC=ON
 OPreProccessor_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
 
 //Value Computed by CMake
+O_ByteCode_generator_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
+
+//Value Computed by CMake
+O_ByteCode_generator_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+O_ByteCode_generator_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
+
+//Value Computed by CMake
+OtoOVMCompiler_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
+
+//Value Computed by CMake
+OtoOVMCompiler_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OtoOVMCompiler_SOURCE_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS
+
+//Value Computed by CMake
 OtoPythonTranslator_BINARY_DIR:STATIC=/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
 
 //Value Computed by CMake

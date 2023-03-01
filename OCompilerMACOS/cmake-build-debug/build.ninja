@@ -194,18 +194,84 @@ build libOPreProccessor.a: CXX_STATIC_LIBRARY_LINKER__OPreProccessor_Debug CMake
   TARGET_PDB = OPreProccessor.a.dbg
 
 # =============================================================================
+# Object build statements for STATIC_LIBRARY target O_ByteCode_generator
+
+
+#############################################
+# Order-only phony target for O_ByteCode_generator
+
+build cmake_object_order_depends_target_O_ByteCode_generator: phony || CMakeFiles/O_ByteCode_generator.dir
+
+build CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp.o: CXX_COMPILER__O_ByteCode_generator_Debug /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp || cmake_object_order_depends_target_O_ByteCode_generator
+  DEP_FILE = CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp.o.d
+  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OCompilerBase
+  OBJECT_DIR = CMakeFiles/O_ByteCode_generator.dir
+  OBJECT_FILE_DIR = CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target O_ByteCode_generator
+
+
+#############################################
+# Link the static library libO_ByteCode_generator.a
+
+build libO_ByteCode_generator.a: CXX_STATIC_LIBRARY_LINKER__O_ByteCode_generator_Debug CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp.o
+  ARCH_FLAGS = -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = CMakeFiles/O_ByteCode_generator.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = libO_ByteCode_generator.a
+  TARGET_PDB = O_ByteCode_generator.a.dbg
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target OtoOVMCompiler
+
+
+#############################################
+# Order-only phony target for OtoOVMCompiler
+
+build cmake_object_order_depends_target_OtoOVMCompiler: phony || cmake_object_order_depends_target_O_ByteCode_generator
+
+build CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o: CXX_COMPILER__OtoOVMCompiler_Debug /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp || cmake_object_order_depends_target_OtoOVMCompiler
+  DEP_FILE = CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o.d
+  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OCompilerBase -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../O-ByteCode-generator
+  OBJECT_DIR = CMakeFiles/OtoOVMCompiler.dir
+  OBJECT_FILE_DIR = CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target OtoOVMCompiler
+
+
+#############################################
+# Link the static library libOtoOVMCompiler.a
+
+build libOtoOVMCompiler.a: CXX_STATIC_LIBRARY_LINKER__OtoOVMCompiler_Debug CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o || libO_ByteCode_generator.a
+  ARCH_FLAGS = -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = CMakeFiles/OtoOVMCompiler.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = libOtoOVMCompiler.a
+  TARGET_PDB = OtoOVMCompiler.a.dbg
+
+# =============================================================================
 # Object build statements for EXECUTABLE target OCompilerMAC
 
 
 #############################################
 # Order-only phony target for OCompilerMAC
 
-build cmake_object_order_depends_target_OCompilerMAC: phony || cmake_object_order_depends_target_OLanguageSematicAnalyser cmake_object_order_depends_target_OLexicalAnalyser cmake_object_order_depends_target_OPreProccessor cmake_object_order_depends_target_OtoPythonTranslator
+build cmake_object_order_depends_target_OCompilerMAC: phony || cmake_object_order_depends_target_OLanguageSematicAnalyser cmake_object_order_depends_target_OLexicalAnalyser cmake_object_order_depends_target_OPreProccessor cmake_object_order_depends_target_O_ByteCode_generator cmake_object_order_depends_target_OtoOVMCompiler cmake_object_order_depends_target_OtoPythonTranslator
 
 build CMakeFiles/OCompilerMAC.dir/main.cpp.o: CXX_COMPILER__OCompilerMAC_Debug /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/main.cpp || cmake_object_order_depends_target_OCompilerMAC
   DEP_FILE = CMakeFiles/OCompilerMAC.dir/main.cpp.o.d
   FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu++17
-  INCLUDES = -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OCompilerBase -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OLanguageSematicAnalyser -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OtoPythonTranslator -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OLexicalAnalyser -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OPreProccessor
+  INCLUDES = -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OCompilerBase -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OLanguageSematicAnalyser -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OtoPythonTranslator -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OLexicalAnalyser -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OPreProccessor -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OtoOVMCompiler -I/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../O-ByteCode-generator
   OBJECT_DIR = CMakeFiles/OCompilerMAC.dir
   OBJECT_FILE_DIR = CMakeFiles/OCompilerMAC.dir
 
@@ -217,9 +283,9 @@ build CMakeFiles/OCompilerMAC.dir/main.cpp.o: CXX_COMPILER__OCompilerMAC_Debug /
 #############################################
 # Link the executable OCompilerMAC
 
-build OCompilerMAC: CXX_EXECUTABLE_LINKER__OCompilerMAC_Debug CMakeFiles/OCompilerMAC.dir/main.cpp.o | libOLexicalAnalyser.a libOLanguageSematicAnalyser.a libOtoPythonTranslator.a libOPreProccessor.a libOLexicalAnalyser.a || libOLanguageSematicAnalyser.a libOLexicalAnalyser.a libOPreProccessor.a libOtoPythonTranslator.a
+build OCompilerMAC: CXX_EXECUTABLE_LINKER__OCompilerMAC_Debug CMakeFiles/OCompilerMAC.dir/main.cpp.o | libOLexicalAnalyser.a libOLanguageSematicAnalyser.a libOtoPythonTranslator.a libOPreProccessor.a libOtoOVMCompiler.a libOLexicalAnalyser.a libO_ByteCode_generator.a || libOLanguageSematicAnalyser.a libOLexicalAnalyser.a libOPreProccessor.a libO_ByteCode_generator.a libOtoOVMCompiler.a libOtoPythonTranslator.a
   FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
-  LINK_LIBRARIES = libOLexicalAnalyser.a  libOLanguageSematicAnalyser.a  libOtoPythonTranslator.a  libOPreProccessor.a  libOLexicalAnalyser.a
+  LINK_LIBRARIES = libOLexicalAnalyser.a  libOLanguageSematicAnalyser.a  libOtoPythonTranslator.a  libOPreProccessor.a  libOtoOVMCompiler.a  libOLexicalAnalyser.a  libO_ByteCode_generator.a
   OBJECT_DIR = CMakeFiles/OCompilerMAC.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -258,6 +324,10 @@ build OLexicalAnalyser: phony libOLexicalAnalyser.a
 
 build OPreProccessor: phony libOPreProccessor.a
 
+build O_ByteCode_generator: phony libO_ByteCode_generator.a
+
+build OtoOVMCompiler: phony libOtoOVMCompiler.a
+
 build OtoPythonTranslator: phony libOtoPythonTranslator.a
 
 # =============================================================================
@@ -268,7 +338,7 @@ build OtoPythonTranslator: phony libOtoPythonTranslator.a
 #############################################
 # Folder: /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug
 
-build all: phony libOLexicalAnalyser.a libOLanguageSematicAnalyser.a libOtoPythonTranslator.a libOPreProccessor.a OCompilerMAC
+build all: phony libOLexicalAnalyser.a libOLanguageSematicAnalyser.a libOtoPythonTranslator.a libOPreProccessor.a libO_ByteCode_generator.a libOtoOVMCompiler.a OCompilerMAC
 
 # =============================================================================
 # Built-in targets
@@ -277,14 +347,14 @@ build all: phony libOLexicalAnalyser.a libOLanguageSematicAnalyser.a libOtoPytho
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCXXInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeGenericSystem.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeInitializeConfigs.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeLanguageInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/GNU.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/UnixPaths.cmake /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerBase/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OPreProccessor/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/CMakeLists.txt CMakeCache.txt CMakeFiles/3.25.2/CMakeCCompiler.cmake CMakeFiles/3.25.2/CMakeCXXCompiler.cmake CMakeFiles/3.25.2/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCXXInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeGenericSystem.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeInitializeConfigs.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeLanguageInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/GNU.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/UnixPaths.cmake /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerBase/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OPreProccessor/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/CMakeLists.txt CMakeCache.txt CMakeFiles/3.25.2/CMakeCCompiler.cmake CMakeFiles/3.25.2/CMakeCXXCompiler.cmake CMakeFiles/3.25.2/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCXXInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeGenericSystem.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeInitializeConfigs.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeLanguageInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/GNU.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/UnixPaths.cmake /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerBase/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OPreProccessor/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/CMakeLists.txt CMakeCache.txt CMakeFiles/3.25.2/CMakeCCompiler.cmake CMakeFiles/3.25.2/CMakeCXXCompiler.cmake CMakeFiles/3.25.2/CMakeSystem.cmake: phony
+build /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCXXInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeGenericSystem.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeInitializeConfigs.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeLanguageInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Compiler/GNU.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Apple-Clang.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/Darwin.cmake /Applications/CLion$ 2023.1$ EAP.app/Contents/bin/cmake/mac/share/cmake-3.25/Modules/Platform/UnixPaths.cmake /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerBase/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OPreProccessor/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/CMakeLists.txt /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/CMakeLists.txt CMakeCache.txt CMakeFiles/3.25.2/CMakeCCompiler.cmake CMakeFiles/3.25.2/CMakeCXXCompiler.cmake CMakeFiles/3.25.2/CMakeSystem.cmake: phony
 
 
 #############################################
