@@ -25,7 +25,7 @@
 
 #define CREATEZEROPARAM(name, index)std::vector<int> Geneerator::name(){return {index,0,0,0,0};}
 
-#define CREATEONEPARAM(name, index) std::vector<int> Geneerator::name(int value){return {index, 0, value,0,0};}std::vector<int> Geneerator::name(Geneerator::Registers value){TORET toRet.push_back(index);LOADREG(r0, value)ADDVECTORTOVECTOR(toRet, r0)return toRet;}std::vector<int> Geneerator::name(std::string sector, int offset, Registers anchor){TORET toRet.push_back(index);LOADMAD(m0, sector, anchor, offset)ADDVECTORTOVECTOR(toRet, m0)return toRet;}
+#define CREATEONEPARAM(name, index) std::vector<int> Geneerator::name(int value){return {index, 0, value,0,0};}std::vector<int> Geneerator::name(Geneerator::Registers value){TORET toRet.push_back(index);LOADREG(r0, value)ADDVECTORTOVECTOR(toRet, r0)toRet.push_back(0);toRet.push_back(0);return toRet;}std::vector<int> Geneerator::name(std::string sector, int offset, Registers anchor){TORET toRet.push_back(index);LOADMAD(m0, sector, anchor, offset)ADDVECTORTOVECTOR(toRet, m0)toRet.push_back(0);toRet.push_back(0);return toRet;}
 
 std::vector<int> Geneerator::generateMad(std::string sectorName, Geneerator::Registers anchor, int offset) {
     std::vector<int> toRet;
@@ -67,3 +67,7 @@ CREATEFIRSTOPMAD2op(sub, 2)
 CREATEZEROPARAM(ret, 5)
 
 CREATEONEPARAM(call, 6)
+
+CREATEONEPARAM(pop, 3)
+
+CREATEONEPARAM(push, 4)

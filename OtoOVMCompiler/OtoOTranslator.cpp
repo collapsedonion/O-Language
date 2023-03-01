@@ -7,6 +7,8 @@
 #define SET_VALUE_NAME "SET_VALUE"
 #define FALSE_NAME "FALSE"
 
+#define ADDVTV(vd, vs) vd.insert(vd.end(), vs.begin(), vs.end());
+
 namespace O {
     void OtoOTranslator::Build(File f) {
         auto mov = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
@@ -42,9 +44,10 @@ namespace O {
         if(add){
             addOffset = offset;
         }
-
-        auto sub = Geneerator::sub(Geneerator::Registers::esp, offset);
-        Instructions.insert(Instructions.end(), sub.begin(), sub.end());
+        if(!add) {
+            auto sub = Geneerator::sub(Geneerator::Registers::esp, offset);
+            Instructions.insert(Instructions.end(), sub.begin(), sub.end());
+        }
     }
 
     int OtoOTranslator::GetDataSize(DataTypes dt) {
@@ -150,6 +153,9 @@ namespace O {
             LoadVariables(fun.arguments, true);
             LoadVariables(fun.variables, true);
 
+            auto addd = Geneerator::add(Geneerator::Registers::ebp, addOffset + 1);
+            ADDVTV(Instructions, addd)
+
             for(auto inst : fun.body){
                 ProccessInstruction(inst);
             }
@@ -158,7 +164,7 @@ namespace O {
                 auto retCommand = Geneerator::ret();
                 Instructions.insert(Instructions.end(), retCommand.begin(), retCommand.end());
             }
-
+            newF.name = fun.name;
             newF.stackSize = addOffset;
             storedFunctions.push_back(newF);
 
@@ -170,8 +176,51 @@ namespace O {
     void OtoOTranslator::CallFunction(Instruction inst) {
         auto func = getFun(inst.name);
 
+        auto saveEBP = Geneerator::push(Geneerator::Registers::ebp);
+        ADDVTV(Instructions, saveEBP);
+        auto util = Geneerator::push(Geneerator::Registers::ebp);
+        ADDVTV(Instructions, util);
 
+        int currentOffset = 0;
 
+        for(auto p : inst.Parameters){
+            if(!p.IsVariable && !p.IsFunction){
+                int source;
+                switch (p.type) {
+                    case DataTypes::Integer:
+                        source = std::stoi(p.name);
+                        break;
+                    case DataTypes::Character:
+                        source = (int)p.name[0];
+                        break;
+                    case DataTypes::Boolean:
+                        if(p.name == FALSE_NAME){
+                            source = 0;
+                        }else{
+                            source = 1;
+                        }
+                        break;
+                    case DataTypes::FloatingPoint:
+                        float nv = std::stof(inst.Parameters[1].name);
+                        source = *((int*)&nv);
+                        break;
+                }
+                auto m = Geneerator::mov("__REGISTERS__", currentOffset, Geneerator::Registers::esp, source);
+                Instructions.insert(Instructions.end(), m.begin(), m.end());
+                currentOffset -= GetDataSize(p.type);
+            }
+        }
+
+        auto su = Geneerator::sub(Geneerator::Registers::esp, func.stackSize);
+        ADDVTV(Instructions, su)
+        auto c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
+        Instructions.insert(Instructions.end(), c.begin(), c.end());
+        auto a = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
+        ADDVTV(Instructions, a);
+        auto s = Geneerator::pop(Geneerator::Registers::ebp);
+        ADDVTV(Instructions, s)
+        auto load = Geneerator::pop(Geneerator::Registers::ebp);
+        ADDVTV(Instructions, load)
     }
 
     OtoOTranslator::FunctionStored OtoOTranslator::getFun(std::string name) {

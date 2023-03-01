@@ -27,7 +27,7 @@ namespace O {
         }
         stackStart = sd.start;
         int* esp = GetRegisterAccess(Registers::esp);
-        *esp = sd.start + sd.size;
+        *esp = sd.start + sd.size - 1;
     }
 
     int Memory::LoadProgram(std::string sectorName, std::vector<int> content) {
@@ -54,7 +54,7 @@ namespace O {
     void Memory::push(Memory::Registers reg) {
         int* registerSource = GetRegisterAccess(reg);
         int* esp = GetRegisterAccess(Registers::esp);
-        (*esp)++;
+        (*esp)--;
         if((*esp) < stackStart){
             throw std::exception();
         }
@@ -76,6 +76,8 @@ namespace O {
         *dest = _mem[*esp];
         (*esp)++;
     }
+
+
 
     int *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
         SectorDescription sd;
@@ -107,5 +109,20 @@ namespace O {
 
     int *Memory::getMem() {
         return _mem.data();
+    }
+
+    int Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
+        SectorDescription sd;
+        for(auto s : _sectors){
+            if(s.name == mad.sectorName){
+                sd = s;
+                break;
+            }
+        }
+        int anchor = 0;
+        if((int)mad.anchor != -1){
+            anchor = *GetRegisterAccess(mad.anchor);
+        }
+        return sd.start + anchor + mad.offset;
     }
 } // O

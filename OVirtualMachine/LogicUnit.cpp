@@ -93,7 +93,7 @@ namespace O {
     }
 
     void LogicUnit::ret(){
-        _mem->pop(O::Memory::Registers::esp);
+        _mem->pop(O::Memory::Registers::eip);
     }
 
     void LogicUnit::call(int value) {
@@ -105,7 +105,7 @@ namespace O {
     }
 
     void LogicUnit::call(O::Memory::MemoryAddressDescriptor mad) {
-        _mem->push(O::Memory::Registers::esp);
-        GETREG(O::Memory::Registers::esp) = GETMAD(mad);
+        _mem->push(O::Memory::Registers::eip);
+        GETREG(O::Memory::Registers::eip) = _mem->GetIdByMAD(mad);
     }
 }
