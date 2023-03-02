@@ -76,6 +76,8 @@ namespace O{
             INSTSETUPONEPARAM(push, memoryUnit)
             INSTSETUPZEROPARAM(ret, lu)
             INSTSETUPONEPARAM(call, lu)
+            INSTSETUPZEROPARAM(pushs, memoryUnit)
+            INSTSETUPZEROPARAM(pops, memoryUnit)
         }
     }
 }

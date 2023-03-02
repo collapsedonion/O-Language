@@ -25,6 +25,8 @@ namespace O {
             push = 4,
             ret = 5,
             call = 6,
+            pushs = 7,
+            pops = 8
         };
 
         struct Operand{

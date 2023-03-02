@@ -63,6 +63,8 @@ namespace O {
         void pop(Registers reg);
         void pop(MemoryAddressDescriptor mad);
         void pop(int value);
+        void pushs();
+        void pops();
         int* getMem();
     };
 

@@ -43,8 +43,10 @@ namespace O {
         void MovConstantToRegister(int constant, Geneerator::Registers dest);
         void SetInstruction(Instruction inst);
         void CallFunction(Instruction inst);
+        void ReturnFunction(Instruction inst);
         VariableStored getVar(std::string name);
         FunctionStored getFun(std::string name);
+        int GetValueToInt(Instruction inst);
 
         int GetDataSize(DataTypes dt);
 

@@ -27,7 +27,7 @@ namespace O {
         }
         stackStart = sd.start;
         int* esp = GetRegisterAccess(Registers::esp);
-        *esp = sd.start + sd.size - 1;
+        *esp = sd.start + sd.size;
     }
 
     int Memory::LoadProgram(std::string sectorName, std::vector<int> content) {
@@ -81,12 +81,17 @@ namespace O {
 
     int *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
         SectorDescription sd;
-        for(auto s : _sectors){
-            if(s.name == mad.sectorName){
-                sd = s;
-                break;
+        if(mad.sectorName == ""){
+            sd = registerSectionDescriptor;
+        }else{
+            for(auto s : _sectors){
+                if(s.name == mad.sectorName){
+                    sd = s;
+                    break;
+                }
             }
         }
+
         int anchor = 0;
         if((int)mad.anchor != -1){
             anchor = *GetRegisterAccess(mad.anchor);
@@ -124,5 +129,13 @@ namespace O {
             anchor = *GetRegisterAccess(mad.anchor);
         }
         return sd.start + anchor + mad.offset;
+    }
+
+    void Memory::pushs() {
+
+    }
+
+    void Memory::pops() {
+
     }
 } // O
