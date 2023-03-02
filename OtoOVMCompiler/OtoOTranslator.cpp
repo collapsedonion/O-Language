@@ -8,6 +8,7 @@
 #define FALSE_NAME "FALSE"
 #define RETURN_NAME "return"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
+#define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
 
 #define ADDVTV(vd, vs) vd.insert(vd.end(), vs.begin(), vs.end());
 
@@ -117,6 +118,10 @@ namespace O {
         if(inst.Parameters[0].IsVariable){
             auto var = getVar(inst.Parameters[0].name);
             auto mov = G::mov(FILLVAR(var), GR::aa0);
+            ADDVTV(Instructions, mov)
+        }else if(inst.Parameters[0].name == POINTER_ACCESS_INSTRUCTION_NAME){
+            LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
+            auto mov = G::mov("", 0, GR::mc3, GR::aa0);
             ADDVTV(Instructions, mov)
         }
     }
@@ -254,9 +259,17 @@ namespace O {
     void OtoOTranslator::LoadInstToReg(Instruction inst, Geneerator::Registers reg) {
         if(!inst.IsVariable && !inst.IsFunction && !inst.ArithmeticProccess){
             if(inst.name == POINTER_ACCESS_INSTRUCTION_NAME){
-
-
-            }else {
+                LoadInstToReg(inst.Parameters[0], GR::mc1);
+                auto mm1 = Geneerator::mov(reg, "", 0, GR::mc1);
+                ADDVTV(Instructions, mm1);
+            }else if(inst.name == POINTER_GET_INSTRUCTION_NAME){
+                auto v = getVar(inst.Parameters[0].name);
+                auto moveEbp = G::mov(reg, GR::ebp);
+                auto subTarget = G::add(reg, v.fromEbpOffset);
+                ADDVTV(Instructions, moveEbp);
+                ADDVTV(Instructions, subTarget)
+            }
+            else {
                 auto op1 = GetValueToInt(inst);
                 auto mm1 = Geneerator::mov(reg, op1);
                 ADDVTV(Instructions, mm1);
