@@ -25,6 +25,7 @@ public:
         edp = 6,
         esi = 7,
         edi = 8,
+        mc0 = 9,
         mc1 = 10,
         mc2 = 11,
         mc3 = 12,

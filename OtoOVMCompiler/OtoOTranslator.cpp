@@ -7,8 +7,19 @@
 #define SET_VALUE_NAME "SET_VALUE"
 #define FALSE_NAME "FALSE"
 #define RETURN_NAME "return"
+#define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 
 #define ADDVTV(vd, vs) vd.insert(vd.end(), vs.begin(), vs.end());
+
+#define G Geneerator
+#define GR Geneerator::Registers
+
+#define FILLVAR(varName) varName.sector, varName.fromEbpOffset, GR::ebp
+#define LOADFUNRESULT(reg) G::mov(reg, GR::eax)
+#define LOADMATH(reg) G::mov(reg, GR::mc0)
+#define PUSH(reg) G::push(GR::reg)
+#define POP(reg) G::pop(GR::reg)
+#define ISINSTTYPEEQU(inst1, inst2, TYPE) inst1.type == TYPE && inst2.type == TYPE
 
 namespace O {
     void OtoOTranslator::Build(File f) {
@@ -101,23 +112,12 @@ namespace O {
     }
 
     void OtoOTranslator::SetInstruction(Instruction inst) {
-        if(inst.Parameters[0].IsVariable && !inst.Parameters[1].IsFunction && !inst.Parameters[1].IsVariable){
-            auto varDest = getVar(inst.Parameters[0].name);
-            auto instr = Geneerator::mov(varDest.sector, varDest.fromEbpOffset, Geneerator::Registers::ebp,GetValueToInt(inst.Parameters[1]));
-            Instructions.insert(Instructions.end(), instr.begin(), instr.end());
-        }
-        else if(inst.Parameters[0].IsVariable && inst.Parameters[1].IsVariable){
-            auto varDest = getVar(inst.Parameters[0].name);
-            auto varSource = getVar(inst.Parameters[1].name);
+        LoadInstToReg(inst.Parameters[1], GR::aa0);
 
-            auto instr = Geneerator::mov(varDest.sector, varDest.fromEbpOffset, Geneerator::Registers::ebp, varSource.sector, varSource.fromEbpOffset, Geneerator::Registers::ebp);
-            Instructions.insert(Instructions.end(), instr.begin(), instr.end());
-        }else if(inst.Parameters[0].IsVariable && inst.Parameters[1].IsFunction){
-            auto varDest = getVar(inst.Parameters[0].name);
-            CallFunction(inst.Parameters[1]);
-
-            auto instr = Geneerator::mov(varDest.sector, varDest.fromEbpOffset, Geneerator::Registers::ebp, Geneerator::Registers::eax);
-            ADDVTV(Instructions, instr)
+        if(inst.Parameters[0].IsVariable){
+            auto var = getVar(inst.Parameters[0].name);
+            auto mov = G::mov(FILLVAR(var), GR::aa0);
+            ADDVTV(Instructions, mov)
         }
     }
 
@@ -172,20 +172,9 @@ namespace O {
         ADDVTV(Instructions, saveEBP);
 
         for(auto p : inst.Parameters){
-            if(!p.IsVariable && !p.IsFunction){
-                auto m = Geneerator::push(GetValueToInt(p));
-                Instructions.insert(Instructions.end(), m.begin(), m.end());
-            }else if(p.IsVariable){
-                auto vd = getVar(p.name);
-                auto movToR = Geneerator::mov(Geneerator::Registers::esi, vd.sector, vd.fromEbpOffset, Geneerator::Registers::ebp);
-                ADDVTV(Instructions, movToR);
-                auto p = Geneerator::push(Geneerator::Registers::esi);
-                ADDVTV(Instructions, p);
-            }else if(p.IsFunction){
-                CallFunction(p);
-                auto p = Geneerator::push(Geneerator::Registers::eax);
-                ADDVTV(Instructions, p)
-            }
+            LoadInstToReg(p, GR::esi);
+            auto push = PUSH(esi);
+            ADDVTV(Instructions, push)
         }
 
         auto subEsp = Geneerator::sub(Geneerator::Registers::esp, func.stackSize - inst.Parameters.size());
@@ -245,17 +234,71 @@ namespace O {
     }
 
     void OtoOTranslator::ReturnFunction(Instruction inst) {
-        if(!inst.Parameters[0].IsVariable && !inst.Parameters[0].IsFunction){
-            int val = GetValueToInt(inst.Parameters[0]);
-            auto movToEAX = Geneerator::mov(Geneerator::Registers::eax, val);
-            ADDVTV(Instructions, movToEAX)
-        }else if(inst.Parameters[0].IsVariable){
-            auto v = getVar(inst.Parameters[0].name);
-            auto movToEAX = Geneerator::mov(Geneerator::Registers::eax, v.sector, v.fromEbpOffset, Geneerator::Registers::ebp);
-            ADDVTV(Instructions, movToEAX)
-        }
-
+        LoadInstToReg(inst.Parameters[0], GR::eax);
         auto ret = Geneerator::ret();
         ADDVTV(Instructions, ret);
+    }
+
+    void OtoOTranslator::MathematicalProccess(Instruction inst) {
+        LoadInstToReg(inst.Parameters[0], GR::mc1);
+        LoadInstToReg(inst.Parameters[1], GR::mc2);
+
+        if(isStdLogic(inst.Parameters[0], inst.Parameters[1])) {
+            ProccessStdLogic(inst.Parameters[0], inst.Parameters[1], inst.name);
+        }
+
+        auto mm0 = G::mov(GR::mc0, GR::mc1);
+        ADDVTV(Instructions, mm0);
+    }
+
+    void OtoOTranslator::LoadInstToReg(Instruction inst, Geneerator::Registers reg) {
+        if(!inst.IsVariable && !inst.IsFunction && !inst.ArithmeticProccess){
+            if(inst.name == POINTER_ACCESS_INSTRUCTION_NAME){
+
+
+            }else {
+                auto op1 = GetValueToInt(inst);
+                auto mm1 = Geneerator::mov(reg, op1);
+                ADDVTV(Instructions, mm1);
+            }
+        }else if(inst.IsVariable){
+            auto op1 = getVar(inst.name);
+            auto mm1 = G::mov(reg,FILLVAR(op1));
+            ADDVTV(Instructions, mm1);
+        }else if(inst.IsFunction){
+            CallFunction(inst);
+            auto mm1 = LOADFUNRESULT(reg);
+            ADDVTV(Instructions, mm1);
+        }else if(inst.ArithmeticProccess){
+            MathematicalProccess(inst);
+            auto mm1 = LOADMATH(reg);
+            ADDVTV(Instructions, mm1);
+        }
+    }
+
+    bool OtoOTranslator::isStdLogic(Instruction instOP1, Instruction instOP2) {
+        return (ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer));
+    }
+
+    OtoOTranslator::StdLogicType OtoOTranslator::getLogicType(Instruction instOP1, Instruction instOP2) {
+        if(ISINSTTYPEEQU(instOP1, instOP2,DataTypes::Integer)){
+            return I;
+        }
+    }
+
+    void OtoOTranslator::ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::string type) {
+        std::vector<int> newInst;
+        switch (getLogicType(instOP1, instOP2)) {
+            case I:{
+                if(type == "+") {
+                    newInst = G::add(GR::mc1, GR::mc2);
+                }else if(type == "-"){
+                    newInst = G::sub(GR::mc1, GR::mc2);
+                }
+                break;
+            }
+        }
+
+        ADDVTV(Instructions, newInst);
     }
 } // O

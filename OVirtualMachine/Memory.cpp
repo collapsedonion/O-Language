@@ -132,10 +132,16 @@ namespace O {
     }
 
     void Memory::pushs() {
-
+        push(Registers::mc0);
+        push(Registers::mc1);
+        push(Registers::mc2);
+        push(Registers::aa0);
     }
 
     void Memory::pops() {
-
+        pop(Registers::aa0);
+        pop(Registers::mc2);
+        pop(Registers::mc1);
+        pop(Registers::mc0);
     }
 } // O

@@ -27,6 +27,12 @@ namespace O {
             int fromZeroOffset = 0;
         };
 
+        enum StdLogicType {
+            I,
+            B,
+            F
+        };
+
         std::vector<VariableStored> variables;
         std::vector<VariableStored> additionalVariables;
         int addOffset = 0;
@@ -44,9 +50,15 @@ namespace O {
         void SetInstruction(Instruction inst);
         void CallFunction(Instruction inst);
         void ReturnFunction(Instruction inst);
+        void LoadInstToReg(Instruction inst, Geneerator::Registers reg);
         VariableStored getVar(std::string name);
         FunctionStored getFun(std::string name);
         int GetValueToInt(Instruction inst);
+        bool isStdLogic(Instruction instOP1, Instruction instOP2);
+        StdLogicType getLogicType(Instruction instOP1, Instruction instOP2);
+        void ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::string type);
+
+        void MathematicalProccess(Instruction inst);
 
         int GetDataSize(DataTypes dt);
 
