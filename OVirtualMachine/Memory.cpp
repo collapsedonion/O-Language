@@ -5,7 +5,7 @@
 #include "Memory.h"
 
 namespace O {
-    int Memory::registersCount = 16;
+    int Memory::registersCount = 17;
 
     Memory::Memory(int stackSize) {
         SectorDescription sd;
@@ -118,10 +118,14 @@ namespace O {
 
     int Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
         SectorDescription sd;
-        for(auto s : _sectors){
-            if(s.name == mad.sectorName){
-                sd = s;
-                break;
+        if(mad.sectorName == ""){
+            sd = registerSectionDescriptor;
+        }else {
+            for (auto s: _sectors) {
+                if (s.name == mad.sectorName) {
+                    sd = s;
+                    break;
+                }
             }
         }
         int anchor = 0;

@@ -28,7 +28,8 @@ namespace O {
             mc3 = 12,
             aa0 = 13,
             aa1 = 14,
-            ebp = 15
+            ebp = 15,
+            flag = 16
         };
 
         static int registersCount;

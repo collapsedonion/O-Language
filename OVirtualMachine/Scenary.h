@@ -26,7 +26,13 @@ namespace O {
             ret = 5,
             call = 6,
             pushs = 7,
-            pops = 8
+            pops = 8,
+            cmp = 9,
+            movg = 10,
+            movl = 11,
+            move = 12,
+            jmp = 13,
+            jme = 14
         };
 
         struct Operand{

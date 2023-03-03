@@ -38,7 +38,8 @@ namespace O {
         int addOffset = 0;
         int bodyStart = 0;
 
-        std::vector<int> Instructions;
+        std::vector<int>* Instructions;
+        std::vector<int> mainFlow;
         std::vector<FunctionStored> storedFunctions;
 
     private:
@@ -51,6 +52,7 @@ namespace O {
         void CallFunction(Instruction inst);
         void ReturnFunction(Instruction inst);
         void LoadInstToReg(Instruction inst, Geneerator::Registers reg);
+        void IfFunction(Instruction inst);
         VariableStored getVar(std::string name);
         FunctionStored getFun(std::string name);
         int GetValueToInt(Instruction inst);

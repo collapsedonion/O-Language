@@ -9,8 +9,9 @@
 #define RETURN_NAME "return"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
+#define IF_NAME "if"
 
-#define ADDVTV(vd, vs) vd.insert(vd.end(), vs.begin(), vs.end());
+#define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
 
 #define G Geneerator
 #define GR Geneerator::Registers
@@ -27,10 +28,11 @@ namespace O {
         auto mov = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
 
         LoadFunctions(f.functions);
+        Instructions = &mainFlow;
 
-        bodyStart = this->Instructions.size();
+        bodyStart = this->Instructions->size();
 
-        Instructions.insert(Instructions.end(), mov.begin(), mov.end());
+        Instructions->insert(Instructions->end(), mov.begin(), mov.end());
         LoadVariables(f.variables);
 
         for(auto inst : f.instructions){
@@ -62,7 +64,7 @@ namespace O {
         }
         if(!add) {
             auto sub = Geneerator::sub(Geneerator::Registers::esp, offset);
-            Instructions.insert(Instructions.end(), sub.begin(), sub.end());
+            Instructions->insert(Instructions->end(), sub.begin(), sub.end());
         }
     }
 
@@ -78,6 +80,8 @@ namespace O {
     void OtoOTranslator::ProccessInstruction(Instruction inst) {
         if(inst.name == SET_VALUE_NAME){
             SetInstruction(inst);
+        }else if(inst.name == IF_NAME){
+            IfFunction(inst);
         }
         else if(inst.name == RETURN_NAME){
             ReturnFunction(inst);
@@ -104,12 +108,12 @@ namespace O {
     void OtoOTranslator::MovVariableToRegister(std::string name, Geneerator::Registers dest) {
         auto var = getVar(name);
         auto inst = Geneerator::mov(dest, var.sector, var.fromEbpOffset, Geneerator::Registers::esp);
-        Instructions.insert(Instructions.end(), inst.begin(), inst.end());
+        Instructions->insert(Instructions->end(), inst.begin(), inst.end());
     }
 
     void OtoOTranslator::MovConstantToRegister(int constant, Geneerator::Registers dest) {
         auto instr = Geneerator::mov(dest, constant);
-        Instructions.insert(Instructions.end(), Instructions.begin(), Instructions.end());
+        Instructions->insert(Instructions->end(), instr.begin(), instr.end());
     }
 
     void OtoOTranslator::SetInstruction(Instruction inst) {
@@ -129,13 +133,13 @@ namespace O {
     void OtoOTranslator::WriteResulToFile(std::string filepath) {
         std::ofstream f(filepath);
 
-        int size = Instructions.size();
+        int size = mainFlow.size();
 
         f.write((char*)&size, 4);
         f.write((char*)&bodyStart, 4);
 
-        for(int i = 0; i < Instructions.size(); i++){
-            f.write((char*)&Instructions[i], 4);
+        for(int i = 0; i < mainFlow.size(); i++){
+            f.write((char*)&((*Instructions)[i]), 4);
         }
 
         f.close();
@@ -146,7 +150,7 @@ namespace O {
         for(auto fun : functions) {
             FunctionStored newF;
             newF.sector = "main";
-            newF.fromZeroOffset = Instructions.size();
+            newF.fromZeroOffset = Instructions->size();
             LoadVariables(fun.arguments, true);
             LoadVariables(fun.variables, true);
 
@@ -156,7 +160,7 @@ namespace O {
 
             if(fun.returnType == DataTypes::Void){
                 auto retCommand = Geneerator::ret();
-                Instructions.insert(Instructions.end(), retCommand.begin(), retCommand.end());
+                Instructions->insert(Instructions->end(), retCommand.begin(), retCommand.end());
             }
             newF.name = fun.name;
             newF.stackSize = addOffset;
@@ -192,7 +196,7 @@ namespace O {
             ADDVTV(Instructions, setEbp)
         }
         auto c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
-        Instructions.insert(Instructions.end(), c.begin(), c.end());
+        Instructions->insert(Instructions->end(), c.begin(), c.end());
         auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
         ADDVTV(Instructions, addEsp);
         auto loadEBP = Geneerator::pop(Geneerator::Registers::ebp);
@@ -307,11 +311,50 @@ namespace O {
                     newInst = G::add(GR::mc1, GR::mc2);
                 }else if(type == "-"){
                     newInst = G::sub(GR::mc1, GR::mc2);
+                }else if(type == "?"){
+                    newInst = G::cmp(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::move(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
+                }else if(type == ">"){
+                    newInst = G::cmp(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::movg(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
+                }else if(type == "<"){
+                    newInst = G::cmp(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::movl(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
                 }
                 break;
             }
         }
 
         ADDVTV(Instructions, newInst);
+    }
+
+    void OtoOTranslator::IfFunction(Instruction inst) {
+        auto jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
+        ADDVTV(Instructions, jmpToEndBody)
+        int jumpOffsetId = Instructions->size() - 1 - 2;
+        int oldSize = Instructions->size();
+        for(int i = 1; i<inst.Parameters.size(); i++){
+           ProccessInstruction(inst.Parameters[i]);
+        }
+        jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
+        ADDVTV(Instructions, jmpToEndBody)
+        int offsetOfExit = Instructions->size() - 1 - 2;
+        int exitSize = Instructions->size();
+        (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
+        LoadInstToReg(inst.Parameters[0], GR::mc3);
+        auto cm = G::cmp(GR::mc3, 1);
+        auto je = G::jme("main", jumpOffsetId + 3, GR::NULLREG);
+        ADDVTV(Instructions, cm);
+        ADDVTV(Instructions, je);
+        (*Instructions)[offsetOfExit] = Instructions->size() - exitSize;
     }
 } // O

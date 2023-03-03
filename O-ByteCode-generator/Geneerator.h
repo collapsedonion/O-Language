@@ -31,7 +31,8 @@ public:
         mc3 = 12,
         aa0 = 13,
         aa1 = 14,
-        ebp = 15
+        ebp = 15,
+        flag = 16
     };
 
     static std::vector<int> generateMad(std::string sectorName, Registers anchor, int offset);
@@ -47,6 +48,12 @@ public:
     GENERATEONEPARAMDEF(pop);
     GENERATEZEROPARAMDEF(pushs);
     GENERATEZEROPARAMDEF(pops);
+    GENERATETWOPARAMETERSDEF(cmp);
+    GENERATETWOPARAMETERSDEF(move)
+    GENERATETWOPARAMETERSDEF(movg)
+    GENERATETWOPARAMETERSDEF(movl)
+    GENERATEONEPARAMDEF(jmp)
+    GENERATEONEPARAMDEF(jme)
 };
 
 

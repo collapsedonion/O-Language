@@ -108,4 +108,203 @@ namespace O {
         _mem->push(O::Memory::Registers::eip);
         GETREG(O::Memory::Registers::eip) = _mem->GetIdByMAD(mad);
     }
+
+    void LogicUnit::cmp(O::Memory::Registers destReg, int value) {
+        auto p1 = GETREG(destReg);
+        auto p2 = value;
+        auto res = 0;
+
+        if(p1 == p2){
+            res = 0b1;
+        }else if(p1 > p2){
+            res = 0b10;
+        }else if(p1 < p2){
+            res = 0b100;
+        }
+
+        auto newRegV = GETREG(Memory::Registers::flag);
+
+        auto mask = ~0b111;
+
+        newRegV = newRegV & mask;
+        newRegV += res;
+
+        GETREG(Memory::Registers::flag) = newRegV;
+    }
+
+    // 1 = e ; 10 = g ; 100 = l
+    void LogicUnit::cmp(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        auto p2 = GETREG(sourceReg);
+        cmp(destReg, p2);
+    }
+
+    void LogicUnit::cmp(O::Memory::MemoryAddressDescriptor dest, int value) {
+        throw std::exception();
+    }
+
+    void LogicUnit::cmp(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        throw std::exception();
+    }
+
+    void LogicUnit::cmp(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        throw std::exception();
+    }
+
+    void LogicUnit::cmp(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        throw std::exception();
+    }
+
+    void LogicUnit::move(O::Memory::Registers destReg, int value) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            mov(destReg, value);
+        }
+    }
+
+    void LogicUnit::move(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            mov(destReg, sourceReg);
+        }
+    }
+
+    void LogicUnit::move(O::Memory::MemoryAddressDescriptor dest, int value) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            mov(dest, value);
+        }
+    }
+
+    void LogicUnit::move(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::move(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::move(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::movg(O::Memory::Registers destReg, int value) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b10) == 0b10){
+            mov(destReg, value);
+        }
+    }
+
+    void LogicUnit::movg(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b10) == 0b10){
+            mov(destReg, sourceReg);
+        }
+    }
+
+    void LogicUnit::movg(O::Memory::MemoryAddressDescriptor dest, int value) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b10) == 0b10){
+            mov(dest, value);
+        }
+    }
+
+    void LogicUnit::movg(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b10) == 0b10){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::movg(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b10) == 0b10){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::movg(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b10) == 0b10){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::movl(O::Memory::Registers destReg, int value) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b100) == 0b100){
+            mov(destReg, value);
+        }
+    }
+
+    void LogicUnit::movl(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b100) == 0b100){
+            mov(destReg, sourceReg);
+        }
+    }
+
+    void LogicUnit::movl(O::Memory::MemoryAddressDescriptor dest, int value) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b100) == 0b100){
+            mov(dest, value);
+        }
+    }
+
+    void LogicUnit::movl(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b100) == 0b100){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::movl(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b100) == 0b100){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::movl(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b100) == 0b100){
+            mov(dest, source);
+        }
+    }
+
+    void LogicUnit::jmp(int value) {
+        throw std::exception();
+    }
+
+    void LogicUnit::jmp(O::Memory::Registers destReg) {
+        throw std::exception();
+    }
+
+    void LogicUnit::jmp(O::Memory::MemoryAddressDescriptor mad) {
+        GETREG(O::Memory::Registers::eip) = _mem->GetIdByMAD(mad);
+    }
+
+    void LogicUnit::jme(int value) {
+        throw std::exception();
+    }
+
+    void LogicUnit::jme(O::Memory::Registers destReg) {
+        throw std::exception();
+    }
+
+    void LogicUnit::jme(O::Memory::MemoryAddressDescriptor mad) {
+        auto flags = GETREG(Memory::Registers::flag);
+        if((flags & 0b1) == 0b1){
+            jmp(mad);
+        }
+    }
+
 }

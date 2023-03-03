@@ -78,6 +78,12 @@ namespace O{
             INSTSETUPONEPARAM(call, lu)
             INSTSETUPZEROPARAM(pushs, memoryUnit)
             INSTSETUPZEROPARAM(pops, memoryUnit)
+            INSTSETUPTWOPARAM(cmp)
+            INSTSETUPTWOPARAM(move)
+            INSTSETUPTWOPARAM(movl)
+            INSTSETUPTWOPARAM(movg)
+            INSTSETUPONEPARAM(jmp, lu)
+            INSTSETUPONEPARAM(jme, lu)
         }
     }
 }
