@@ -10,6 +10,8 @@
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
 #define IF_NAME "if"
+#define ELSE_NAME "else"
+#define ELIF_NAME "else if"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
 
@@ -82,6 +84,10 @@ namespace O {
             SetInstruction(inst);
         }else if(inst.name == IF_NAME){
             IfFunction(inst);
+        }else if(inst.name == ELSE_NAME){
+            ElseInstruction(inst);
+        } else if(inst.name == ELIF_NAME){
+            ElifInstruction(inst);
         }
         else if(inst.name == RETURN_NAME){
             ReturnFunction(inst);
@@ -342,9 +348,13 @@ namespace O {
         ADDVTV(Instructions, jmpToEndBody)
         int jumpOffsetId = Instructions->size() - 1 - 2;
         int oldSize = Instructions->size();
+        auto saveFlag = G::push(GR::flag);
+        ADDVTV(Instructions, saveFlag)
         for(int i = 1; i<inst.Parameters.size(); i++){
            ProccessInstruction(inst.Parameters[i]);
         }
+        auto loadFlag = G::pop(GR::flag);
+        ADDVTV(Instructions, loadFlag)
         jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
         int offsetOfExit = Instructions->size() - 1 - 2;
@@ -356,5 +366,29 @@ namespace O {
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
         (*Instructions)[offsetOfExit] = Instructions->size() - exitSize;
+    }
+
+    void OtoOTranslator::ElseInstruction(Instruction inst) {
+        auto jmpIfT = Geneerator::jme("", 123456, GR::eip);
+        ADDVTV(Instructions, jmpIfT);
+        int jumpOffset = Instructions->size() - 1 - 2;
+        int oldSize = Instructions->size();
+        auto saveFlag = G::push(GR::flag);
+        ADDVTV(Instructions, saveFlag)
+        for(int i = 0; i < inst.Parameters.size(); i++){
+            ProccessInstruction(inst.Parameters[i]);
+        }
+        auto loadFlag = G::pop(GR::flag);
+        ADDVTV(Instructions, loadFlag)
+        (*Instructions)[jumpOffset] = Instructions->size() - oldSize;
+    }
+
+    void OtoOTranslator::ElifInstruction(Instruction inst) {
+        auto jmpIfT = Geneerator::jme("", 123456, GR::eip);
+        ADDVTV(Instructions, jmpIfT);
+        int jumpOffset = Instructions->size() - 1 - 2;
+        int oldSize = Instructions->size();
+        IfFunction(inst);
+        (*Instructions)[jumpOffset] = Instructions->size() - oldSize;
     }
 } // O

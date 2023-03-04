@@ -53,6 +53,8 @@ namespace O {
         void ReturnFunction(Instruction inst);
         void LoadInstToReg(Instruction inst, Geneerator::Registers reg);
         void IfFunction(Instruction inst);
+        void ElseInstruction(Instruction inst);
+        void ElifInstruction(Instruction inst);
         VariableStored getVar(std::string name);
         FunctionStored getFun(std::string name);
         int GetValueToInt(Instruction inst);

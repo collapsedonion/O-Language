@@ -376,9 +376,24 @@ Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile to
 
 	toRet.Parameters.push_back(inst);
 
-	for (auto elem : token.subToken) {
-		toRet.Parameters.push_back(ProcessToken(elem, false));
-	}
+    if(token.subToken.size() != 0) {
+        SematicAnalyser sa;
+        sa.adt = adt;
+        sa.operators = std::vector<Operator>(operators);
+        sa.functions = std::vector<Function>(functions);
+        sa.variables = std::vector<Variable>(variables);
+        sa.definedStructures = std::vector<Structure>(definedStructures);
+
+        for(auto elem : token.subToken){
+            sa.ProcessToken(elem);
+        }
+
+        variablesCreatedAtThatField.insert(variablesCreatedAtThatField.end(), sa.variablesCreatedAtThatField.begin(), sa.variablesCreatedAtThatField.end());
+
+        for (int i = 0; i < sa.instructions.size(); i++) {
+            toRet.Parameters.push_back(sa.instructions[i]);
+        }
+    }
 
 	return toRet;
 }
@@ -405,9 +420,24 @@ Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFil
 
 	toRet.Parameters.push_back(inst);
 
-	for (auto elem : token.subToken) {
-		toRet.Parameters.push_back(ProcessToken(elem, false));
-	}
+    if(token.subToken.size() != 0) {
+        SematicAnalyser sa;
+        sa.adt = adt;
+        sa.operators = std::vector<Operator>(operators);
+        sa.functions = std::vector<Function>(functions);
+        sa.variables = std::vector<Variable>(variables);
+        sa.definedStructures = std::vector<Structure>(definedStructures);
+
+        for(auto elem : token.subToken){
+            sa.ProcessToken(elem);
+        }
+
+        variablesCreatedAtThatField.insert(variablesCreatedAtThatField.end(), sa.variablesCreatedAtThatField.begin(), sa.variablesCreatedAtThatField.end());
+
+        for (int i = 0; i < sa.instructions.size(); i++) {
+            toRet.Parameters.push_back(sa.instructions[i]);
+        }
+    }
 
 	return toRet;
 }
@@ -426,9 +456,24 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
 	toRet.name = token.name.token;
 	toRet.type = DataTypes::Void;
 
-	for (auto elem : token.subToken) {
-		toRet.Parameters.push_back(ProcessToken(elem, false));
-	}
+    if(token.subToken.size() != 0) {
+        SematicAnalyser sa;
+        sa.adt = adt;
+        sa.operators = std::vector<Operator>(operators);
+        sa.functions = std::vector<Function>(functions);
+        sa.variables = std::vector<Variable>(variables);
+        sa.definedStructures = std::vector<Structure>(definedStructures);
+
+        for(auto elem : token.subToken){
+            sa.ProcessToken(elem);
+        }
+
+        variablesCreatedAtThatField.insert(variablesCreatedAtThatField.end(), sa.variablesCreatedAtThatField.begin(), sa.variablesCreatedAtThatField.end());
+
+        for (int i = 0; i < sa.instructions.size(); i++) {
+            toRet.Parameters.push_back(sa.instructions[i]);
+        }
+    }
 
 	return toRet;
 }
