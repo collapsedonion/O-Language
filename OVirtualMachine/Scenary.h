@@ -32,7 +32,8 @@ namespace O {
             movl = 11,
             move = 12,
             jmp = 13,
-            jme = 14
+            jme = 14,
+            malloc = 15,
         };
 
         struct Operand{

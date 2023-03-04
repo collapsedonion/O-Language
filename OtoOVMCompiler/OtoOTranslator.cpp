@@ -12,6 +12,8 @@
 #define IF_NAME "if"
 #define ELSE_NAME "else"
 #define ELIF_NAME "else if"
+#define ARRAY_CREATION_NAME "ARRAY_INIT"
+#define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
 
@@ -133,6 +135,13 @@ namespace O {
             LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
             auto mov = G::mov("", 0, GR::mc3, GR::aa0);
             ADDVTV(Instructions, mov)
+        }else if(inst.Parameters[0].name == ARRAY_ELEMENT_ACCESS_NAME) {
+            LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
+            LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
+            auto add = G::add(GR::edi, GR::mc3);
+            ADDVTV(Instructions, add);
+            auto mov = G::mov("", 0, GR::edi, GR::aa0);
+            ADDVTV(Instructions, mov);
         }
     }
 
@@ -255,8 +264,16 @@ namespace O {
     }
 
     void OtoOTranslator::MathematicalProccess(Instruction inst) {
+        auto saveMC1 = G::push(GR::mc1);
+        auto saveMC2 = G::push(GR::mc2);
+        auto loadMC1 = G::pop(GR::mc1);
+        auto loadMC2 = G::pop(GR::mc2);
+        ADDVTV(Instructions, saveMC1)
+        ADDVTV(Instructions, saveMC2)
         LoadInstToReg(inst.Parameters[0], GR::mc1);
+        ADDVTV(Instructions, saveMC1)
         LoadInstToReg(inst.Parameters[1], GR::mc2);
+        ADDVTV(Instructions, loadMC1)
 
         if(isStdLogic(inst.Parameters[0], inst.Parameters[1])) {
             ProccessStdLogic(inst.Parameters[0], inst.Parameters[1], inst.name);
@@ -264,6 +281,8 @@ namespace O {
 
         auto mm0 = G::mov(GR::mc0, GR::mc1);
         ADDVTV(Instructions, mm0);
+        ADDVTV(Instructions, loadMC2);
+        ADDVTV(Instructions, loadMC1);
     }
 
     void OtoOTranslator::LoadInstToReg(Instruction inst, Geneerator::Registers reg) {
@@ -278,6 +297,23 @@ namespace O {
                 auto subTarget = G::add(reg, v.fromEbpOffset);
                 ADDVTV(Instructions, moveEbp);
                 ADDVTV(Instructions, subTarget)
+            }else if(inst.name == ARRAY_CREATION_NAME){
+                auto malloc = G::malloc((int)inst.Parameters[0].name[0]);
+                ADDVTV(Instructions, malloc);
+                auto movRes = G::mov(reg, GR::eax);
+                ADDVTV(Instructions, movRes)
+                for(int i = 1; i < inst.Parameters.size(); i++){
+                    LoadInstToReg(inst.Parameters[i], GR::aa1);
+                    auto mov = G::mov("", i - 1, reg, GR::aa1);
+                    ADDVTV(Instructions, mov);
+                }
+            }else if(inst.name == ARRAY_ELEMENT_ACCESS_NAME){
+                LoadInstToReg(inst.Parameters[0], GR::mc1);
+                LoadInstToReg(inst.Parameters[1], GR::edi);
+                auto add = G::add(GR::edi, GR::mc1);
+                ADDVTV(Instructions, add);
+                auto mov = G::mov(reg, "", 0, GR::edi);
+                ADDVTV(Instructions, mov);
             }
             else {
                 auto op1 = GetValueToInt(inst);

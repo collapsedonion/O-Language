@@ -77,8 +77,6 @@ namespace O {
         (*esp)++;
     }
 
-
-
     int *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
         SectorDescription sd;
         if(mad.sectorName == ""){
@@ -140,12 +138,39 @@ namespace O {
         push(Registers::mc1);
         push(Registers::mc2);
         push(Registers::aa0);
+        push(Registers::flag);
+        push(Registers::esi);
+        push(Registers::edi);
     }
 
     void Memory::pops() {
+        pop(Registers::edi);
+        pop(Registers::esi);
+        pop(Registers::flag);
         pop(Registers::aa0);
         pop(Registers::mc2);
         pop(Registers::mc1);
         pop(Registers::mc0);
+    }
+
+    void Memory::malloc(Memory::Registers reg) {
+        malloc(*GetRegisterAccess(reg));
+    }
+
+    void Memory::malloc(Memory::MemoryAddressDescriptor mad) {
+        malloc(*GetAccessByMemoryDescriptor(mad));
+    }
+
+    void Memory::malloc(int value) {
+        auto start = _mem.size();
+        for(int i = 0; i < value; i++){
+            _mem.push_back(0);
+        }
+        SectorDescription sd;
+        sd.name = std::to_string(start) + "ALLOC" + std::to_string(value);
+        sd.size = value;
+        sd.start = start;
+        _sectors.push_back(sd);
+        *GetRegisterAccess(Registers::eax) = start;
     }
 } // O

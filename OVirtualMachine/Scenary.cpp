@@ -84,6 +84,7 @@ namespace O{
             INSTSETUPTWOPARAM(movg)
             INSTSETUPONEPARAM(jmp, lu)
             INSTSETUPONEPARAM(jme, lu)
+            INSTSETUPONEPARAM(malloc, memoryUnit)
         }
     }
 }
