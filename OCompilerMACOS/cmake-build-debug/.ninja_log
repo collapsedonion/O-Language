@@ -19,3 +19,9 @@
 743	766	1677554480458576000	libOtoPythonTranslator.a	c8cb7533e67c8a3d
 697	724	1677413600152530000	libOLexicalAnalyser.a	36dff39ae2096dd1
 7	654	1677996629278023753	CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp.o	ed4f9fa5fc19f24c
+21	607	1678015335242779846	CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp.o	ed4f9fa5fc19f24c
+607	700	1678015335339895000	libO_ByteCode_generator.a	1bfbb7e29879d4b6
+22	736	1678015335371922084	CMakeFiles/OCompilerMAC.dir/main.cpp.o	3a8eee5a093e39a9
+22	764	1678015335400252178	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
+764	783	1678015335422878000	libOtoOVMCompiler.a	b86a94008fb82cc2
+783	843	1678015335481119770	OCompilerMAC	ca6bd2c29d4d0e6e

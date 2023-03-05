@@ -6,6 +6,8 @@
 #define OVIRTUALMACHINE_LOGICUNIT_H
 
 #include "Memory.h"
+#include <OVM_SDK.h>
+#include <dlfcn.h>
 
 #define DOUBLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg, int value);void instName(O::Memory::Registers destReg, O::Memory::Registers sourceReg);void instName(O::Memory::MemoryAddressDescriptor dest, int value);void instName(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source);void instName(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source);void instName(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source);
 #define SINGLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg); void instName(O::Memory::MemoryAddressDescriptor mad); void instName(int value);
@@ -15,8 +17,13 @@ namespace O {
     class LogicUnit {
     private:
         Memory* _mem = nullptr;
+
+        std::vector<Interrupt> registeredInterrupts;
     public:
         LogicUnit(Memory* memoryUnit);
+
+        void LoadNewInterrupts(std::string path);
+
         DOUBLEOPINSTRUCTIONDESCRIPTION(mov)
 
         DOUBLEOPINSTRUCTIONDESCRIPTION(add)
@@ -38,6 +45,8 @@ namespace O {
         SINGLEOPINSTRUCTIONDESCRIPTION(jmp);
 
         SINGLEOPINSTRUCTIONDESCRIPTION(jme);
+
+        SINGLEOPINSTRUCTIONDESCRIPTION(interrupt);
     };
 }
 

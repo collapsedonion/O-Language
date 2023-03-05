@@ -241,7 +241,12 @@ namespace O {
             auto setEbp = Geneerator::add(Geneerator::Registers::ebp, func.stackSize - 1);
             ADDVTV(Instructions, setEbp)
         }
-        auto c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
+        std::vector<int> c;
+        if(func.sector != "") {
+            c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
+        }else{
+            c = Geneerator::call(inst.name, 0, GR::NULLREG);
+        }
         Instructions->insert(Instructions->end(), c.begin(), c.end());
         auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
         ADDVTV(Instructions, addEsp);

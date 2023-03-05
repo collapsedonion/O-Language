@@ -203,5 +203,14 @@ namespace O {
         return -1;
     }
 
+    MEM_POINTER Memory::getMemPointer() {
+        MEM_POINTER mp;
+        mp._mem = &_mem;
+        mp.sectors = &_sectors;
+        mp.eax = GetRegisterAccess(Registers::eax);
+        mp.esp = *GetRegisterAccess(Registers::esp);
+        return mp;
+    }
+
 
 } // O

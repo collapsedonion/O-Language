@@ -56,6 +56,7 @@ public:
     GENERATEONEPARAMDEF(jme)
     GENERATEONEPARAMDEF(malloc)
     GENERATEONEPARAMDEF(free)
+    GENERATEONEPARAMDEF(interrupt)
 };
 
 

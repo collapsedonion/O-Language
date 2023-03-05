@@ -6,6 +6,7 @@
 #define OVIRTUALMACHINE_MEMORY_H
 
 #include <vector>
+#include <OVM_SDK.h>
 #include <string>
 
 namespace O {
@@ -33,12 +34,6 @@ namespace O {
         };
 
         static int registersCount;
-
-        struct SectorDescription{
-            std::string name;
-            int start;
-            int size;
-        };
 
         struct MemoryAddressDescriptor{
             std::string sectorName;
@@ -73,6 +68,7 @@ namespace O {
         void free(MemoryAddressDescriptor mad);
         void pushs();
         void pops();
+        MEM_POINTER getMemPointer();
         int* getMem();
     };
 

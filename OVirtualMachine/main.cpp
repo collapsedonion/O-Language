@@ -29,8 +29,8 @@ int main() {
     f.close();
 
     O::Memory mem(200);
-    int start = mem.LoadProgram("main", fileRep) + bodyStart;
     O::LogicUnit lu(&mem);
+    int start = mem.LoadProgram("main", fileRep) + bodyStart;
     lu.mov(O::Memory::Registers::eip, start);
 
 

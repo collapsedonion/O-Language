@@ -307,4 +307,39 @@ namespace O {
         }
     }
 
+    void LogicUnit::interrupt(int value) {
+        Interrupt inter = registeredInterrupts[value];
+        inter.hInt(_mem->getMemPointer());
+    }
+
+    void LogicUnit::interrupt(O::Memory::Registers destReg) {
+        throw std::exception();
+    }
+
+    void LogicUnit::interrupt(O::Memory::MemoryAddressDescriptor mad) {
+        throw std::exception();
+    }
+
+    void LogicUnit::LoadNewInterrupts(std::string path) {
+        void* hDl = dlopen(path.c_str(), RTLD_NOW);
+
+        if(hDl == nullptr){
+            throw std::exception();
+        }
+
+        OVM_MODULE_MAIN main = (OVM_MODULE_MAIN)dlsym(hDl, "_Omain");
+        if(main == nullptr){
+            throw std::exception();
+        }
+
+        std::vector<Interrupt> newInterrupts = main(registeredInterrupts.size());
+
+        for(auto i : newInterrupts){
+            std::vector<int> b = {17, 0, i.id, 0, 0,5,0,0,0,0};
+            _mem->LoadProgram(i.name, b);
+        }
+
+        registeredInterrupts.insert(registeredInterrupts.end(), newInterrupts.begin(), newInterrupts.end());
+    }
+
 }
