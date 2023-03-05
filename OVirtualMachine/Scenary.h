@@ -34,6 +34,7 @@ namespace O {
             jmp = 13,
             jme = 14,
             malloc = 15,
+            free = 16
         };
 
         struct Operand{

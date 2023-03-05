@@ -85,6 +85,7 @@ namespace O{
             INSTSETUPONEPARAM(jmp, lu)
             INSTSETUPONEPARAM(jme, lu)
             INSTSETUPONEPARAM(malloc, memoryUnit)
+            INSTSETUPONEPARAM(free, memoryUnit)
         }
     }
 }

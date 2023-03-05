@@ -52,6 +52,7 @@ namespace O {
         void CallFunction(Instruction inst);
         void ReturnFunction(Instruction inst);
         void LoadInstToReg(Instruction inst, Geneerator::Registers reg);
+        void FreeInstruction(Instruction inst);
         void IfFunction(Instruction inst);
         void ElseInstruction(Instruction inst);
         void ElifInstruction(Instruction inst);

@@ -13,6 +13,7 @@
 #define ELSE_NAME "else"
 #define ELIF_NAME "else if"
 #define ARRAY_CREATION_NAME "ARRAY_INIT"
+#define FREE_INSTRUCTION_NAME "_FREE"
 #define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
@@ -82,7 +83,10 @@ namespace O {
     }
 
     void OtoOTranslator::ProccessInstruction(Instruction inst) {
-        if(inst.name == SET_VALUE_NAME){
+        if(inst.name == FREE_INSTRUCTION_NAME){
+            FreeInstruction(inst);
+        }
+        else if(inst.name == SET_VALUE_NAME){
             SetInstruction(inst);
         }else if(inst.name == IF_NAME){
             IfFunction(inst);
@@ -426,5 +430,11 @@ namespace O {
         int oldSize = Instructions->size();
         IfFunction(inst);
         (*Instructions)[jumpOffset] = Instructions->size() - oldSize;
+    }
+
+    void OtoOTranslator::FreeInstruction(Instruction inst) {
+        LoadInstToReg(inst.Parameters[0], GR::esi);
+        auto f = G::free(GR::esi);
+        ADDVTV(Instructions, f)
     }
 } // O

@@ -12,6 +12,9 @@
 #define POINTER_GET_INSTRUCTION_TOKEN "@"
 #define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
 
+#define FREE_INSTRUCTION_TOKEN "free"
+#define FREE_INSTRUCTION_NAME "_FREE"
+
 #define POINTER_ACCESS_INSTRUCTION_TOKEN "~"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
 
@@ -927,7 +930,11 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 		}
 	}
 			else if (token.type == Analyser::Type::Name) {
-				if (token.forward) {
+                if(token.token == FREE_INSTRUCTION_TOKEN){
+                    res.name = FREE_INSTRUCTION_NAME;
+                    res.Parameters.push_back(proccessInstCall(token.childToken[0]));
+                }
+				else if (token.forward) {
 					res = checkAndGetFunction(token);
 				}
 				else {

@@ -78,7 +78,7 @@ namespace O {
     }
 
     int *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
-        SectorDescription sd;
+        SectorDescription sd = registerSectionDescriptor;
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
         }else{
@@ -95,7 +95,9 @@ namespace O {
             anchor = *GetRegisterAccess(mad.anchor);
         }
 
-        return &_mem[sd.start + anchor + mad.offset];
+        int index = sd.start + anchor + mad.offset;
+
+        return &_mem[index];
     }
 
     void Memory::pop(int value) {
@@ -167,10 +169,39 @@ namespace O {
             _mem.push_back(0);
         }
         SectorDescription sd;
-        sd.name = std::to_string(start) + "ALLOC" + std::to_string(value);
+        sd.name = std::to_string(start) + "ALLOC";
         sd.size = value;
         sd.start = start;
         _sectors.push_back(sd);
         *GetRegisterAccess(Registers::eax) = start;
     }
+
+    void Memory::free(int value) {
+        auto name = std::to_string(value) + "ALLOC";
+        int id = GetSectorIndex(name);
+        if(id == _sectors.size() - 1){
+            _mem.erase(_mem.begin() + _sectors[id].start, _mem.end());
+        }
+        _sectors.erase(_sectors.begin() + id);
+    }
+
+    void Memory::free(Memory::Registers reg) {
+        free(*GetRegisterAccess(reg));
+    }
+
+    void Memory::free(Memory::MemoryAddressDescriptor mad) {
+        free(*GetAccessByMemoryDescriptor(mad));
+    }
+
+    int Memory::GetSectorIndex(std::string name) {
+        for(int i = 0; i < _sectors.size(); i++){
+            if(_sectors[i].name == name){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+
 } // O

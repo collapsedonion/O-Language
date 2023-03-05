@@ -58,6 +58,7 @@ namespace O {
         int* GetRegisterAccess(Registers reg);
         int* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
         int GetIdByMAD(MemoryAddressDescriptor mad);
+        int GetSectorIndex(std::string name);
         void push(Registers reg);
         void push(MemoryAddressDescriptor mad);
         void push(int value);
@@ -67,6 +68,9 @@ namespace O {
         void malloc(Registers reg);
         void malloc(MemoryAddressDescriptor mad);
         void malloc(int value);
+        void free(int value);
+        void free(Registers reg);
+        void free(MemoryAddressDescriptor mad);
         void pushs();
         void pops();
         int* getMem();
