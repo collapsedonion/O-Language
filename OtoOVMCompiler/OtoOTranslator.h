@@ -35,6 +35,8 @@ namespace O {
 
         std::vector<VariableStored> variables;
         std::vector<VariableStored> additionalVariables;
+        std::vector<Structure> structs;
+        AdditionalDataType adtTable;
         int addOffset = 0;
         int bodyStart = 0;
 

@@ -15,6 +15,8 @@
 #define ARRAY_CREATION_NAME "ARRAY_INIT"
 #define FREE_INSTRUCTION_NAME "_FREE"
 #define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
+#define STRUCTURE_ELEMENT_ACCESS_NAME "STRUCTURE_ACCESS"
+#define MALLOC_INSTRUCTION_NAME "_MALLOC"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
 
@@ -30,6 +32,9 @@
 
 namespace O {
     void OtoOTranslator::Build(File f) {
+        structs = std::vector<Structure>(f.structures);
+        adtTable = f.adtTable;
+
         auto mov = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
 
         LoadFunctions(f.functions);
@@ -144,6 +149,28 @@ namespace O {
             LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
             auto add = G::add(GR::edi, GR::mc3);
             ADDVTV(Instructions, add);
+            auto mov = G::mov("", 0, GR::edi, GR::aa0);
+            ADDVTV(Instructions, mov);
+        }else if(inst.Parameters[0].name == STRUCTURE_ELEMENT_ACCESS_NAME){
+            LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
+            auto elementName = inst.Parameters[0].Parameters[0].name;
+            auto dt = inst.Parameters[0].Parameters[1].type;
+            Structure structure;
+            for(auto elem : structs){
+                if(elem.myDt == dt){
+                    structure = elem;
+                    break;
+                }
+            }
+            int offset = 0;
+            for(int i = 0; i < structure.variables.size(); i++){
+                if(structure.variables[i].name == elementName){
+                    offset = i;
+                    break;
+                }
+            }
+            auto add = G::add(GR::edi, offset);
+            ADDVTV(Instructions, add)
             auto mov = G::mov("", 0, GR::edi, GR::aa0);
             ADDVTV(Instructions, mov);
         }
@@ -295,12 +322,18 @@ namespace O {
                 LoadInstToReg(inst.Parameters[0], GR::mc1);
                 auto mm1 = Geneerator::mov(reg, "", 0, GR::mc1);
                 ADDVTV(Instructions, mm1);
-            }else if(inst.name == POINTER_GET_INSTRUCTION_NAME){
+            }else if(inst.name == MALLOC_INSTRUCTION_NAME) {
+                auto malloc = G::malloc(std::stoi(inst.Parameters[0].name));
+                ADDVTV(Instructions, malloc);
+                auto movRes = G::mov(reg, GR::eax);
+                ADDVTV(Instructions, movRes)
+            }else if(inst.name == POINTER_GET_INSTRUCTION_NAME) {
                 auto v = getVar(inst.Parameters[0].name);
                 auto moveEbp = G::mov(reg, GR::ebp);
                 auto subTarget = G::add(reg, v.fromEbpOffset);
                 ADDVTV(Instructions, moveEbp);
                 ADDVTV(Instructions, subTarget)
+
             }else if(inst.name == ARRAY_CREATION_NAME){
                 auto malloc = G::malloc((int)inst.Parameters[0].name[0]);
                 ADDVTV(Instructions, malloc);
@@ -316,6 +349,26 @@ namespace O {
                 LoadInstToReg(inst.Parameters[1], GR::edi);
                 auto add = G::add(GR::edi, GR::mc1);
                 ADDVTV(Instructions, add);
+                auto mov = G::mov(reg, "", 0, GR::edi);
+                ADDVTV(Instructions, mov);
+            }else if(inst.name == STRUCTURE_ELEMENT_ACCESS_NAME){
+                LoadInstToReg(inst.Parameters[1], GR::edi);
+                Structure structure;
+                for(auto elem : structs){
+                    if(elem.myDt == inst.Parameters[1].type){
+                        structure = elem;
+                        break;
+                    }
+                }
+                int offset = 0;
+                for(int i = 0; i < structure.variables.size(); i++){
+                    if(structure.variables[i].name == inst.Parameters[0].name){
+                        offset = i;
+                        break;
+                    }
+                }
+                auto add = G::add(GR::edi, offset);
+                ADDVTV(Instructions, add)
                 auto mov = G::mov(reg, "", 0, GR::edi);
                 ADDVTV(Instructions, mov);
             }

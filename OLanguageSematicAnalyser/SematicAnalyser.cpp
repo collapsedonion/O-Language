@@ -14,6 +14,8 @@
 
 #define FREE_INSTRUCTION_TOKEN "free"
 #define FREE_INSTRUCTION_NAME "_FREE"
+#define MALLOC_INSTRUCTION_TOKEN "malloc"
+#define MALLOC_INSTRUCTION_NAME "_MALLOC"
 
 #define POINTER_ACCESS_INSTRUCTION_TOKEN "~"
 #define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
@@ -933,6 +935,11 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
                 if(token.token == FREE_INSTRUCTION_TOKEN){
                     res.name = FREE_INSTRUCTION_NAME;
                     res.Parameters.push_back(proccessInstCall(token.childToken[0]));
+                    res.type = DataTypes::Void;
+                }else if(token.token == MALLOC_INSTRUCTION_TOKEN){
+                    res.type = getDataType(token.childToken[0]);
+                    res.Parameters.push_back(proccessInstCall(token.childToken[1]));
+                    res.name = MALLOC_INSTRUCTION_NAME;
                 }
 				else if (token.forward) {
 					res = checkAndGetFunction(token);
