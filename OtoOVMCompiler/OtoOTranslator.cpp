@@ -38,8 +38,9 @@ namespace O {
 
         auto mov = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
 
-        LoadFunctions(f.functions);
         Instructions = &mainFlow;
+
+        LoadFunctions(f.functions);
 
         bodyStart = this->Instructions->size();
 
@@ -235,8 +236,14 @@ namespace O {
             ADDVTV(Instructions, push)
         }
 
-        auto subEsp = Geneerator::sub(Geneerator::Registers::esp, func.stackSize - inst.Parameters.size());
-        ADDVTV(Instructions, subEsp);
+
+        if(func.sector != "") {
+            auto subEsp = Geneerator::sub(Geneerator::Registers::esp, func.stackSize - inst.Parameters.size());
+            ADDVTV(Instructions, subEsp);
+        }else{
+            auto subEsp = Geneerator::sub(Geneerator::Registers::esp, inst.Parameters.size() - 1);
+            ADDVTV(Instructions, subEsp);
+        }
 
         auto movEbp = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
         ADDVTV(Instructions, movEbp)
@@ -251,8 +258,13 @@ namespace O {
             c = Geneerator::call(inst.name, 0, GR::NULLREG);
         }
         Instructions->insert(Instructions->end(), c.begin(), c.end());
-        auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
-        ADDVTV(Instructions, addEsp);
+        if(func.stackSize != 0) {
+            auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
+            ADDVTV(Instructions, addEsp);
+        }else{
+            auto addEsp = Geneerator::add(Geneerator::Registers::esp, inst.Parameters.size());
+            ADDVTV(Instructions, addEsp);
+        }
         auto loadEBP = Geneerator::pop(Geneerator::Registers::ebp);
         ADDVTV(Instructions, loadEBP)
 

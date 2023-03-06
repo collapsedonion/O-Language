@@ -14,7 +14,8 @@ void LoadDL(std::string path, O::LogicUnit* lu){
         while (!f.eof()){
             std::string newF;
             f >> newF;
-            lu->LoadNewInterrupts(orgPath + "/" + path);
+            newF = orgPath + "/" + newF;
+            lu->LoadNewInterrupts(newF);
         }
     }
 }
@@ -47,7 +48,7 @@ int main(int argc, char* args[]) {
     O::Memory mem(200);
     O::LogicUnit lu(&mem);
 
-    if(argc == 2){
+    if(argc == 3){
         LoadDL(args[2], &lu);
     }
 

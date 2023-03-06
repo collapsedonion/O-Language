@@ -38,6 +38,7 @@ struct MEM_POINTER{
     std::vector<int>* _mem;
     std::vector<SectorDescription>* sectors;
     int esp;
+    int ebp;
     int* eax;
 };
 

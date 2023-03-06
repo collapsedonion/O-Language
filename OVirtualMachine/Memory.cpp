@@ -209,6 +209,7 @@ namespace O {
         mp.sectors = &_sectors;
         mp.eax = GetRegisterAccess(Registers::eax);
         mp.esp = *GetRegisterAccess(Registers::esp);
+        mp.ebp = *GetRegisterAccess(Registers::ebp);
         return mp;
     }
 
