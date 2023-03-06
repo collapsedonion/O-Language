@@ -5,11 +5,27 @@
 #include <iostream>
 #include <string>
 
-int main() {
+void LoadDL(std::string path, O::LogicUnit* lu){
+    std::ifstream f(path);
 
-    std::string loadFile;
+    std::string orgPath = path.substr(0, path.rfind('/'));
 
-    std::cin >> loadFile;
+    if(f.good()){
+        while (!f.eof()){
+            std::string newF;
+            f >> newF;
+            lu->LoadNewInterrupts(orgPath + "/" + path);
+        }
+    }
+}
+
+int main(int argc, char* args[]) {
+
+    if(argc == 1){
+        return -1;
+    }
+
+    std::string loadFile = args[1];
 
     std::ifstream f(loadFile);
 
@@ -30,6 +46,11 @@ int main() {
 
     O::Memory mem(200);
     O::LogicUnit lu(&mem);
+
+    if(argc == 2){
+        LoadDL(args[2], &lu);
+    }
+
     int start = mem.LoadProgram("main", fileRep) + bodyStart;
     lu.mov(O::Memory::Registers::eip, start);
 
