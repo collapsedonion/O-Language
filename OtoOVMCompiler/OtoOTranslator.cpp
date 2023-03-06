@@ -16,6 +16,7 @@
 #define FREE_INSTRUCTION_NAME "_FREE"
 #define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
 #define STRUCTURE_ELEMENT_ACCESS_NAME "STRUCTURE_ACCESS"
+#define WHILE_CYCLE_NAME "WHILE_CYCLE"
 #define MALLOC_INSTRUCTION_NAME "_MALLOC"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
@@ -99,6 +100,8 @@ namespace O {
             ElseInstruction(inst);
         } else if(inst.name == ELIF_NAME){
             ElifInstruction(inst);
+        }else if(inst.name == WHILE_CYCLE_NAME){
+            WhileInstruction(inst);
         }
         else if(inst.name == RETURN_NAME){
             ReturnFunction(inst);
@@ -398,11 +401,11 @@ namespace O {
     }
 
     bool OtoOTranslator::isStdLogic(Instruction instOP1, Instruction instOP2) {
-        return (ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer));
+        return (ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Character));
     }
 
     OtoOTranslator::StdLogicType OtoOTranslator::getLogicType(Instruction instOP1, Instruction instOP2) {
-        if(ISINSTTYPEEQU(instOP1, instOP2,DataTypes::Integer)){
+        if(ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Character)){
             return I;
         }
     }
@@ -494,5 +497,25 @@ namespace O {
         LoadInstToReg(inst.Parameters[0], GR::esi);
         auto f = G::free(GR::esi);
         ADDVTV(Instructions, f)
+    }
+
+    void OtoOTranslator::WhileInstruction(Instruction inst) {
+        auto jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
+        ADDVTV(Instructions, jmpToEndBody)
+        int jumpOffsetId = Instructions->size() - 1 - 2;
+        int oldSize = Instructions->size();
+        auto saveFlag = G::push(GR::flag);
+        ADDVTV(Instructions, saveFlag)
+        for(int i = 1; i<inst.Parameters.size(); i++){
+            ProccessInstruction(inst.Parameters[i]);
+        }
+        auto loadFlag = G::pop(GR::flag);
+        ADDVTV(Instructions, loadFlag)
+        (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
+        LoadInstToReg(inst.Parameters[0], GR::mc3);
+        auto cm = G::cmp(GR::mc3, 1);
+        auto je = G::jme("main", jumpOffsetId + 3, GR::NULLREG);
+        ADDVTV(Instructions, cm);
+        ADDVTV(Instructions, je);
     }
 } // O

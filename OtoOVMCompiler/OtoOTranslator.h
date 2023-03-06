@@ -58,6 +58,7 @@ namespace O {
         void IfFunction(Instruction inst);
         void ElseInstruction(Instruction inst);
         void ElifInstruction(Instruction inst);
+        void WhileInstruction(Instruction inst);
         VariableStored getVar(std::string name);
         FunctionStored getFun(std::string name);
         int GetValueToInt(Instruction inst);
