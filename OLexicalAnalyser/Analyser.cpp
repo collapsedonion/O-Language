@@ -2,15 +2,16 @@
 #include "pch.h"
 
 char O::Analyser::mathOperators[] = {
-    '?',
-    '>',
-    '<',
-    '-',
-    '+',
-    '*',
-    '/',
-    '|',
-    '&'
+        '|',
+        '&',
+        '?',
+        '>',
+        '<',
+        '-',
+        '+',
+        '*',
+        '/',
+        '%',
 };
 
 char O::Analyser::unarMathOperators[] = {

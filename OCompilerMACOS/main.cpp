@@ -10,6 +10,10 @@
 
 const std::string PreInclude =
         "extern:func:bool operator \"?\" (char a, char b);\n"
+        "extern:func:bool operator \"|\" (bool a, bool b);\n"
+        "extern:func:bool operator \"&\" (bool a, bool b);\n"
+        "extern:func:int operator \"%\" (int a, int b);\n"
+        "extern:func:int operator \"-\" (char a, char b);\n"
         "";
 
 int main(int argC, char* args[]) {

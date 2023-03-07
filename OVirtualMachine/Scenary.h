@@ -36,6 +36,9 @@ namespace O {
             malloc = 15,
             free = 16,
             interrupt = 17,
+            mul = 18,
+            div = 19,
+            mod = 20,
         };
 
         struct Operand{

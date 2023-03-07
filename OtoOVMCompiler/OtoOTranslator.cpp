@@ -236,22 +236,24 @@ namespace O {
             ADDVTV(Instructions, push)
         }
 
-
         if(func.sector != "") {
             auto subEsp = Geneerator::sub(Geneerator::Registers::esp, func.stackSize - inst.Parameters.size());
             ADDVTV(Instructions, subEsp);
-        }else{
-            if(inst.Parameters.size()!= 0) {
-                auto subEsp = Geneerator::sub(Geneerator::Registers::esp, inst.Parameters.size() - 1);
-                ADDVTV(Instructions, subEsp);
-            }
         }
 
         auto movEbp = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
         ADDVTV(Instructions, movEbp)
-        if(func.stackSize != 0) {
-            auto setEbp = Geneerator::add(Geneerator::Registers::ebp, func.stackSize - 1);
-            ADDVTV(Instructions, setEbp)
+
+        if(func.sector != "") {
+            if (func.stackSize != 0) {
+                auto setEbp = Geneerator::add(Geneerator::Registers::ebp, func.stackSize - 1);
+                ADDVTV(Instructions, setEbp)
+            }
+        }else{
+            if(inst.Parameters.size() != 0){
+                auto setEbp = Geneerator::add(Geneerator::Registers::ebp, inst.Parameters.size() - 1);
+                ADDVTV(Instructions, setEbp)
+            }
         }
         std::vector<int> c;
         if(func.sector != "") {
@@ -260,11 +262,11 @@ namespace O {
             c = Geneerator::call(inst.name, 0, GR::NULLREG);
         }
         Instructions->insert(Instructions->end(), c.begin(), c.end());
-        if(func.stackSize != 0) {
+        if(func.sector != "") {
             auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
             ADDVTV(Instructions, addEsp);
         }else{
-            if(inst.Parameters.size()!= 0) {
+            if(inst.Parameters.size() != 0) {
                 auto addEsp = Geneerator::add(Geneerator::Registers::esp, inst.Parameters.size());
                 ADDVTV(Instructions, addEsp);
             }
@@ -467,6 +469,12 @@ namespace O {
                     auto r = G::movl(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
+                }else if(type == "*"){
+                    newInst = G::mul(GR::mc1, GR::mc2);
+                }else if(type == "/"){
+                    newInst = G::div(GR::mc1, GR::mc2);
+                }else if(type == "%"){
+                    newInst = G::mod(GR::mc1, GR::mc2);
                 }
                 break;
             }

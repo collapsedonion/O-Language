@@ -342,4 +342,78 @@ namespace O {
         registeredInterrupts.insert(registeredInterrupts.end(), newInterrupts.begin(), newInterrupts.end());
     }
 
+    void LogicUnit::mul(O::Memory::Registers destReg, int value) {
+
+        GETREG(destReg) = GETREG(destReg) * value;
+    }
+
+    void LogicUnit::mul(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        GETREG(destReg) = GETREG(destReg) * GETREG(sourceReg);
+    }
+
+    void LogicUnit::mul(O::Memory::MemoryAddressDescriptor dest, int value) {
+        GETMAD(dest) *= value;
+    }
+
+    void LogicUnit::mul(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        GETMAD(dest) *= GETMAD(source);
+    }
+
+    void LogicUnit::mul(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        GETREG(dest) *= GETMAD(source);
+    }
+
+    void LogicUnit::mul(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        GETMAD(dest) *= GETREG(source);
+    }
+
+    void LogicUnit::div(O::Memory::Registers destReg, int value) {
+
+        GETREG(destReg) = GETREG(destReg) / value;
+    }
+
+    void LogicUnit::div(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        GETREG(destReg) = GETREG(destReg) / GETREG(sourceReg);
+    }
+
+    void LogicUnit::div(O::Memory::MemoryAddressDescriptor dest, int value) {
+        GETMAD(dest) /= value;
+    }
+
+    void LogicUnit::div(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        GETMAD(dest) /= GETMAD(source);
+    }
+
+    void LogicUnit::div(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        GETREG(dest) /= GETMAD(source);
+    }
+
+    void LogicUnit::div(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        GETMAD(dest) /= GETREG(source);
+    }
+
+    void LogicUnit::mod(O::Memory::Registers destReg, int value) {
+
+        GETREG(destReg) = GETREG(destReg) % value;
+    }
+
+    void LogicUnit::mod(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        GETREG(destReg) = GETREG(destReg) % GETREG(sourceReg);
+    }
+
+    void LogicUnit::mod(O::Memory::MemoryAddressDescriptor dest, int value) {
+        GETMAD(dest) %= value;
+    }
+
+    void LogicUnit::mod(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        GETMAD(dest) %= GETMAD(source);
+    }
+
+    void LogicUnit::mod(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        GETREG(dest) %= GETMAD(source);
+    }
+
+    void LogicUnit::mod(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        GETMAD(dest) %= GETREG(source);
+    }
 }

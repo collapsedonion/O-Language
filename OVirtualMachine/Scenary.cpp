@@ -87,6 +87,9 @@ namespace O{
             INSTSETUPONEPARAM(malloc, memoryUnit)
             INSTSETUPONEPARAM(free, memoryUnit)
             INSTSETUPONEPARAM(interrupt, lu)
+            INSTSETUPTWOPARAM(mul)
+            INSTSETUPTWOPARAM(div)
+            INSTSETUPTWOPARAM(mod)
         }
     }
 }
