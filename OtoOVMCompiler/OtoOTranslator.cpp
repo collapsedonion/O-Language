@@ -241,8 +241,10 @@ namespace O {
             auto subEsp = Geneerator::sub(Geneerator::Registers::esp, func.stackSize - inst.Parameters.size());
             ADDVTV(Instructions, subEsp);
         }else{
-            auto subEsp = Geneerator::sub(Geneerator::Registers::esp, inst.Parameters.size() - 1);
-            ADDVTV(Instructions, subEsp);
+            if(inst.Parameters.size()!= 0) {
+                auto subEsp = Geneerator::sub(Geneerator::Registers::esp, inst.Parameters.size() - 1);
+                ADDVTV(Instructions, subEsp);
+            }
         }
 
         auto movEbp = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
@@ -262,8 +264,10 @@ namespace O {
             auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
             ADDVTV(Instructions, addEsp);
         }else{
-            auto addEsp = Geneerator::add(Geneerator::Registers::esp, inst.Parameters.size());
-            ADDVTV(Instructions, addEsp);
+            if(inst.Parameters.size()!= 0) {
+                auto addEsp = Geneerator::add(Geneerator::Registers::esp, inst.Parameters.size());
+                ADDVTV(Instructions, addEsp);
+            }
         }
         auto loadEBP = Geneerator::pop(Geneerator::Registers::ebp);
         ADDVTV(Instructions, loadEBP)
@@ -290,7 +294,22 @@ namespace O {
                 source = std::stoi(inst.name);
                 break;
             case DataTypes::Character:
-                source = (int)inst.name[0];
+                if(inst.name[0] == '\\'){
+                    switch (inst.name[1]) {
+                        case 'n':
+                            source = '\n';
+                            break;
+                        case '0':
+                            source = '\0';
+                            break;
+                        case '\r':
+                            source = '\r';
+                            break;
+                    }
+                }
+                else {
+                    source = (int) inst.name[0];
+                }
                 break;
             case DataTypes::Boolean:
                 if(inst.name == FALSE_NAME){
@@ -403,7 +422,7 @@ namespace O {
             ADDVTV(Instructions, mm1);
         }else if(inst.IsFunction){
             CallFunction(inst);
-            auto mm1 = LOADFUNRESULT(reg);
+            auto mm1 = G::mov(reg, GR::eax);
             ADDVTV(Instructions, mm1);
         }else if(inst.ArithmeticProccess){
             MathematicalProccess(inst);

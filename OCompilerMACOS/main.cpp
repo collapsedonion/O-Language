@@ -5,19 +5,30 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <Call.h>
 #include <OtoOTranslator.h>
 #include <Preproccesor.h>
 
-int main() {
+const std::string PreInclude =
+        "extern:func:bool operator \"?\" (char a, char b);\n"
+        "";
+
+int main(int argC, char* args[]) {
 
     std::string filepath = "";
     std::string outfilepath = "";
 
-    std::cout << "Enter in and out filepaths:\n";
+    std::cout << args[0] << "\n";
 
-    std::cin >> filepath;
-    std::cin >> outfilepath;
+    if (argC == 1) {
+        return -1;
+    } else if (argC == 2) {
+        filepath = args[1];
+
+        outfilepath = "a.ovm";
+    } else if (argC == 3) {
+        filepath = args[1];
+        outfilepath = args[2];
+    }
 
     std::string filesource;
 
@@ -28,6 +39,8 @@ int main() {
     filesource = inBuffer.str();
     inBuffer.clear();
 
+    filesource = PreInclude + filesource;
+
     O::Preproccesor pp(filepath);
 
     filesource = pp.proccess(filesource);
@@ -37,16 +50,10 @@ int main() {
     O::SematicAnalyser sematiser;
     sematiser.ProccessTokenisedFile(TokenisedFile);
 
-    if(outfilepath[outfilepath.size() - 1] == 'y' && outfilepath[outfilepath.size() - 2] == 'p') {
-        std::string result = Translate(sematiser.getFileRepresantation());
-        std::ofstream of(outfilepath);
-        of << result;
-        of.close();
-    }else{
-        O::OtoOTranslator translator;
-        translator.Build(sematiser.getFileRepresantation());
-        translator.WriteResulToFile(outfilepath);
-    }
+    O::OtoOTranslator translator;
+    translator.Build(sematiser.getFileRepresantation());
+    translator.WriteResulToFile(outfilepath);
+
 
     return 0;
 }
