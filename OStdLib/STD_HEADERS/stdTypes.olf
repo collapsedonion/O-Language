@@ -1,0 +1,1 @@
+extern:func:int getHighFloat(float a);
