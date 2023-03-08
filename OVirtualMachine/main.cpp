@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <OVM_SDK.h>
+#include <mach-o/dyld.h>
 
 void GetHighFloat(MEM_POINTER mem){
     int* origin = &(*mem._mem)[mem.ebp];
@@ -32,6 +33,20 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
+    uint32_t execPathBufSize;
+    char* execPathBuf = (char*)malloc(execPathBufSize);
+
+    while(_NSGetExecutablePath(execPathBuf, &execPathBufSize) == -1){
+        free(execPathBuf);
+        execPathBufSize += 1024;
+        execPathBuf = (char*)malloc(execPathBufSize);
+    }
+
+    std::string execPath(execPathBuf);
+    free(execPathBuf);
+
+    execPath = execPath.substr(0, execPath.rfind("/"));
+
     std::string loadFile = args[1];
 
     std::ifstream f(loadFile);
@@ -55,6 +70,8 @@ int main(int argc, char* args[]) {
     O::LogicUnit lu(&mem);
 
     lu.AddNewInterrupt("getHighFloat", GetHighFloat);
+
+    LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
     if(argc == 3){
         LoadDL(args[2], &lu);

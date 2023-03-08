@@ -58,6 +58,9 @@ namespace O {
         if(!isAlredyIncluded(params[1])){
             included.push_back(params[1]);
             std::ifstream f(filePath + params[1]);
+            if(!f.good()){
+                f = std::ifstream(execPath + "/stdLib/" + params[1]);
+            }
             std::stringstream buf;
             buf << f.rdbuf();
             std::string content = buf.str();
@@ -104,11 +107,13 @@ namespace O {
         return "";
     }
 
-    Preproccesor::Preproccesor(std::string filePath) {
+    Preproccesor::Preproccesor(std::string filePath, std::string execPath) {
         auto indexOfLast = filePath.rfind('/');
         if(indexOfLast != std::string::npos)
         {
            this->filePath = filePath.substr(0, indexOfLast) + "/";
         }
+
+        this->execPath = execPath;
     }
 } // O

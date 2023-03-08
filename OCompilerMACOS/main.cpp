@@ -7,6 +7,7 @@
 #include <sstream>
 #include <OtoOTranslator.h>
 #include <Preproccesor.h>
+#include <mach-o/dyld.h>
 
 const std::string PreInclude =
         "extern:func:bool operator \"?\" (char a, char b);\n"
@@ -29,7 +30,20 @@ int main(int argC, char* args[]) {
     std::string filepath = "";
     std::string outfilepath = "";
 
-    std::cout << args[0] << "\n";
+    char* sourcePath = (char*)malloc(1024);
+    uint32_t sourceSize = 1024;
+
+    while(_NSGetExecutablePath(sourcePath, &sourceSize) == -1){
+        free(sourcePath);
+        sourceSize = sourceSize + 1024;
+        sourcePath = (char*) malloc(sourceSize);
+    }
+
+    std::string execPath(sourcePath);
+
+    free(sourcePath);
+
+    execPath = execPath.substr(0, execPath.rfind('/'));
 
     if (argC == 1) {
         return -1;
@@ -53,7 +67,7 @@ int main(int argC, char* args[]) {
 
     filesource = PreInclude + filesource;
 
-    O::Preproccesor pp(filepath);
+    O::Preproccesor pp(filepath, execPath);
 
     filesource = pp.proccess(filesource);
 

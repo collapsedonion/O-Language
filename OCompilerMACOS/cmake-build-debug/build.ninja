@@ -240,7 +240,7 @@ build OCompilerMAC: CXX_EXECUTABLE_LINKER__OCompilerMAC_Debug CMakeFiles/OCompil
   FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
   LINK_LIBRARIES = libOLexicalAnalyser.a  libOLanguageSematicAnalyser.a  libOPreProccessor.a  libOtoOVMCompiler.a  libOLexicalAnalyser.a  libO_ByteCode_generator.a
   OBJECT_DIR = CMakeFiles/OCompilerMAC.dir
-  POST_BUILD = :
+  POST_BUILD = cd /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug && "/Applications/CLion 2023.1 EAP.app/Contents/bin/cmake/mac/bin/cmake" -E copy_directory /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/../OStdLib/STD_HEADERS /Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OCompilerMACOS/cmake-build-debug/stdlib
   PRE_LINK = :
   TARGET_FILE = OCompilerMAC
   TARGET_PDB = OCompilerMAC.dbg

@@ -23,3 +23,8 @@ target_link_libraries(OCompilerMAC LINK_PUBLIC OLanguageSematicAnalyser)
 target_link_libraries(OCompilerMAC LINK_PUBLIC OPreProccessor)
 
 target_link_libraries(OCompilerMAC LINK_PUBLIC OtoOVMCompiler)
+
+add_custom_command(TARGET OCompilerMAC  POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/../OStdLib/STD_HEADERS
+        ${CMAKE_BINARY_DIR}/stdlib)

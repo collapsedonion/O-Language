@@ -26,8 +26,10 @@ namespace O {
 
         std::string Include(std::string str);
 
+        std::string execPath;
+
     public:
-        Preproccesor(std::string filePath);
+        Preproccesor(std::string filePath, std::string execPath = "");
 
         std::string proccess(std::string str);
     };
