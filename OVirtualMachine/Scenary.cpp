@@ -92,6 +92,11 @@ namespace O{
             INSTSETUPTWOPARAM(mod)
             INSTSETUPTWOPARAM(AND)
             INSTSETUPTWOPARAM(OR)
+            INSTSETUPTWOPARAM(addf)
+            INSTSETUPTWOPARAM(subf)
+            INSTSETUPTWOPARAM(mulf)
+            INSTSETUPTWOPARAM(divf)
+            INSTSETUPTWOPARAM(cmpf)
         }
     }
 }

@@ -466,4 +466,280 @@ namespace O {
     void LogicUnit::OR(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
         GETMAD(dest) |= GETREG(source);
     }
+
+    void LogicUnit::addf(O::Memory::Registers destReg, int value) {
+
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)&value);
+
+        op1 += op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::addf(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)_mem->GetRegisterAccess(sourceReg));
+
+        op1 += op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::addf(O::Memory::MemoryAddressDescriptor dest, int value) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)&value);
+
+        op1 += op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::addf(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 += op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::addf(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetRegisterAccess(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 += op2;
+
+        GETREG(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::addf(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetRegisterAccess(source));
+
+        op1 += op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::subf(O::Memory::Registers destReg, int value) {
+
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)&value);
+
+        op1 -= op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::subf(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)_mem->GetRegisterAccess(sourceReg));
+
+        op1 -= op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::subf(O::Memory::MemoryAddressDescriptor dest, int value) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)&value);
+
+        op1 -= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::subf(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 -= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::subf(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetRegisterAccess(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 -= op2;
+
+        GETREG(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::subf(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetRegisterAccess(source));
+
+        op1 -= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::mulf(O::Memory::Registers destReg, int value) {
+
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)&value);
+
+        op1 *= op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::mulf(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)_mem->GetRegisterAccess(sourceReg));
+
+        op1 *= op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::mulf(O::Memory::MemoryAddressDescriptor dest, int value) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)&value);
+
+        op1 *= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::mulf(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 *= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::mulf(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetRegisterAccess(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 *= op2;
+
+        GETREG(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::mulf(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetRegisterAccess(source));
+
+        op1 *= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::divf(O::Memory::Registers destReg, int value) {
+
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)&value);
+
+        op1 /= op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::divf(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        float op1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float op2 = *((float*)_mem->GetRegisterAccess(sourceReg));
+
+        op1 /= op2;
+
+        GETREG(destReg) = *((int*)&op1);
+    }
+
+    void LogicUnit::divf(O::Memory::MemoryAddressDescriptor dest, int value) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)&value);
+
+        op1 /= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::divf(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 /= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::divf(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        float op1 = *((float*)_mem->GetRegisterAccess(dest));
+        float op2 = *((float*)_mem->GetAccessByMemoryDescriptor(source));
+
+        op1 /= op2;
+
+        GETREG(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::divf(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
+        float op2 = *((float*)_mem->GetRegisterAccess(source));
+
+        op1 /= op2;
+
+        GETMAD(dest) = *((int*)&op1);
+    }
+
+    void LogicUnit::cmpf(O::Memory::Registers destReg, int value) {
+        float p1 = *((float*)_mem->GetRegisterAccess(destReg));
+        float p2 = *((float*)&value);
+        auto res = 0;
+
+        if(p1 == p2){
+            res = 0b1;
+        }else if(p1 > p2){
+            res = 0b10;
+        }else if(p1 < p2){
+            res = 0b100;
+        }
+
+        auto newRegV = GETREG(Memory::Registers::flag);
+
+        auto mask = ~0b111;
+
+        newRegV = newRegV & mask;
+        newRegV += res;
+
+        GETREG(Memory::Registers::flag) = newRegV;
+    }
+
+    // 1 = e ; 10 = g ; 100 = l
+    void LogicUnit::cmpf(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        auto p2 = GETREG(sourceReg);
+        cmp(destReg, p2);
+    }
+
+    void LogicUnit::cmpf(O::Memory::MemoryAddressDescriptor dest, int value) {
+        throw std::exception();
+    }
+
+    void LogicUnit::cmpf(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        throw std::exception();
+    }
+
+    void LogicUnit::cmpf(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        throw std::exception();
+    }
+
+    void LogicUnit::cmpf(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        throw std::exception();
+    }
+
+    void LogicUnit::AddNewInterrupt(std::string name, InterruptHandler interrupt) {
+        std::vector<int> b = {17, 0, (int)registeredInterrupts.size(), 0, 0,5,0,0,0,0};
+        _mem->LoadProgram(name, b);
+
+        Interrupt inter;
+        inter.id = registeredInterrupts.size();
+        inter.name = name;
+        inter.hInt = interrupt;
+        registeredInterrupts.push_back(inter);
+    }
 }

@@ -4,6 +4,12 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <OVM_SDK.h>
+
+void GetHighFloat(MEM_POINTER mem){
+    int* origin = &(*mem._mem)[mem.ebp];
+    *mem.eax = (int)(*(float*)origin);
+}
 
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
@@ -47,6 +53,8 @@ int main(int argc, char* args[]) {
 
     O::Memory mem(200);
     O::LogicUnit lu(&mem);
+
+    lu.AddNewInterrupt("getHighFloat", GetHighFloat);
 
     if(argc == 3){
         LoadDL(args[2], &lu);

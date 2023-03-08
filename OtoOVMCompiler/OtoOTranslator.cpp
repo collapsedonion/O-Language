@@ -321,7 +321,7 @@ namespace O {
                 }
                 break;
             case DataTypes::FloatingPoint:
-                float nv = std::stof(inst.Parameters[1].name);
+                float nv = std::stof(inst.name);
                 source = *((int*)&nv);
                 break;
         }
@@ -435,7 +435,7 @@ namespace O {
 
     bool OtoOTranslator::isStdLogic(Instruction instOP1, Instruction instOP2) {
         return (ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Character) ||
-                ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Boolean));
+                ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Boolean) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::FloatingPoint));
     }
 
     OtoOTranslator::StdLogicType OtoOTranslator::getLogicType(Instruction instOP1, Instruction instOP2) {
@@ -443,49 +443,80 @@ namespace O {
             return I;
         }else if(ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Boolean)){
             return B;
+        }else if(ISINSTTYPEEQU(instOP1, instOP2, DataTypes::FloatingPoint)){
+            return F;
         }
     }
 
     void OtoOTranslator::ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::string type) {
         std::vector<int> newInst;
         switch (getLogicType(instOP1, instOP2)) {
-            case I:{
-                if(type == "+") {
+            case I: {
+                if (type == "+") {
                     newInst = G::add(GR::mc1, GR::mc2);
-                }else if(type == "-"){
+                } else if (type == "-") {
                     newInst = G::sub(GR::mc1, GR::mc2);
-                }else if(type == "?"){
+                } else if (type == "?") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::move(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                }else if(type == ">"){
+                } else if (type == ">") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::movg(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                }else if(type == "<"){
+                } else if (type == "<") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::movl(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                }else if(type == "*"){
+                } else if (type == "*") {
                     newInst = G::mul(GR::mc1, GR::mc2);
-                }else if(type == "/"){
+                } else if (type == "/") {
                     newInst = G::div(GR::mc1, GR::mc2);
-                }else if(type == "%"){
+                } else if (type == "%") {
                     newInst = G::mod(GR::mc1, GR::mc2);
                 }
                 break;
             }
-            case B:{
-                if(type == "&"){
+            case B: {
+                if (type == "&") {
                     newInst = G::AND(GR::mc1, GR::mc2);
-                }else if(type == "|"){
+                } else if (type == "|") {
                     newInst = G::OR(GR::mc1, GR::mc2);
+                }
+            }
+            case F: {
+                if (type == "+") {
+                    newInst = G::addf(GR::mc1, GR::mc2);
+                } else if (type == "-") {
+                    newInst = G::subf(GR::mc1, GR::mc2);
+                } else if (type == "?") {
+                    newInst = G::cmpf(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::move(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
+                } else if (type == ">") {
+                    newInst = G::cmpf(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::movg(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
+                } else if (type == "<") {
+                    newInst = G::cmpf(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::movl(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
+                } else if (type == "*") {
+                    newInst = G::mulf(GR::mc1, GR::mc2);
+                } else if (type == "/") {
+                    newInst = G::divf(GR::mc1, GR::mc2);
                 }
             }
         }

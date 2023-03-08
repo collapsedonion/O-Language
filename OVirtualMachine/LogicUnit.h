@@ -24,6 +24,8 @@ namespace O {
 
         void LoadNewInterrupts(std::string path);
 
+        void AddNewInterrupt(std::string name, InterruptHandler interrupt);
+
         DOUBLEOPINSTRUCTIONDESCRIPTION(mov)
 
         DOUBLEOPINSTRUCTIONDESCRIPTION(add)
@@ -57,6 +59,16 @@ namespace O {
         DOUBLEOPINSTRUCTIONDESCRIPTION(AND);
 
         DOUBLEOPINSTRUCTIONDESCRIPTION(OR);
+
+        DOUBLEOPINSTRUCTIONDESCRIPTION(addf);
+
+        DOUBLEOPINSTRUCTIONDESCRIPTION(subf);
+
+        DOUBLEOPINSTRUCTIONDESCRIPTION(mulf)
+
+        DOUBLEOPINSTRUCTIONDESCRIPTION(divf);
+
+        DOUBLEOPINSTRUCTIONDESCRIPTION(cmpf);
     };
 }
 

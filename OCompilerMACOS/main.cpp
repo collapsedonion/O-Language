@@ -15,6 +15,13 @@ const std::string PreInclude =
         "extern:func:int operator \"%\" (int a, int b);\n"
         "extern:func:char operator \"-\" (char a, char b);\n"
         "extern:func:char operator \"+\" (char a, char b);\n"
+        "extern:func:float operator \"+\" (float a, float b);\n"
+        "extern:func:float operator \"-\" (float a, float b);\n"
+        "extern:func:float operator \"*\" (float a, float b);\n"
+        "extern:func:float operator \"/\" (float a, float b);\n"
+        "extern:func:bool operator \"<\" (float a, float b);\n"
+        "extern:func:bool operator \">\" (float a, float b);\n"
+        "extern:func:bool operator \"?\" (float a, float b);\n"
         "";
 
 int main(int argC, char* args[]) {

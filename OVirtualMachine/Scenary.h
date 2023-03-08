@@ -40,7 +40,12 @@ namespace O {
             div = 19,
             mod = 20,
             AND = 21,
-            OR = 22
+            OR = 22,
+            addf = 23,
+            subf = 24,
+            mulf = 25,
+            divf = 26,
+            cmpf = 27,
         };
 
         struct Operand{
