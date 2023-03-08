@@ -106,11 +106,20 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token)
 		dataTypes.push_back(inst.type);
 		retInst.Parameters.push_back(inst);
 	}
-	
+
 	auto f = containsFunction(retInst.name, dataTypes);
 
 	if (f == DataTypes::Error) {
+
+        auto dt = getDataType(token);
+
+        if(dt != DataTypes::Error && retInst.Parameters.size() == 1){
+            retInst.Parameters[0].type = dt;
+            return retInst.Parameters[0];
+        }
+
 		std::string message = "Unable to find function with name \"" + retInst.name + "\"";
+
 		throw(std::exception());
 	}
 

@@ -416,4 +416,54 @@ namespace O {
     void LogicUnit::mod(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
         GETMAD(dest) %= GETREG(source);
     }
+
+    void LogicUnit::AND(O::Memory::Registers destReg, int value) {
+
+        GETREG(destReg) = GETREG(destReg) & value;
+    }
+
+    void LogicUnit::AND(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        GETREG(destReg) = GETREG(destReg) & GETREG(sourceReg);
+    }
+
+    void LogicUnit::AND(O::Memory::MemoryAddressDescriptor dest, int value) {
+        GETMAD(dest) &= value;
+    }
+
+    void LogicUnit::AND(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        GETMAD(dest) &= GETMAD(source);
+    }
+
+    void LogicUnit::AND(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        GETREG(dest) &= GETMAD(source);
+    }
+
+    void LogicUnit::AND(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        GETMAD(dest) &= GETREG(source);
+    }
+
+    void LogicUnit::OR(O::Memory::Registers destReg, int value) {
+
+        GETREG(destReg) = GETREG(destReg) | value;
+    }
+
+    void LogicUnit::OR(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
+        GETREG(destReg) = GETREG(destReg) | GETREG(sourceReg);
+    }
+
+    void LogicUnit::OR(O::Memory::MemoryAddressDescriptor dest, int value) {
+        GETMAD(dest) |= value;
+    }
+
+    void LogicUnit::OR(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
+        GETMAD(dest) |= GETMAD(source);
+    }
+
+    void LogicUnit::OR(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
+        GETREG(dest) |= GETMAD(source);
+    }
+
+    void LogicUnit::OR(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
+        GETMAD(dest) |= GETREG(source);
+    }
 }

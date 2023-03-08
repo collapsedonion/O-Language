@@ -39,6 +39,8 @@ namespace O {
             mul = 18,
             div = 19,
             mod = 20,
+            AND = 21,
+            OR = 22
         };
 
         struct Operand{

@@ -90,6 +90,8 @@ namespace O{
             INSTSETUPTWOPARAM(mul)
             INSTSETUPTWOPARAM(div)
             INSTSETUPTWOPARAM(mod)
+            INSTSETUPTWOPARAM(AND)
+            INSTSETUPTWOPARAM(OR)
         }
     }
 }

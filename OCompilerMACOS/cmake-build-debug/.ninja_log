@@ -72,3 +72,17 @@
 7	822	1678197863820382972	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
 823	870	1678197863874947000	libOtoOVMCompiler.a	b86a94008fb82cc2
 870	960	1678197863962487353	OCompilerMAC	6ffe88761cbc8655
+21	685	1678253834367691910	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+685	749	1678253834435911448	OCompilerMAC	6ffe88761cbc8655
+4	638	1678255231475001825	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+638	693	1678255231534763113	OCompilerMAC	6ffe88761cbc8655
+10	646	1678255694705188018	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+9	700	1678255694757887498	CMakeFiles/OLanguageSematicAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/SematicAnalyser.cpp.o	e4992e60d5640522
+701	723	1678255694785492000	libOLanguageSematicAnalyser.a	d09d2e70b46cdd4c
+723	776	1678255694837846121	OCompilerMAC	6ffe88761cbc8655
+5	586	1678256505113308748	CMakeFiles/O_ByteCode_generator.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/O-ByteCode-generator/Geneerator.cpp.o	ed4f9fa5fc19f24c
+586	609	1678256505143657000	libO_ByteCode_generator.a	1bfbb7e29879d4b6
+6	664	1678256505195193335	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+6	701	1678256505232568381	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
+702	720	1678256505254659000	libOtoOVMCompiler.a	b86a94008fb82cc2
+720	774	1678256505307918408	OCompilerMAC	6ffe88761cbc8655

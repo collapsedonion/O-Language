@@ -52,8 +52,8 @@ int main(int argc, char* args[]) {
         LoadDL(args[2], &lu);
     }
 
-    int start = mem.LoadProgram("main", fileRep) + bodyStart;
-    lu.mov(O::Memory::Registers::eip, start);
+    int start = mem.LoadProgram("main", fileRep);
+    lu.mov(O::Memory::Registers::eip, start + bodyStart);
 
 
     while (*(mem.GetRegisterAccess(O::Memory::Registers::eip)) < start + fileRep.size()){

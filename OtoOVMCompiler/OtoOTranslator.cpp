@@ -434,12 +434,15 @@ namespace O {
     }
 
     bool OtoOTranslator::isStdLogic(Instruction instOP1, Instruction instOP2) {
-        return (ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Character));
+        return (ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Character) ||
+                ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Boolean));
     }
 
     OtoOTranslator::StdLogicType OtoOTranslator::getLogicType(Instruction instOP1, Instruction instOP2) {
         if(ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Integer) || ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Character)){
             return I;
+        }else if(ISINSTTYPEEQU(instOP1, instOP2, DataTypes::Boolean)){
+            return B;
         }
     }
 
@@ -477,6 +480,13 @@ namespace O {
                     newInst = G::mod(GR::mc1, GR::mc2);
                 }
                 break;
+            }
+            case B:{
+                if(type == "&"){
+                    newInst = G::AND(GR::mc1, GR::mc2);
+                }else if(type == "|"){
+                    newInst = G::OR(GR::mc1, GR::mc2);
+                }
             }
         }
 
