@@ -1,6 +1,5 @@
 extern:func putChar(char c);
 extern:func:char tookChar();
-extern:func:char~ intToChar(int x);
 
 func readStr(char~ out, int countToRead){
 
