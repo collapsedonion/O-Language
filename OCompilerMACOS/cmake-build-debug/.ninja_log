@@ -27,3 +27,16 @@
 623	682	1678274514700766749	OCompilerMAC	5de1dcb57fd881a7
 3	622	1678274535680136644	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
 622	679	1678274535733877523	OCompilerMAC	5de1dcb57fd881a7
+13	896	1678354162828606287	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
+900	986	1678354162925861000	libOtoOVMCompiler.a	b86a94008fb82cc2
+986	1078	1678354163008197830	OCompilerMAC	5de1dcb57fd881a7
+23	691	1678354543322491770	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+22	721	1678354543352701316	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
+721	745	1678354543379928000	libOtoOVMCompiler.a	b86a94008fb82cc2
+745	805	1678354543433419961	OCompilerMAC	5de1dcb57fd881a7
+5	866	1678354652686384576	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
+868	894	1678354652718982000	libOtoOVMCompiler.a	b86a94008fb82cc2
+894	960	1678354652777308580	OCompilerMAC	5de1dcb57fd881a7
+7	817	1678355045451823292	CMakeFiles/OtoOVMCompiler.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoOVMCompiler/OtoOTranslator.cpp.o	1d5530a152960779
+818	842	1678355045482329000	libOtoOVMCompiler.a	b86a94008fb82cc2
+842	908	1678355045540079063	OCompilerMAC	5de1dcb57fd881a7

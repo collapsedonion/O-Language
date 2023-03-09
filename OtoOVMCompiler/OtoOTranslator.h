@@ -60,7 +60,7 @@ namespace O {
         void ElifInstruction(Instruction inst);
         void WhileInstruction(Instruction inst);
         VariableStored getVar(std::string name);
-        FunctionStored getFun(std::string name);
+        FunctionStored getFun(std::string name, std::vector<DataTypes> dt);
         int GetValueToInt(Instruction inst);
         bool isStdLogic(Instruction instOP1, Instruction instOP2);
         StdLogicType getLogicType(Instruction instOP1, Instruction instOP2);

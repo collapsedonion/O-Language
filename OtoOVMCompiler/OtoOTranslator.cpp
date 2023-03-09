@@ -204,6 +204,10 @@ namespace O {
             LoadVariables(fun.arguments, true);
             LoadVariables(fun.variables, true);
 
+            for(auto argument : fun.arguments){
+                newF.parameters.push_back(argument.type);
+            }
+
             for(auto inst : fun.body){
                 ProccessInstruction(inst);
             }
@@ -222,7 +226,13 @@ namespace O {
     }
 
     void OtoOTranslator::CallFunction(Instruction inst) {
-        auto func = getFun(inst.name);
+        std::vector<DataTypes> argumentsDataTypes;
+
+        for(auto argument : inst.Parameters){
+            argumentsDataTypes.push_back(argument.type);
+        }
+
+        auto func = getFun(inst.name, argumentsDataTypes);
 
         auto saveService = Geneerator::pushs();
         ADDVTV(Instructions, saveService);
@@ -278,10 +288,10 @@ namespace O {
         ADDVTV(Instructions, loadService)
     }
 
-    OtoOTranslator::FunctionStored OtoOTranslator::getFun(std::string name) {
+    OtoOTranslator::FunctionStored OtoOTranslator::getFun(std::string name, std::vector<DataTypes> argumentDataTypes) {
 
         for(auto func: storedFunctions){
-            if(func.name == name){
+            if(func.name == name && func.parameters == argumentDataTypes){
                 return func;
             }
         }
