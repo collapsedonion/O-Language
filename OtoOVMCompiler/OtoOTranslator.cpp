@@ -104,7 +104,11 @@ namespace O {
         }else if(inst.name == WHILE_CYCLE_NAME){
             WhileInstruction(inst);
         }
-        else if(inst.name == RETURN_NAME){
+        else if(inst.name == RETURN_NAME) {
+            for(int i = 0; i < popSystemCOunt; i++) {
+                auto popSystem = G::pop(GR::flag);
+                ADDVTV(Instructions, popSystem);
+            }
             ReturnFunction(inst);
         }
         else if(inst.IsFunction){
@@ -498,7 +502,13 @@ namespace O {
                 break;
             }
             case B: {
-                if (type == "&") {
+                if (type == "?") {
+                    newInst = G::cmp(GR::mc1, GR::mc2);
+                    auto preReg = G::mov(GR::mc1, 0);
+                    auto r = G::move(GR::mc1, 1);
+                    newInst.insert(newInst.end(), preReg.begin(), preReg.end());
+                    newInst.insert(newInst.end(), r.begin(), r.end());
+                }else if (type == "&") {
                     newInst = G::AND(GR::mc1, GR::mc2);
                 } else if (type == "|") {
                     newInst = G::OR(GR::mc1, GR::mc2);
@@ -545,9 +555,11 @@ namespace O {
         int oldSize = Instructions->size();
         auto saveFlag = G::push(GR::flag);
         ADDVTV(Instructions, saveFlag)
+        popSystemCOunt += 1;
         for(int i = 1; i<inst.Parameters.size(); i++){
            ProccessInstruction(inst.Parameters[i]);
         }
+        popSystemCOunt -= 1;
         auto loadFlag = G::pop(GR::flag);
         ADDVTV(Instructions, loadFlag)
         jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
@@ -570,9 +582,11 @@ namespace O {
         int oldSize = Instructions->size();
         auto saveFlag = G::push(GR::flag);
         ADDVTV(Instructions, saveFlag)
+        popSystemCOunt++;
         for(int i = 0; i < inst.Parameters.size(); i++){
             ProccessInstruction(inst.Parameters[i]);
         }
+        popSystemCOunt--;
         auto loadFlag = G::pop(GR::flag);
         ADDVTV(Instructions, loadFlag)
         (*Instructions)[jumpOffset] = Instructions->size() - oldSize;
@@ -600,9 +614,11 @@ namespace O {
         int oldSize = Instructions->size();
         auto saveFlag = G::push(GR::flag);
         ADDVTV(Instructions, saveFlag)
+        popSystemCOunt++;
         for(int i = 1; i<inst.Parameters.size(); i++){
             ProccessInstruction(inst.Parameters[i]);
         }
+        popSystemCOunt--;
         auto loadFlag = G::pop(GR::flag);
         ADDVTV(Instructions, loadFlag)
         (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;

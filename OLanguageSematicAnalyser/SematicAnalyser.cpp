@@ -255,6 +255,7 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 		sa.operators = std::vector<Operator>(operators);
 		sa.functions = std::vector<Function>(functions);
 		sa.variables = std::vector<Variable>(variables);
+        sa.returnType = returnType;
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
 		for(auto elem : token.subToken){
@@ -396,6 +397,7 @@ Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile to
         sa.operators = std::vector<Operator>(operators);
         sa.functions = std::vector<Function>(functions);
         sa.variables = std::vector<Variable>(variables);
+        sa.returnType = returnType;
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
         for(auto elem : token.subToken){
@@ -440,6 +442,7 @@ Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFil
         sa.operators = std::vector<Operator>(operators);
         sa.functions = std::vector<Function>(functions);
         sa.variables = std::vector<Variable>(variables);
+        sa.returnType = returnType;
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
         for(auto elem : token.subToken){
@@ -476,6 +479,7 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
         sa.operators = std::vector<Operator>(operators);
         sa.functions = std::vector<Function>(functions);
         sa.variables = std::vector<Variable>(variables);
+        sa.returnType = returnType;
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
         for(auto elem : token.subToken){

@@ -82,3 +82,28 @@ func integerToString(int source, char~ str, int maxSize){
 
     reverseString(str);
 }
+
+func:bool compareString(char~ str1, char~ str2){
+
+    var:int str1Size = stringSize(str1);
+    var:int str2Size = stringSize(str2);
+
+    if(str1Size ? str2Size){
+        var:int index = 0;
+
+        while(index < str1Size){
+            var:bool isOnThatIndexEqual = str1[index] ? str2[index];
+
+            if(isOnThatIndexEqual ? false){
+                return(false);
+            }
+
+            index = index +  1;
+        }
+
+    }else{
+        return(false);
+    }
+
+    return(true);
+}

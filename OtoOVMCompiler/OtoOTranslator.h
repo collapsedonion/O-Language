@@ -38,6 +38,7 @@ namespace O {
         std::vector<Structure> structs;
         AdditionalDataType adtTable;
         int addOffset = 0;
+        int popSystemCOunt = 0;
         int bodyStart = 0;
 
         std::vector<int>* Instructions;
