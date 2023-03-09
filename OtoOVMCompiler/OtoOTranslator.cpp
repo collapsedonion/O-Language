@@ -346,25 +346,29 @@ namespace O {
     }
 
     void OtoOTranslator::MathematicalProccess(Instruction inst) {
-        auto saveMC1 = G::push(GR::mc1);
-        auto saveMC2 = G::push(GR::mc2);
-        auto loadMC1 = G::pop(GR::mc1);
-        auto loadMC2 = G::pop(GR::mc2);
-        ADDVTV(Instructions, saveMC1)
-        ADDVTV(Instructions, saveMC2)
-        LoadInstToReg(inst.Parameters[0], GR::mc1);
-        ADDVTV(Instructions, saveMC1)
-        LoadInstToReg(inst.Parameters[1], GR::mc2);
-        ADDVTV(Instructions, loadMC1)
-
         if(isStdLogic(inst.Parameters[0], inst.Parameters[1])) {
+            auto saveMC1 = G::push(GR::mc1);
+            auto saveMC2 = G::push(GR::mc2);
+            auto loadMC1 = G::pop(GR::mc1);
+            auto loadMC2 = G::pop(GR::mc2);
             ProccessStdLogic(inst.Parameters[0], inst.Parameters[1], inst.name);
+            ADDVTV(Instructions, saveMC1)
+            ADDVTV(Instructions, saveMC2)
+            LoadInstToReg(inst.Parameters[0], GR::mc1);
+            ADDVTV(Instructions, saveMC1)
+            LoadInstToReg(inst.Parameters[1], GR::mc2);
+            ADDVTV(Instructions, loadMC1)
+            ProccessStdLogic(inst.Parameters[0], inst.Parameters[1], inst.name);
+            auto mm0 = G::mov(GR::mc0, GR::mc1);
+            ADDVTV(Instructions, mm0);
+            ADDVTV(Instructions, loadMC2);
+            ADDVTV(Instructions, loadMC1);
         }
-
-        auto mm0 = G::mov(GR::mc0, GR::mc1);
-        ADDVTV(Instructions, mm0);
-        ADDVTV(Instructions, loadMC2);
-        ADDVTV(Instructions, loadMC1);
+        else{
+            CallFunction(inst);
+            auto mm0 = G::mov(GR::mc0, GR::eax);
+            ADDVTV(Instructions, mm0);
+        }
     }
 
     void OtoOTranslator::LoadInstToReg(Instruction inst, Geneerator::Registers reg) {
