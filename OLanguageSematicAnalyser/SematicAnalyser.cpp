@@ -360,17 +360,26 @@ Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
 		throw(std::exception());
 	}
 
-	Instruction toRet = proccessInstCall(token.childToken[0]);
-	if (toRet.type != returnType) {
-		throw(std::exception());
-	}
+    if(token.childToken.size() != 0) {
+        Instruction toRet = proccessInstCall(token.childToken[0]);
+        if (toRet.type != returnType) {
+            throw(std::exception());
+        }
 
-	Instruction inst;
-	inst.type = toRet.type;
-	inst.Parameters.push_back(toRet);
-	inst.name = token.token;
+        Instruction inst;
+        inst.type = toRet.type;
+        inst.Parameters.push_back(toRet);
+        inst.name = token.token;
 
-	return inst;
+        return inst;
+    }else{
+        Instruction inst;
+        inst.type = DataTypes::Void;
+        inst.name = token.token;
+
+        return inst;
+    }
+
 }
 
 Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile token)
@@ -534,7 +543,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 
         for (int i = argOffset; i < nameField.childToken.size(); i++) {
             auto funcArgName = nameField.childToken[i];
-            if (funcArgName.childToken.size() != 1 || funcArgName.childToken[0].type != Analyser::Type::ServiceName) {
+            if (funcArgName.childToken.size() != 1) {
                 throw (std::exception());
             }
             auto funcArgType = getDataType(funcArgName.childToken[0]);

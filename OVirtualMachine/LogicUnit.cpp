@@ -13,38 +13,38 @@ namespace O {
          this->_mem = memoryUnit;
     }
 
-    void LogicUnit::mov(O::Memory::Registers destReg, int value) {
-        int* destination = _mem->GetRegisterAccess(destReg);
+    void LogicUnit::mov(O::Memory::Registers destReg, long value) {
+        long* destination = _mem->GetRegisterAccess(destReg);
         *destination = value;
     }
 
     void LogicUnit::mov(O::Memory::Registers destReg, O::Memory::Registers sourceReg) {
-        int value = *(_mem->GetRegisterAccess(sourceReg));
+        long value = *(_mem->GetRegisterAccess(sourceReg));
         mov(destReg, value);
     }
 
-    void LogicUnit::mov(O::Memory::MemoryAddressDescriptor dest, int value) {
-        int* d = _mem->GetAccessByMemoryDescriptor(dest);
+    void LogicUnit::mov(O::Memory::MemoryAddressDescriptor dest, long value) {
+        long* d = _mem->GetAccessByMemoryDescriptor(dest);
         *d = value;
     }
 
     void LogicUnit::mov(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source) {
-        int* d = _mem->GetAccessByMemoryDescriptor(dest);
-        int* s = _mem->GetAccessByMemoryDescriptor(source);
+        long* d = _mem->GetAccessByMemoryDescriptor(dest);
+        long* s = _mem->GetAccessByMemoryDescriptor(source);
         *d = *s;
     }
 
     void LogicUnit::mov(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source) {
-        int* d = _mem->GetRegisterAccess(dest);
+        long* d = _mem->GetRegisterAccess(dest);
         *d = *_mem->GetAccessByMemoryDescriptor(source);
     }
 
     void LogicUnit::mov(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source) {
-        int* d = _mem->GetAccessByMemoryDescriptor(dest);
+        long* d = _mem->GetAccessByMemoryDescriptor(dest);
         *d = *_mem->GetRegisterAccess(source);
     }
 
-    void LogicUnit::add(O::Memory::Registers dest, int value) {
+    void LogicUnit::add(O::Memory::Registers dest, long value) {
         GETREG(dest) += value;
     }
 
@@ -56,7 +56,7 @@ namespace O {
         GETREG(dest) += GETMAD(source);
     }
 
-    void LogicUnit::sub(O::Memory::Registers dest, int value) {
+    void LogicUnit::sub(O::Memory::Registers dest, long value) {
         GETREG(dest) -= value;
     }
 
@@ -68,7 +68,7 @@ namespace O {
         GETREG(dest) -= GETMAD(source);
     }
 
-    void LogicUnit::add(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::add(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) += value;
     }
 
@@ -80,7 +80,7 @@ namespace O {
         GETMAD(dest) += GETMAD(source);
     }
 
-    void LogicUnit::sub(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::sub(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) -= value;
     }
 
@@ -109,7 +109,7 @@ namespace O {
         GETREG(O::Memory::Registers::eip) = _mem->GetIdByMAD(mad);
     }
 
-    void LogicUnit::cmp(O::Memory::Registers destReg, int value) {
+    void LogicUnit::cmp(O::Memory::Registers destReg, long value) {
         auto p1 = GETREG(destReg);
         auto p2 = value;
         auto res = 0;
@@ -138,7 +138,7 @@ namespace O {
         cmp(destReg, p2);
     }
 
-    void LogicUnit::cmp(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::cmp(O::Memory::MemoryAddressDescriptor dest, long value) {
         throw std::exception();
     }
 
@@ -154,7 +154,7 @@ namespace O {
         throw std::exception();
     }
 
-    void LogicUnit::move(O::Memory::Registers destReg, int value) {
+    void LogicUnit::move(O::Memory::Registers destReg, long value) {
         auto flags = GETREG(Memory::Registers::flag);
         if((flags & 0b1) == 0b1){
             mov(destReg, value);
@@ -168,7 +168,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::move(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::move(O::Memory::MemoryAddressDescriptor dest, long value) {
         auto flags = GETREG(Memory::Registers::flag);
         if((flags & 0b1) == 0b1){
             mov(dest, value);
@@ -196,7 +196,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::movg(O::Memory::Registers destReg, int value) {
+    void LogicUnit::movg(O::Memory::Registers destReg, long value) {
         auto flags = GETREG(Memory::Registers::flag);
         if((flags & 0b10) == 0b10){
             mov(destReg, value);
@@ -210,7 +210,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::movg(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::movg(O::Memory::MemoryAddressDescriptor dest, long value) {
         auto flags = GETREG(Memory::Registers::flag);
         if((flags & 0b10) == 0b10){
             mov(dest, value);
@@ -238,7 +238,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::movl(O::Memory::Registers destReg, int value) {
+    void LogicUnit::movl(O::Memory::Registers destReg, long value) {
         auto flags = GETREG(Memory::Registers::flag);
         if((flags & 0b100) == 0b100){
             mov(destReg, value);
@@ -252,7 +252,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::movl(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::movl(O::Memory::MemoryAddressDescriptor dest, long value) {
         auto flags = GETREG(Memory::Registers::flag);
         if((flags & 0b100) == 0b100){
             mov(dest, value);
@@ -335,14 +335,14 @@ namespace O {
         std::vector<Interrupt> newInterrupts = main(registeredInterrupts.size());
 
         for(auto i : newInterrupts){
-            std::vector<int> b = {17, 0, i.id, 0, 0,5,0,0,0,0};
+            std::vector<long> b = {17, 0, i.id, 0, 0,5,0,0,0,0};
             _mem->LoadProgram(i.name, b);
         }
 
         registeredInterrupts.insert(registeredInterrupts.end(), newInterrupts.begin(), newInterrupts.end());
     }
 
-    void LogicUnit::mul(O::Memory::Registers destReg, int value) {
+    void LogicUnit::mul(O::Memory::Registers destReg, long value) {
 
         GETREG(destReg) = GETREG(destReg) * value;
     }
@@ -351,7 +351,7 @@ namespace O {
         GETREG(destReg) = GETREG(destReg) * GETREG(sourceReg);
     }
 
-    void LogicUnit::mul(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::mul(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) *= value;
     }
 
@@ -367,7 +367,7 @@ namespace O {
         GETMAD(dest) *= GETREG(source);
     }
 
-    void LogicUnit::div(O::Memory::Registers destReg, int value) {
+    void LogicUnit::div(O::Memory::Registers destReg, long value) {
 
         GETREG(destReg) = GETREG(destReg) / value;
     }
@@ -376,7 +376,7 @@ namespace O {
         GETREG(destReg) = GETREG(destReg) / GETREG(sourceReg);
     }
 
-    void LogicUnit::div(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::div(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) /= value;
     }
 
@@ -392,7 +392,7 @@ namespace O {
         GETMAD(dest) /= GETREG(source);
     }
 
-    void LogicUnit::mod(O::Memory::Registers destReg, int value) {
+    void LogicUnit::mod(O::Memory::Registers destReg, long value) {
 
         GETREG(destReg) = GETREG(destReg) % value;
     }
@@ -401,7 +401,7 @@ namespace O {
         GETREG(destReg) = GETREG(destReg) % GETREG(sourceReg);
     }
 
-    void LogicUnit::mod(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::mod(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) %= value;
     }
 
@@ -417,7 +417,7 @@ namespace O {
         GETMAD(dest) %= GETREG(source);
     }
 
-    void LogicUnit::AND(O::Memory::Registers destReg, int value) {
+    void LogicUnit::AND(O::Memory::Registers destReg,long value) {
 
         GETREG(destReg) = GETREG(destReg) & value;
     }
@@ -426,7 +426,7 @@ namespace O {
         GETREG(destReg) = GETREG(destReg) & GETREG(sourceReg);
     }
 
-    void LogicUnit::AND(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::AND(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) &= value;
     }
 
@@ -442,7 +442,7 @@ namespace O {
         GETMAD(dest) &= GETREG(source);
     }
 
-    void LogicUnit::OR(O::Memory::Registers destReg, int value) {
+    void LogicUnit::OR(O::Memory::Registers destReg, long value) {
 
         GETREG(destReg) = GETREG(destReg) | value;
     }
@@ -451,7 +451,7 @@ namespace O {
         GETREG(destReg) = GETREG(destReg) | GETREG(sourceReg);
     }
 
-    void LogicUnit::OR(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::OR(O::Memory::MemoryAddressDescriptor dest, long value) {
         GETMAD(dest) |= value;
     }
 
@@ -467,7 +467,7 @@ namespace O {
         GETMAD(dest) |= GETREG(source);
     }
 
-    void LogicUnit::addf(O::Memory::Registers destReg, int value) {
+    void LogicUnit::addf(O::Memory::Registers destReg, long value) {
 
         float op1 = *((float*)_mem->GetRegisterAccess(destReg));
         float op2 = *((float*)&value);
@@ -486,7 +486,7 @@ namespace O {
         GETREG(destReg) = *((int*)&op1);
     }
 
-    void LogicUnit::addf(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::addf(O::Memory::MemoryAddressDescriptor dest, long value) {
         float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
         float op2 = *((float*)&value);
 
@@ -522,7 +522,7 @@ namespace O {
         GETMAD(dest) = *((int*)&op1);
     }
 
-    void LogicUnit::subf(O::Memory::Registers destReg, int value) {
+    void LogicUnit::subf(O::Memory::Registers destReg, long value) {
 
         float op1 = *((float*)_mem->GetRegisterAccess(destReg));
         float op2 = *((float*)&value);
@@ -541,7 +541,7 @@ namespace O {
         GETREG(destReg) = *((int*)&op1);
     }
 
-    void LogicUnit::subf(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::subf(O::Memory::MemoryAddressDescriptor dest, long value) {
         float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
         float op2 = *((float*)&value);
 
@@ -577,7 +577,7 @@ namespace O {
         GETMAD(dest) = *((int*)&op1);
     }
 
-    void LogicUnit::mulf(O::Memory::Registers destReg, int value) {
+    void LogicUnit::mulf(O::Memory::Registers destReg, long value) {
 
         float op1 = *((float*)_mem->GetRegisterAccess(destReg));
         float op2 = *((float*)&value);
@@ -596,7 +596,7 @@ namespace O {
         GETREG(destReg) = *((int*)&op1);
     }
 
-    void LogicUnit::mulf(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::mulf(O::Memory::MemoryAddressDescriptor dest, long value) {
         float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
         float op2 = *((float*)&value);
 
@@ -632,7 +632,7 @@ namespace O {
         GETMAD(dest) = *((int*)&op1);
     }
 
-    void LogicUnit::divf(O::Memory::Registers destReg, int value) {
+    void LogicUnit::divf(O::Memory::Registers destReg, long value) {
 
         float op1 = *((float*)_mem->GetRegisterAccess(destReg));
         float op2 = *((float*)&value);
@@ -651,7 +651,7 @@ namespace O {
         GETREG(destReg) = *((int*)&op1);
     }
 
-    void LogicUnit::divf(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::divf(O::Memory::MemoryAddressDescriptor dest, long value) {
         float op1 = *((float*)_mem->GetAccessByMemoryDescriptor(dest));
         float op2 = *((float*)&value);
 
@@ -687,7 +687,7 @@ namespace O {
         GETMAD(dest) = *((int*)&op1);
     }
 
-    void LogicUnit::cmpf(O::Memory::Registers destReg, int value) {
+    void LogicUnit::cmpf(O::Memory::Registers destReg, long value) {
         float p1 = *((float*)_mem->GetRegisterAccess(destReg));
         float p2 = *((float*)&value);
         auto res = 0;
@@ -716,7 +716,7 @@ namespace O {
         cmp(destReg, p2);
     }
 
-    void LogicUnit::cmpf(O::Memory::MemoryAddressDescriptor dest, int value) {
+    void LogicUnit::cmpf(O::Memory::MemoryAddressDescriptor dest, long value) {
         throw std::exception();
     }
 
@@ -733,7 +733,7 @@ namespace O {
     }
 
     void LogicUnit::AddNewInterrupt(std::string name, InterruptHandler interrupt) {
-        std::vector<int> b = {17, 0, (int)registeredInterrupts.size(), 0, 0,5,0,0,0,0};
+        std::vector<long> b = {17, 0, (long)registeredInterrupts.size(), 0, 0,5,0,0,0,0};
         _mem->LoadProgram(name, b);
 
         Interrupt inter;

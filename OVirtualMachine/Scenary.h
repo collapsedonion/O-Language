@@ -62,8 +62,8 @@ namespace O {
             Operand op2;
         };
 
-        static std::pair<int, Operand> readOperand(OperandType opT, int* a, int id);
-        static std::pair<int, ScriptWord> generateScript(int* a, int id);
+        static std::pair<int, Operand> readOperand(OperandType opT, long* a, int id);
+        static std::pair<int, ScriptWord> generateScript(long* a, int id);
         static void EvaluateWord(ScriptWord sw, LogicUnit* lu, Memory* memoryUnit);
 
     };

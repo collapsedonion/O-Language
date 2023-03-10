@@ -26,11 +26,11 @@ namespace O {
             _mem.push_back(0);
         }
         stackStart = sd.start;
-        int* esp = GetRegisterAccess(Registers::esp);
+        long* esp = GetRegisterAccess(Registers::esp);
         *esp = sd.start + sd.size;
     }
 
-    int Memory::LoadProgram(std::string sectorName, std::vector<int> content) {
+    int Memory::LoadProgram(std::string sectorName, std::vector<long> content) {
         int lastId = _mem.size();
         SectorDescription sd;
         sd.name = sectorName;
@@ -44,7 +44,7 @@ namespace O {
         return lastId;
     }
 
-    int *Memory::GetRegisterAccess(Memory::Registers reg) {
+    long *Memory::GetRegisterAccess(Memory::Registers reg) {
 
         int index = registerSectionDescriptor.start + (int)reg;
 
@@ -52,8 +52,8 @@ namespace O {
     }
 
     void Memory::push(Memory::Registers reg) {
-        int* registerSource = GetRegisterAccess(reg);
-        int* esp = GetRegisterAccess(Registers::esp);
+        long* registerSource = GetRegisterAccess(reg);
+        long* esp = GetRegisterAccess(Registers::esp);
         (*esp)--;
         if((*esp) < stackStart){
             throw std::exception();
@@ -62,7 +62,7 @@ namespace O {
     }
 
     void Memory::push(int value) {
-        int* esp = GetRegisterAccess(Registers::esp);
+        long* esp = GetRegisterAccess(Registers::esp);
         (*esp)--;
         if((*esp) < stackStart){
             throw std::exception();
@@ -71,13 +71,13 @@ namespace O {
     }
 
     void Memory::pop(Memory::Registers reg) {
-        int* esp = GetRegisterAccess(Registers::esp);
-        int* dest = GetRegisterAccess(reg);
+        long* esp = GetRegisterAccess(Registers::esp);
+        long* dest = GetRegisterAccess(reg);
         *dest = _mem[*esp];
         (*esp)++;
     }
 
-    int *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
+    long *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
         SectorDescription sd = registerSectionDescriptor;
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
@@ -112,7 +112,7 @@ namespace O {
         throw std::exception();
     }
 
-    int *Memory::getMem() {
+    long *Memory::getMem() {
         return _mem.data();
     }
 

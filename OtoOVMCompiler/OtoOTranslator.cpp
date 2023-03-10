@@ -344,7 +344,9 @@ namespace O {
     }
 
     void OtoOTranslator::ReturnFunction(Instruction inst) {
-        LoadInstToReg(inst.Parameters[0], GR::eax);
+        if(inst.Parameters.size() != 0) {
+            LoadInstToReg(inst.Parameters[0], GR::eax);
+        }
         auto ret = Geneerator::ret();
         ADDVTV(Instructions, ret);
     }

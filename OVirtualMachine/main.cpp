@@ -8,7 +8,7 @@
 #include <mach-o/dyld.h>
 
 void GetHighFloat(MEM_POINTER mem){
-    int* origin = &(*mem._mem)[mem.ebp];
+    long* origin = &(*mem._mem)[mem.ebp];
     *mem.eax = (int)(*(float*)origin);
 }
 
@@ -51,7 +51,7 @@ int main(int argc, char* args[]) {
 
     std::ifstream f(loadFile);
 
-    std::vector<int> fileRep;
+    std::vector<long> fileRep;
 
     int size;
     f.read((char*)&size, 4);
@@ -59,7 +59,7 @@ int main(int argc, char* args[]) {
     f.read((char*)&bodyStart, 4);
 
     for(int i = 0; i < size; i++){
-        int newE;
+        long newE = 0;
         f.read((char*)&newE, 4);
         fileRep.push_back(newE);
     }

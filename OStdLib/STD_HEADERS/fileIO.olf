@@ -1,0 +1,50 @@
+struct:File{
+}
+
+extern:func:File openIFile(char~ path);
+extern:func:File openOFile(char~ path);
+extern:func:bool endOfFile(File file);
+extern:func:bool fGood(File file);
+extern:func:char fReadChar(File file);
+extern:func fPutChar(File file, char ch);
+extern:func closeFile(File file);
+
+func fReadToString(File file, char~ str, int stringSize){
+
+    var:int index = 0;
+
+    var:bool lineEnd = false;
+
+    while(fGood(file) & endOfFile(file) ? false & lineEnd ? false & index + 2 < stringSize){
+        var:char newChar = fReadChar(file);
+        if(newChar ? '\n'){
+            lineEnd = true;
+        }else{
+            str[index] = newChar;
+        }
+        index = index + 1;
+    }
+
+    str[index] = '\0';
+}
+
+func fWriteString(File file, char~ str){
+    if(fGood(file) ? false){
+        return();
+    }
+
+    var:bool notComplete = true;
+
+    var:int index = 0;
+
+    while(notComplete){
+        if(str[index] ? '\0'){
+            notComplete = false;
+        }else{
+            fPutChar(file, str[index]);
+        }
+        index = index + 1;
+    }
+
+    fPutChar(file, '\0');
+}

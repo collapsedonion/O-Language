@@ -42,16 +42,16 @@ namespace O {
         };
 
     private:
-        std::vector<int> _mem;
+        std::vector<long> _mem;
         SectorDescription registerSectionDescriptor;
         std::vector<SectorDescription> _sectors;
         int stackStart = -1;
 
     public:
         Memory(int stackSize);
-        int LoadProgram(std::string sectorName, std::vector<int> content);
-        int* GetRegisterAccess(Registers reg);
-        int* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
+        int LoadProgram(std::string sectorName, std::vector<long> content);
+        long* GetRegisterAccess(Registers reg);
+        long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
         int GetIdByMAD(MemoryAddressDescriptor mad);
         int GetSectorIndex(std::string name);
         void push(Registers reg);
@@ -69,7 +69,7 @@ namespace O {
         void pushs();
         void pops();
         MEM_POINTER getMemPointer();
-        int* getMem();
+        long* getMem();
     };
 
 } // O

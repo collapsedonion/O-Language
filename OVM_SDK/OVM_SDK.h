@@ -35,11 +35,11 @@ struct SectorDescription{
 };
 
 struct MEM_POINTER{
-    std::vector<int>* _mem;
+    std::vector<long>* _mem;
     std::vector<SectorDescription>* sectors;
-    int esp;
-    int ebp;
-    int* eax;
+    long esp;
+    long ebp;
+    long* eax;
 };
 
 typedef void (*InterruptHandler)(MEM_POINTER);
