@@ -19,16 +19,7 @@ void OpenFileInput(MEM_POINTER mem){
     long addressOfFilePath = (*mem._mem)[mem.ebp];
     auto filePath = (long*)&((*mem._mem)[addressOfFilePath]);
     std::string path = long_String_to_char8_String(filePath);
-    std::ifstream* f = new std::ifstream(path);
-    *mem.eax = (long)f;
-}
-
-void OpenFileOutput(MEM_POINTER mem){
-    long addressOfFilePath = (*mem._mem)[mem.ebp];
-    auto filePath = (long*)&((*mem._mem)[addressOfFilePath]);
-    std::string path = long_String_to_char8_String(filePath);
-    std::ofstream* f = new std::ofstream(path);
-
+    std::fstream* f = new std::fstream(path);
     *mem.eax = (long)f;
 }
 
@@ -53,14 +44,14 @@ void IsGood(MEM_POINTER mem){
 void WriteCharToFile(MEM_POINTER mem){
     long addressOfFile = (*mem._mem)[mem.ebp];
     char toWrite = (char)(*mem._mem)[mem.ebp-1];
-    auto *file = (std::ofstream*)addressOfFile;
+    auto *file = (std::fstream*)addressOfFile;
 
     file->put(toWrite);
 }
 
 void ReadCharFromFile(MEM_POINTER mem){
     long addressOfFile = (*mem._mem)[mem.ebp];
-    auto *file = (std::ifstream*)addressOfFile;
+    auto *file = (std::fstream*)addressOfFile;
 
     char res;
 
@@ -69,25 +60,18 @@ void ReadCharFromFile(MEM_POINTER mem){
     *mem.eax = res;
 }
 
-void CloseFile(MEM_POINTER mem){
+void CloseFile(MEM_POINTER mem) {
     long adressOfFile = (*mem._mem)[mem.ebp];
-    try {
-        auto *file = (std::ifstream *) adressOfFile;
+    auto *file = (std::fstream *) adressOfFile;
 
-        file->close();
-        delete (file);
-    }catch (...){
-        auto *file = (std::ofstream *) adressOfFile;
-
-        file->close();
-        delete (file);
-    }
+    file->close();
+    delete (file);
 }
 
 extern "C" std::vector<Interrupt> _Omain(int _lastId){
     Interrupt OpenFileInterrupt;
     OpenFileInterrupt.id = _lastId;
-    OpenFileInterrupt.name = "openIFile";
+    OpenFileInterrupt.name = "openFile";
     OpenFileInterrupt.hInt = OpenFileInput;
 
     Interrupt ReadCharFromFileI;
@@ -100,26 +84,21 @@ extern "C" std::vector<Interrupt> _Omain(int _lastId){
     closeFile.name = "closeFile";
     closeFile.hInt = CloseFile;
 
-    Interrupt openFileOutput;
-    openFileOutput.id = _lastId + 3;
-    openFileOutput.name = "openOFile";
-    openFileOutput.hInt = OpenFileOutput;
-
     Interrupt eof;
-    eof.id = _lastId + 4;
+    eof.id = _lastId + 3;
     eof.name = "endOfFile";
     eof.hInt = IsEOF;
 
     Interrupt good;
-    good.id = _lastId + 5;
+    good.id = _lastId + 4;
     good.name = "fGood";
     good.hInt = IsGood;
 
     Interrupt writeChar;
-    writeChar.id = _lastId + 6;
+    writeChar.id = _lastId + 5;
     writeChar.name = "fPutChar";
     writeChar.hInt = WriteCharToFile;
 
-    return {OpenFileInterrupt, ReadCharFromFileI, closeFile, openFileOutput, eof, good, writeChar};
+    return {OpenFileInterrupt, ReadCharFromFileI, closeFile, eof, good, writeChar};
 }
 

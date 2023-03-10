@@ -1,8 +1,7 @@
 struct:File{
 }
 
-extern:func:File openIFile(char~ path);
-extern:func:File openOFile(char~ path);
+extern:func:File openFile(char~ path);
 extern:func:bool endOfFile(File file);
 extern:func:bool fGood(File file);
 extern:func:char fReadChar(File file);
@@ -45,6 +44,4 @@ func fWriteString(File file, char~ str){
         }
         index = index + 1;
     }
-
-    fPutChar(file, '\0');
 }
