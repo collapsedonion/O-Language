@@ -90,12 +90,18 @@ namespace O {
             }
         }
 
-        int anchor = 0;
+        long anchor = 0;
         if((int)mad.anchor != -1){
             anchor = *GetRegisterAccess(mad.anchor);
         }
 
-        int index = sd.start + anchor + mad.offset;
+        long index = sd.start + anchor + mad.offset;
+
+        int pageIndex = index >> 32;
+
+        if(pageIndex != 0){
+            return &_heap[pageIndex][(int)index];
+        }
 
         return &_mem[index];
     }
@@ -164,24 +170,29 @@ namespace O {
     }
 
     void Memory::malloc(int value) {
-        auto start = _mem.size();
+        auto start = getFreeHeap();
+        _heap.insert({start, std::vector<long>()});
+
         for(int i = 0; i < value; i++){
-            _mem.push_back(0);
+            _heap[start].push_back(0);
         }
+
         SectorDescription sd;
         sd.name = std::to_string(start) + "ALLOC";
         sd.size = value;
         sd.start = start;
         _sectors.push_back(sd);
-        *GetRegisterAccess(Registers::eax) = start;
+
+        long result = start;
+        result <<= 32;
+
+        *GetRegisterAccess(Registers::eax) = result;
     }
 
-    void Memory::free(int value) {
-        auto name = std::to_string(value) + "ALLOC";
+    void Memory::free(long value) {
+        auto name = std::to_string(value >> 32) + "ALLOC";
         int id = GetSectorIndex(name);
-        if(id == _sectors.size() - 1){
-            _mem.erase(_mem.begin() + _sectors[id].start, _mem.end());
-        }
+        _heap.erase(int(value >> 32));
         _sectors.erase(_sectors.begin() + id);
     }
 
@@ -207,10 +218,24 @@ namespace O {
         MEM_POINTER mp;
         mp._mem = &_mem;
         mp.sectors = &_sectors;
+        mp._heap = &_heap;
         mp.eax = GetRegisterAccess(Registers::eax);
         mp.esp = *GetRegisterAccess(Registers::esp);
         mp.ebp = *GetRegisterAccess(Registers::ebp);
         return mp;
+    }
+
+    int Memory::getFreeHeap() {
+
+        if(!heapFree.empty()){
+            int value = heapFree.top();
+            heapFree.pop();
+            return value;
+        }
+        else{
+            return _heap.size() + 1;
+        }
+
     }
 
 

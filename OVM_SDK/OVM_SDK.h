@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 enum class Registers{
     eax = 0,
@@ -34,13 +35,33 @@ struct SectorDescription{
     int size;
 };
 
+inline std::pair<bool, std::pair<int, int>> decodeAddress(long address){
+    int page = address >> 32;
+    if(page != 0){
+        return {true, {page, (int)address}};
+    }else{
+        return {false, {0, address}};
+    }
+}
+
 struct MEM_POINTER{
     std::vector<long>* _mem;
+    std::map<int, std::vector<long>>* _heap;
     std::vector<SectorDescription>* sectors;
     long esp;
     long ebp;
     long* eax;
 };
+
+inline long* getObjectReferenceByAddress(MEM_POINTER mem, long address){
+    auto decodedAddress = decodeAddress(address);
+
+    if(!decodedAddress.first){
+        return &((*(mem._mem))[decodedAddress.second.second]);
+    }else{
+        return &((*(mem._heap))[decodedAddress.second.first][decodedAddress.second.second]);
+    }
+}
 
 typedef void (*InterruptHandler)(MEM_POINTER);
 struct Interrupt{

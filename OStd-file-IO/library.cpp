@@ -17,7 +17,7 @@ std::string long_String_to_char8_String(long* str){
 
 void OpenFileInput(MEM_POINTER mem){
     long addressOfFilePath = (*mem._mem)[mem.ebp];
-    auto filePath = (long*)&((*mem._mem)[addressOfFilePath]);
+    auto filePath = getObjectReferenceByAddress(mem, addressOfFilePath);
     std::string path = long_String_to_char8_String(filePath);
     std::fstream* f = new std::fstream(path);
     *mem.eax = (long)f;

@@ -8,6 +8,8 @@
 #include <vector>
 #include <OVM_SDK.h>
 #include <string>
+#include <map>
+#include <stack>
 
 namespace O {
 
@@ -43,12 +45,15 @@ namespace O {
 
     private:
         std::vector<long> _mem;
+        std::map<int, std::vector<long>> _heap;
+        std::stack<int> heapFree;
         SectorDescription registerSectionDescriptor;
         std::vector<SectorDescription> _sectors;
         int stackStart = -1;
 
     public:
         Memory(int stackSize);
+        int getFreeHeap();
         int LoadProgram(std::string sectorName, std::vector<long> content);
         long* GetRegisterAccess(Registers reg);
         long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
@@ -63,7 +68,7 @@ namespace O {
         void malloc(Registers reg);
         void malloc(MemoryAddressDescriptor mad);
         void malloc(int value);
-        void free(int value);
+        void free(long value);
         void free(Registers reg);
         void free(MemoryAddressDescriptor mad);
         void pushs();
