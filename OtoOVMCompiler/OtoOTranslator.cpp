@@ -206,7 +206,15 @@ namespace O {
             newF.sector = "main";
             newF.fromZeroOffset = Instructions->size();
             LoadVariables(fun.arguments, true);
+            addOffset += 1;
             LoadVariables(fun.variables, true);
+
+            int countOfLocalVariable = addOffset - fun.arguments.size() - 1;
+
+            localSize = countOfLocalVariable;
+
+            auto sub0 = G::sub(GR::esp, countOfLocalVariable);
+            ADDVTV(Instructions, sub0);
 
             for(auto argument : fun.arguments){
                 newF.parameters.push_back(argument.type);
@@ -217,6 +225,10 @@ namespace O {
             }
 
             if(fun.returnType == DataTypes::Void){
+                if(countOfLocalVariable != 0) {
+                    auto add0 = G::add(GR::esp, countOfLocalVariable);
+                    ADDVTV(Instructions, add0);
+                }
                 auto retCommand = Geneerator::ret();
                 Instructions->insert(Instructions->end(), retCommand.begin(), retCommand.end());
             }
@@ -250,25 +262,13 @@ namespace O {
             ADDVTV(Instructions, push)
         }
 
-        if(func.sector != "") {
-            auto subEsp = Geneerator::sub(Geneerator::Registers::esp, func.stackSize - inst.Parameters.size());
-            ADDVTV(Instructions, subEsp);
+        if(inst.Parameters.size() != 0) {
+            auto m0 = G::mov(GR::ebp, GR::esp);
+            ADDVTV(Instructions, m0);
+            auto a0 = G::add(GR::ebp, inst.Parameters.size() - 1);
+            ADDVTV(Instructions, a0);
         }
 
-        auto movEbp = Geneerator::mov(Geneerator::Registers::ebp, Geneerator::Registers::esp);
-        ADDVTV(Instructions, movEbp)
-
-        if(func.sector != "") {
-            if (func.stackSize != 0) {
-                auto setEbp = Geneerator::add(Geneerator::Registers::ebp, func.stackSize - 1);
-                ADDVTV(Instructions, setEbp)
-            }
-        }else{
-            if(inst.Parameters.size() != 0){
-                auto setEbp = Geneerator::add(Geneerator::Registers::ebp, inst.Parameters.size() - 1);
-                ADDVTV(Instructions, setEbp)
-            }
-        }
         std::vector<int> c;
         if(func.sector != "") {
             c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
@@ -276,15 +276,12 @@ namespace O {
             c = Geneerator::call(inst.name, 0, GR::NULLREG);
         }
         Instructions->insert(Instructions->end(), c.begin(), c.end());
-        if(func.sector != "") {
-            auto addEsp = Geneerator::add(Geneerator::Registers::esp, func.stackSize);
+
+        if(inst.Parameters.size() != 0){
+            auto addEsp = G::add(GR::esp, inst.Parameters.size());
             ADDVTV(Instructions, addEsp);
-        }else{
-            if(inst.Parameters.size() != 0) {
-                auto addEsp = Geneerator::add(Geneerator::Registers::esp, inst.Parameters.size());
-                ADDVTV(Instructions, addEsp);
-            }
         }
+
         auto loadEBP = Geneerator::pop(Geneerator::Registers::ebp);
         ADDVTV(Instructions, loadEBP)
 
@@ -346,6 +343,10 @@ namespace O {
     void OtoOTranslator::ReturnFunction(Instruction inst) {
         if(inst.Parameters.size() != 0) {
             LoadInstToReg(inst.Parameters[0], GR::eax);
+        }
+        if(localSize!= 0) {
+            auto add0 = G::add(GR::esp, localSize);
+            ADDVTV(Instructions, add0);
         }
         auto ret = Geneerator::ret();
         ADDVTV(Instructions, ret);

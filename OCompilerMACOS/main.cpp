@@ -81,6 +81,5 @@ int main(int argC, char* args[]) {
     translator.Build(sematiser.getFileRepresantation());
     translator.WriteResulToFile(outfilepath);
 
-
     return 0;
 }

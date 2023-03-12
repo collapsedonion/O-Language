@@ -217,7 +217,8 @@ Instruction O::SematicAnalyser::proccessString(Analyser::Token token)
 		Analyser::Token newC;
 		newC.type = Analyser::Type::Char;
 		if (token.token[i] == '\\'){
-			newC.token = "\\" + token.token[i + 1];
+			newC.token = "\\";
+            newC.token  += token.token[i + 1];
 			i++;
 		}
 		else {
