@@ -12,6 +12,88 @@ void GetHighFloat(MEM_POINTER mem){
     *mem.eax = (int)(*(float*)origin);
 }
 
+void LoadPackage(MEM_POINTER mem){
+    long* destPackage = &((*mem._mem)[(*mem._mem)[mem.ebp]]);
+    long sourceData = (*mem._mem)[mem.ebp - 1];
+    unsigned char elementIndex = (*mem._mem)[mem.ebp - 2];
+    unsigned char length = (*mem._mem)[mem.ebp - 3];
+
+    switch (length) {
+        case 1: {
+            long val = (char)sourceData & 0b1;
+            long clearMask = ~(1 << elementIndex);
+            val <<= elementIndex;
+            *destPackage &= clearMask;
+            *destPackage |= val;
+            break;
+        }
+        case 8: {
+            long val = (char)sourceData;
+            long shift = elementIndex * 8;
+
+            long clearMask = 0b11111111;
+            clearMask <<= shift;
+            clearMask = ~clearMask;
+
+            val <<= shift;
+            *destPackage &= clearMask;
+            *destPackage |= val;
+            break;
+        }
+        case 32: {
+            long value = (int)sourceData;
+            long shift = elementIndex * 32;
+
+            long clearMask = 0xFFFFFFFF;
+            clearMask <<= shift;
+            clearMask = ~clearMask;
+            value <<= shift;
+            *destPackage &= clearMask;
+            *destPackage |= value;
+            break;
+        }
+        default:
+            throw std::exception();
+    }
+}
+
+void ExtractPackage(MEM_POINTER mem){
+    long sourceData = (*mem._mem)[mem.ebp];
+    unsigned char elementIndex = (*mem._mem)[mem.ebp - 1];
+    unsigned char length = (*mem._mem)[mem.ebp - 2];
+
+    switch (length) {
+        case 1: {
+            long value = sourceData & (0b1 << elementIndex);
+            value >>= elementIndex;
+            *mem.eax = value;
+            break;
+        }
+        case 8: {
+            long shift = elementIndex * 8;
+            long mask = 0xFF;
+            mask <<= shift;
+
+            long value = sourceData & mask;
+            value >>= elementIndex * 8;
+            *mem.eax = value;
+            break;
+        }
+        case 32: {
+            long shift = elementIndex * 32;
+            long mask = 0xFFFFFFFF;
+            mask <<= shift;
+
+            long value = sourceData & mask;
+            value >>= elementIndex * 32;
+            *mem.eax = value;
+            break;
+        }
+        default:
+            throw std::exception();
+    }
+}
+
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
 
@@ -70,6 +152,8 @@ int main(int argc, char* args[]) {
     O::LogicUnit lu(&mem);
 
     lu.AddNewInterrupt("getHighFloat", GetHighFloat);
+    lu.AddNewInterrupt("packSend", LoadPackage);
+    lu.AddNewInterrupt("packExtract", ExtractPackage);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 

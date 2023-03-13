@@ -1,0 +1,46 @@
+extern:func packSend(int~ dest, int source, int index, int length);
+extern:func:int packExtract(int source, int index, int length);
+
+struct:PBool64{
+}
+
+struct:PFloat2{
+}
+
+struct:PInt2{
+}
+
+struct:PChar8{
+}
+
+func sendPBool64(PBool64~ dest, bool source, int index){
+    packSend(int~(dest), int(source), index, 1);
+}
+
+func sendPFloat2(PFloat2~ dest, float source, int index){
+    packSend(int~(dest), int(source), index, 32);
+}
+
+func sendPInt2(PInt2~ dest, int source, int index){
+    packSend(int~(dest), int(source), index, 32);
+}
+
+func sendPChar8(PChar8~ dest, char source, int index){
+    packSend(int~(dest), int(source), index, 8);
+}
+
+func:bool extractPBool64(PBool64 source, int index){
+    return(bool(packExtract(int(source), index, 1));
+}
+
+func:float extractPFloat2(PFloat2 source, int index){
+    return(float(packExtract(int(source), index, 32));
+}
+
+func:int extractPInt2(PInt2 source, int index){
+    return(int(packExtract(int(source), index, 32));
+}
+
+func:char extractPChar8(PChar8 source, int index){
+    return(char(packExtract(int(source), index, 8));
+}

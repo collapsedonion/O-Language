@@ -52,6 +52,7 @@
 DataTypes O::SematicAnalyser::containsFunction(std::string name, std::vector<DataTypes> dt)
 {
 	for (auto elem : functions) {
+        bool test = elem.getArgumentsDataTypes() == dt;
 		if (elem.name == name && elem.getArgumentsDataTypes() == dt) {
 			return elem.returnType;
 		}
@@ -111,7 +112,21 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token)
 
 	if (f == DataTypes::Error) {
 
-        auto dt = getDataType(token);
+        auto check = token.token;
+
+        Analyser::Token checkToken;
+        Analyser::Token *lastCreated = &checkToken;
+
+        while(*(check.end() - 1) == '~'){
+            lastCreated->token = '~';
+            lastCreated->childToken.emplace_back(Analyser::Token());
+            lastCreated = &lastCreated->childToken[0];
+            check = check.substr(0, check.size() - 1);
+        }
+
+        lastCreated->token = check;
+
+        auto dt = getDataType(checkToken);
 
         if(dt != DataTypes::Error && retInst.Parameters.size() == 1){
             retInst.Parameters[0].type = dt;
