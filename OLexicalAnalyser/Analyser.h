@@ -11,7 +11,7 @@
 #include <string>
 
 namespace O {
-	static bool operator & (std::string str1, std::string str2);
+	static bool operator & (std::wstring str1, std::wstring str2);
 
 	class Analyser
 	{
@@ -28,14 +28,14 @@ namespace O {
 		struct Token {
 		public:
 			Type type;
-			std::string token;
+			std::wstring token;
 			bool twoSided = false;
 			bool forward = false;
 			std::vector<Token> childToken;
 		};
 
 		struct StructurisedFile {
-			std::string name;
+			std::wstring name;
 			std::vector<StructurisedFile> subFile;
 		};
 
@@ -46,32 +46,32 @@ namespace O {
 		};
 
 	private:
-		static char mathOperators[];
-		static char unarMathOperators[];
-		static std::string defaultServiceNames[];
+		static wchar_t mathOperators[];
+		static wchar_t unarMathOperators[];
+		static std::wstring defaultServiceNames[];
 
 	private:
-		static int charNotInBrackets(std::string str, char c);
-		static int charNotInQuets(std::string str, char c);
-		static int charNotInFunction(std::string str, char c);
-		static std::pair<bool, std::pair<std::string, std::string>> doubleBracketOperator(std::string str, char left, char right);
-		static int stringNotInFunction(std::string str, std::string toFind);
-		static bool isDefaultServiceName(std::string str);
-		static bool isNumber(std::string str);
-		static bool isString(std::string str);
-		static std::string removeBrackes(std::string str);
-		static std::pair<std::string, std::string> sliceString(std::string str, int slicePoint);
-		static std::string removeSpaceBars(std::string str);
+		static int charNotInBrackets(std::wstring str, wchar_t c);
+		static int charNotInQuets(std::wstring str, wchar_t c);
+		static int charNotInFunction(std::wstring str, wchar_t c);
+		static std::pair<bool, std::pair<std::wstring, std::wstring>> doubleBracketOperator(std::wstring str, wchar_t left, wchar_t right);
+		static int stringNotInFunction(std::wstring str, std::wstring toFind);
+		static bool isDefaultServiceName(std::wstring str);
+		static bool isNumber(std::wstring str);
+		static bool isString(std::wstring str);
+		static std::wstring removeBrackes(std::wstring str);
+		static std::pair<std::wstring, std::wstring> sliceString(std::wstring str, int slicePoint);
+		static std::wstring removeSpaceBars(std::wstring str);
 
-		static Token getMathematicExpression(std::string str);
+		static Token getMathematicExpression(std::wstring str);
 
-		static Token ProccessNameOrCreation(std::string str);
+		static Token ProccessNameOrCreation(std::wstring str);
 
-		static std::pair<bool, std::pair<std::string, std::string>> getEqulitySign(std::string str);
+		static std::pair<bool, std::pair<std::wstring, std::wstring>> getEqulitySign(std::wstring str);
 
 	public:
-		static Token StringToTree(std::string str);
-		static StructurisedFile StructuriseFile(std::string str, std::string name = "___MAIN___");
+		static Token StringToTree(std::wstring str);
+		static StructurisedFile StructuriseFile(std::wstring str, std::wstring name = L"___MAIN___");
 		static TokenisedFile TokeniseFile(StructurisedFile sf);
 	};
 }

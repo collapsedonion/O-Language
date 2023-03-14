@@ -16,25 +16,25 @@ enum class DataTypes {
 struct AdditionalDataType {
 	int lastId = 7;
 	std::vector<int> additionalNumber;
-	std::vector<std::string> additionalName;
+	std::vector<std::wstring> additionalName;
 };
 
-inline DataTypes stringToDataType(std::string str, AdditionalDataType adt) {
+inline DataTypes stringToDataType(std::wstring str, AdditionalDataType adt) {
 
-	if (str == "int") {
+	if (str == L"int") {
 		return DataTypes::Integer;
 	}
-	else if (str == "bool") {
+	else if (str == L"bool") {
 		return DataTypes::Boolean;
 	}
-	else if (str == "void") {
+	else if (str == L"void") {
 		return DataTypes::Void;
 	}
-	else if (str == "float")
+	else if (str == L"float")
 	{
 		return DataTypes::FloatingPoint;
 	}
-	else if (str == "char") {
+	else if (str == L"char") {
 		return DataTypes::Character;
 	}
 	else {
@@ -59,7 +59,7 @@ inline bool contains(std::vector<T> vector, T value) {
 	return false;
 }
 
-inline bool containsChar(std::string str, char c) {
+inline bool containsChar(std::wstring str, wchar_t c) {
 	for (auto elem : str) {
 		if (elem == c) {
 			return true;
@@ -69,7 +69,7 @@ inline bool containsChar(std::string str, char c) {
 	return false;
 }
 
-inline DataTypes getTypeOfNumber(std::string str) {
+inline DataTypes getTypeOfNumber(std::wstring str) {
 	if (containsChar(str, '.')) {
 		return DataTypes::FloatingPoint;
 	}
@@ -77,36 +77,36 @@ inline DataTypes getTypeOfNumber(std::string str) {
 	return DataTypes::Integer;
 }
 
-inline std::string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType()) {
+inline std::wstring dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType()) {
 	switch (dt)
 	{
 	case DataTypes::ServiceInstruction:
-		return "___SI___";
+		return L"___SI___";
 	case DataTypes::MathematicalOperator:
-		return "___MO___";
+		return L"___MO___";
 	case DataTypes::Void:
-		return "void";
+		return L"void";
 	case DataTypes::Integer:
-		return "int";
+		return L"int";
 	case DataTypes::FloatingPoint:
-		return "float";
+		return L"float";
 	case DataTypes::Boolean:
-		return "bool";
+		return L"bool";
 	case DataTypes::Character:
-		return "char";
+		return L"char";
 	case DataTypes::Error:
-		return "ERROR";
+		return L"ERROR";
 	default:
 		for (int i = 0; i < adt.lastId - 7; i++) {
 			if (adt.additionalNumber[i] == (int)dt) {
 				return adt.additionalName[i];
 			}
 		}
-		return "ERROR";
+		return L"ERROR";
 	}
 }
 
-inline bool adtContains(std::string str, AdditionalDataType adt) {
+inline bool adtContains(std::wstring str, AdditionalDataType adt) {
 	for (auto elem : adt.additionalName) {
 		if (elem == str) {
 			return true;
@@ -118,22 +118,22 @@ inline bool adtContains(std::string str, AdditionalDataType adt) {
 
 struct Variable {
 	DataTypes type;
-	std::string name;
+	std::wstring name;
 };
 
 struct Operator {
-	std::string op;
+	std::wstring op;
 	DataTypes left;
 	DataTypes right;
 	DataTypes resultType;
 
 	Operator() {
-		op = "";
+		op = L"";
 		left = DataTypes::Error;
 		right = DataTypes::Error;
 	}
 
-	Operator(std::string op, DataTypes left, DataTypes right, DataTypes resultType) {
+	Operator(std::wstring op, DataTypes left, DataTypes right, DataTypes resultType) {
 		this->op = op;
 		this->left = left;
 		this->right = right;
@@ -142,13 +142,13 @@ struct Operator {
 };
 
 struct Structure{
-    std::string name;
+    std::wstring name;
     DataTypes myDt;
     std::vector<Variable> variables;
 };
 
 struct Instruction {
-	std::string name = "UNSIGNED_TOKEN";
+	std::wstring name = L"UNSIGNED_TOKEN";
 	DataTypes type = DataTypes::Error;
 	bool ArithmeticProccess = false;
 	bool IsVariable = false;
@@ -157,7 +157,7 @@ struct Instruction {
 };
 
 struct Function {
-	std::string name;
+	std::wstring name;
 	DataTypes returnType;
 	std::vector<Variable> arguments;
 	std::vector<Variable> variables;
@@ -181,7 +181,7 @@ struct File {
     std::vector<Structure> structures;
 };
 
-typedef std::string(__stdcall *TranslateFunction)(File);
+typedef std::wstring(__stdcall *TranslateFunction)(File);
 
 template <typename T>
 inline bool operator == (std::vector<T> v1, std::vector<T> v2) {

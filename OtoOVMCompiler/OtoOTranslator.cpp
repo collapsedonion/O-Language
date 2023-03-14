@@ -4,20 +4,20 @@
 
 #include "OtoOTranslator.h"
 
-#define SET_VALUE_NAME "SET_VALUE"
-#define FALSE_NAME "FALSE"
-#define RETURN_NAME "return"
-#define POINTER_ACCESS_INSTRUCTION_NAME "GET_POINTER_CONTENT"
-#define POINTER_GET_INSTRUCTION_NAME "GET_POINTER"
-#define IF_NAME "if"
-#define ELSE_NAME "else"
-#define ELIF_NAME "else if"
-#define ARRAY_CREATION_NAME "ARRAY_INIT"
-#define FREE_INSTRUCTION_NAME "_FREE"
-#define ARRAY_ELEMENT_ACCESS_NAME "ARRAY_ACCESS_INTEGER"
-#define STRUCTURE_ELEMENT_ACCESS_NAME "STRUCTURE_ACCESS"
-#define WHILE_CYCLE_NAME "WHILE_CYCLE"
-#define MALLOC_INSTRUCTION_NAME "_MALLOC"
+#define SET_VALUE_NAME L"SET_VALUE"
+#define FALSE_NAME L"FALSE"
+#define RETURN_NAME L"return"
+#define POINTER_ACCESS_INSTRUCTION_NAME L"GET_POINTER_CONTENT"
+#define POINTER_GET_INSTRUCTION_NAME L"GET_POINTER"
+#define IF_NAME L"if"
+#define ELSE_NAME L"else"
+#define ELIF_NAME L"else if"
+#define ARRAY_CREATION_NAME L"ARRAY_INIT"
+#define FREE_INSTRUCTION_NAME L"_FREE"
+#define ARRAY_ELEMENT_ACCESS_NAME L"ARRAY_ACCESS_INTEGER"
+#define STRUCTURE_ELEMENT_ACCESS_NAME L"STRUCTURE_ACCESS"
+#define WHILE_CYCLE_NAME L"WHILE_CYCLE"
+#define MALLOC_INSTRUCTION_NAME L"_MALLOC"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
 
@@ -58,7 +58,7 @@ namespace O {
         for(auto elem : variables){
             offset+= GetDataSize(elem.type);
             VariableStored vs;
-            vs.sector = "";
+            vs.sector = L"";
             vs.fromEbpOffset = (offset * -1);
             if(add){
                 vs.fromEbpOffset += 1;
@@ -116,7 +116,7 @@ namespace O {
         }
     }
 
-    OtoOTranslator::VariableStored OtoOTranslator::getVar(std::string name) {
+    OtoOTranslator::VariableStored OtoOTranslator::getVar(std::wstring name) {
         for(auto v:variables){
             if(v.name == name){
                 return v;
@@ -130,7 +130,7 @@ namespace O {
         return VariableStored();
     }
 
-    void OtoOTranslator::MovVariableToRegister(std::string name, Geneerator::Registers dest) {
+    void OtoOTranslator::MovVariableToRegister(std::wstring name, Geneerator::Registers dest) {
         auto var = getVar(name);
         auto inst = Geneerator::mov(dest, var.sector, var.fromEbpOffset, Geneerator::Registers::esp);
         Instructions->insert(Instructions->end(), inst.begin(), inst.end());
@@ -150,14 +150,14 @@ namespace O {
             ADDVTV(Instructions, mov)
         }else if(inst.Parameters[0].name == POINTER_ACCESS_INSTRUCTION_NAME){
             LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
-            auto mov = G::mov("", 0, GR::mc3, GR::aa0);
+            auto mov = G::mov(L"", 0, GR::mc3, GR::aa0);
             ADDVTV(Instructions, mov)
         }else if(inst.Parameters[0].name == ARRAY_ELEMENT_ACCESS_NAME) {
             LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
             LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
             auto add = G::add(GR::edi, GR::mc3);
             ADDVTV(Instructions, add);
-            auto mov = G::mov("", 0, GR::edi, GR::aa0);
+            auto mov = G::mov(L"", 0, GR::edi, GR::aa0);
             ADDVTV(Instructions, mov);
         }else if(inst.Parameters[0].name == STRUCTURE_ELEMENT_ACCESS_NAME){
             LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
@@ -179,12 +179,12 @@ namespace O {
             }
             auto add = G::add(GR::edi, offset);
             ADDVTV(Instructions, add)
-            auto mov = G::mov("", 0, GR::edi, GR::aa0);
+            auto mov = G::mov(L"", 0, GR::edi, GR::aa0);
             ADDVTV(Instructions, mov);
         }
     }
 
-    void OtoOTranslator::WriteResulToFile(std::string filepath) {
+    void OtoOTranslator::WriteResulToFile(std::wstring filepath) {
         std::ofstream f(filepath);
 
         int size = mainFlow.size();
@@ -203,7 +203,7 @@ namespace O {
 
         for(auto fun : functions) {
             FunctionStored newF;
-            newF.sector = "main";
+            newF.sector = L"main";
             newF.fromZeroOffset = Instructions->size();
             LoadVariables(fun.arguments, true);
             addOffset += 1;
@@ -270,7 +270,7 @@ namespace O {
         }
 
         std::vector<int> c;
-        if(func.sector != "") {
+        if(func.sector != L"") {
             c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
         }else{
             c = Geneerator::call(inst.name, 0, GR::NULLREG);
@@ -289,7 +289,7 @@ namespace O {
         ADDVTV(Instructions, loadService)
     }
 
-    OtoOTranslator::FunctionStored OtoOTranslator::getFun(std::string name, std::vector<DataTypes> argumentDataTypes) {
+    OtoOTranslator::FunctionStored OtoOTranslator::getFun(std::wstring name, std::vector<DataTypes> argumentDataTypes) {
 
         for(auto func: storedFunctions){
             if(func.name == name && func.parameters == argumentDataTypes){
@@ -382,7 +382,7 @@ namespace O {
         if(!inst.IsVariable && !inst.IsFunction && !inst.ArithmeticProccess){
             if(inst.name == POINTER_ACCESS_INSTRUCTION_NAME){
                 LoadInstToReg(inst.Parameters[0], GR::mc1);
-                auto mm1 = Geneerator::mov(reg, "", 0, GR::mc1);
+                auto mm1 = Geneerator::mov(reg, L"", 0, GR::mc1);
                 ADDVTV(Instructions, mm1);
             }else if(inst.name == MALLOC_INSTRUCTION_NAME) {
                 auto malloc = G::malloc(std::stoi(inst.Parameters[0].name));
@@ -403,7 +403,7 @@ namespace O {
                 ADDVTV(Instructions, movRes)
                 for(int i = 1; i < inst.Parameters.size(); i++){
                     LoadInstToReg(inst.Parameters[i], GR::aa1);
-                    auto mov = G::mov("", i - 1, reg, GR::aa1);
+                    auto mov = G::mov(L"", i - 1, reg, GR::aa1);
                     ADDVTV(Instructions, mov);
                 }
             }else if(inst.name == ARRAY_ELEMENT_ACCESS_NAME){
@@ -411,7 +411,7 @@ namespace O {
                 LoadInstToReg(inst.Parameters[1], GR::edi);
                 auto add = G::add(GR::edi, GR::mc1);
                 ADDVTV(Instructions, add);
-                auto mov = G::mov(reg, "", 0, GR::edi);
+                auto mov = G::mov(reg, L"", 0, GR::edi);
                 ADDVTV(Instructions, mov);
             }else if(inst.name == STRUCTURE_ELEMENT_ACCESS_NAME){
                 LoadInstToReg(inst.Parameters[1], GR::edi);
@@ -431,7 +431,7 @@ namespace O {
                 }
                 auto add = G::add(GR::edi, offset);
                 ADDVTV(Instructions, add)
-                auto mov = G::mov(reg, "", 0, GR::edi);
+                auto mov = G::mov(reg, L"", 0, GR::edi);
                 ADDVTV(Instructions, mov);
             }
             else {
@@ -469,80 +469,80 @@ namespace O {
         }
     }
 
-    void OtoOTranslator::ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::string type) {
+    void OtoOTranslator::ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::wstring type) {
         std::vector<int> newInst;
         switch (getLogicType(instOP1, instOP2)) {
             case I: {
-                if (type == "+") {
+                if (type == L"+") {
                     newInst = G::add(GR::mc1, GR::mc2);
-                } else if (type == "-") {
+                } else if (type == L"-") {
                     newInst = G::sub(GR::mc1, GR::mc2);
-                } else if (type == "?") {
+                } else if (type == L"?") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::move(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                } else if (type == ">") {
+                } else if (type == L">") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::movg(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                } else if (type == "<") {
+                } else if (type == L"<") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::movl(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                } else if (type == "*") {
+                } else if (type == L"*") {
                     newInst = G::mul(GR::mc1, GR::mc2);
-                } else if (type == "/") {
+                } else if (type == L"/") {
                     newInst = G::div(GR::mc1, GR::mc2);
-                } else if (type == "%") {
+                } else if (type == L"%") {
                     newInst = G::mod(GR::mc1, GR::mc2);
                 }
                 break;
             }
             case B: {
-                if (type == "?") {
+                if (type == L"?") {
                     newInst = G::cmp(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::move(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                }else if (type == "&") {
+                }else if (type == L"&") {
                     newInst = G::AND(GR::mc1, GR::mc2);
-                } else if (type == "|") {
+                } else if (type == L"|") {
                     newInst = G::OR(GR::mc1, GR::mc2);
                 }
             }
             case F: {
-                if (type == "+") {
+                if (type == L"+") {
                     newInst = G::addf(GR::mc1, GR::mc2);
-                } else if (type == "-") {
+                } else if (type == L"-") {
                     newInst = G::subf(GR::mc1, GR::mc2);
-                } else if (type == "?") {
+                } else if (type == L"?") {
                     newInst = G::cmpf(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::move(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                } else if (type == ">") {
+                } else if (type == L">") {
                     newInst = G::cmpf(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::movg(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                } else if (type == "<") {
+                } else if (type == L"<") {
                     newInst = G::cmpf(GR::mc1, GR::mc2);
                     auto preReg = G::mov(GR::mc1, 0);
                     auto r = G::movl(GR::mc1, 1);
                     newInst.insert(newInst.end(), preReg.begin(), preReg.end());
                     newInst.insert(newInst.end(), r.begin(), r.end());
-                } else if (type == "*") {
+                } else if (type == L"*") {
                     newInst = G::mulf(GR::mc1, GR::mc2);
-                } else if (type == "/") {
+                } else if (type == L"/") {
                     newInst = G::divf(GR::mc1, GR::mc2);
                 }
             }
@@ -552,7 +552,7 @@ namespace O {
     }
 
     void OtoOTranslator::IfFunction(Instruction inst) {
-        auto jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
+        auto jmpToEndBody = Geneerator::jmp(L"", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
         int jumpOffsetId = Instructions->size() - 1 - 2;
         int oldSize = Instructions->size();
@@ -565,21 +565,21 @@ namespace O {
         popSystemCOunt -= 1;
         auto loadFlag = G::pop(GR::flag);
         ADDVTV(Instructions, loadFlag)
-        jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
+        jmpToEndBody = Geneerator::jmp(L"", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
         int offsetOfExit = Instructions->size() - 1 - 2;
         int exitSize = Instructions->size();
         (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
         LoadInstToReg(inst.Parameters[0], GR::mc3);
         auto cm = G::cmp(GR::mc3, 1);
-        auto je = G::jme("main", jumpOffsetId + 3, GR::NULLREG);
+        auto je = G::jme(L"main", jumpOffsetId + 3, GR::NULLREG);
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
         (*Instructions)[offsetOfExit] = Instructions->size() - exitSize;
     }
 
     void OtoOTranslator::ElseInstruction(Instruction inst) {
-        auto jmpIfT = Geneerator::jme("", 123456, GR::eip);
+        auto jmpIfT = Geneerator::jme(L"", 123456, GR::eip);
         ADDVTV(Instructions, jmpIfT);
         int jumpOffset = Instructions->size() - 1 - 2;
         int oldSize = Instructions->size();
@@ -596,7 +596,7 @@ namespace O {
     }
 
     void OtoOTranslator::ElifInstruction(Instruction inst) {
-        auto jmpIfT = Geneerator::jme("", 123456, GR::eip);
+        auto jmpIfT = Geneerator::jme(L"", 123456, GR::eip);
         ADDVTV(Instructions, jmpIfT);
         int jumpOffset = Instructions->size() - 1 - 2;
         int oldSize = Instructions->size();
@@ -611,7 +611,7 @@ namespace O {
     }
 
     void OtoOTranslator::WhileInstruction(Instruction inst) {
-        auto jmpToEndBody = Geneerator::jmp("", 123456, GR::eip);
+        auto jmpToEndBody = Geneerator::jmp(L"", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
         int jumpOffsetId = Instructions->size() - 1 - 2;
         int oldSize = Instructions->size();
@@ -627,7 +627,7 @@ namespace O {
         (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
         LoadInstToReg(inst.Parameters[0], GR::mc3);
         auto cm = G::cmp(GR::mc3, 1);
-        auto je = G::jme("main", jumpOffsetId + 3, GR::NULLREG);
+        auto je = G::jme(L"main", jumpOffsetId + 3, GR::NULLREG);
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
     }

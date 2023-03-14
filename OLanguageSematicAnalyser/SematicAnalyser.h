@@ -20,28 +20,28 @@ namespace O {
         std::vector<Function> exportedFunctions;
         std::vector<Structure> definedStructures;
 		std::vector<Operator> operators = {
-			Operator("<", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
-			Operator(">", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
-			Operator("?", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
-			Operator("+", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-			Operator("-", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-			Operator("*", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-			Operator("/", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
+			Operator(L"<", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
+			Operator(L">", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
+			Operator(L"?", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
+			Operator(L"+", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
+			Operator(L"-", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
+			Operator(L"*", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
+			Operator(L"/", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
 		};
 		
 	private:
 		// returns ERROR if not found
-		DataTypes containsFunction(std::string name, std::vector<DataTypes> dt);
-		bool containsVariable(std::string name);
-		bool containsOperator(std::string op, DataTypes left, DataTypes right);
+		DataTypes containsFunction(std::wstring name, std::vector<DataTypes> dt);
+		bool containsVariable(std::wstring name);
+		bool containsOperator(std::wstring op, DataTypes left, DataTypes right);
         std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
-		DataTypes getReturnDataTypeOfOperator(std::string op, DataTypes left, DataTypes right);
+		DataTypes getReturnDataTypeOfOperator(std::wstring op, DataTypes left, DataTypes right);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
 
 		Instruction proccessPointerGet(Analyser::Token token);
 
-		Instruction getVariableAsInstruction(std::string name);
+		Instruction getVariableAsInstruction(std::wstring name);
 
 		Instruction proccessInstCall(Analyser::Token token);
 

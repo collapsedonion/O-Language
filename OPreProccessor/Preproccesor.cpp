@@ -7,10 +7,10 @@
 namespace O {
 
 
-    std::string Preproccesor::proccess(std::string str) {
-        std::string result;
+    std::wstring Preproccesor::proccess(std::wstring str) {
+        std::wstring result;
 
-        std::string buffer;
+        std::wstring buffer;
 
         bool bufferLoad = false;
 
@@ -21,7 +21,7 @@ namespace O {
 
                 result += getInst(buffer);
 
-                buffer = "";
+                buffer = L"";
                 continue;
             }
 
@@ -41,7 +41,7 @@ namespace O {
         return result;
     }
 
-    bool Preproccesor::isAlredyIncluded(std::string name) {
+    bool Preproccesor::isAlredyIncluded(std::wstring name) {
 
         for(auto e : included){
             if(e == name){
@@ -52,66 +52,66 @@ namespace O {
         return false;
     }
 
-    std::string Preproccesor::Include(std::string str) {
+    std::wstring Preproccesor::Include(std::wstring str) {
         auto params = getParameters(str);
 
         if(!isAlredyIncluded(params[1])){
             included.push_back(params[1]);
-            std::ifstream f(filePath + params[1]);
+            std::wifstream f(filePath + params[1]);
             if(!f.good()){
-                f = std::ifstream(execPath + "/stdLib/" + params[1]);
+                f = std::wifstream(execPath + L"/stdLib/" + params[1]);
             }
-            std::stringstream buf;
+            std::wstringstream buf;
             buf << f.rdbuf();
-            std::string content = buf.str();
+            std::wstring content = buf.str();
             f.close();
             return proccess(content);
         }
 
-        return "";
+        return L"";
     }
 
-    std::vector<std::string> Preproccesor::getParameters(std::string promt) {
+    std::vector<std::wstring> Preproccesor::getParameters(std::wstring promt) {
 
-        std::vector<std::string> toRet;
+        std::vector<std::wstring> toRet;
 
         if(promt[0] != '#'){
             return {};
         }
 
-        std::string last;
+        std::wstring last;
 
         for(auto c : promt){
             if(c == ' '){
                 toRet.push_back(last);
-                last = "";
+                last = L"";
             }else if(c != '\t'){
                 last += c;
             }
         }
 
-        if(last != ""){
+        if(last != L""){
             toRet.push_back(last);
         }
 
         return toRet;
     }
 
-    std::string Preproccesor::getInst(std::string promt) {
+    std::wstring Preproccesor::getInst(std::wstring promt) {
         auto p = getParameters(promt);
 
-        if(p[0] == "#include"){
+        if(p[0] == L"#include"){
             return Include(promt);
         }
 
-        return "";
+        return L"";
     }
 
-    Preproccesor::Preproccesor(std::string filePath, std::string execPath) {
+    Preproccesor::Preproccesor(std::wstring filePath, std::wstring execPath) {
         auto indexOfLast = filePath.rfind('/');
         if(indexOfLast != std::string::npos)
         {
-           this->filePath = filePath.substr(0, indexOfLast) + "/";
+           this->filePath = filePath.substr(0, indexOfLast) + L"/";
         }
 
         this->execPath = execPath;

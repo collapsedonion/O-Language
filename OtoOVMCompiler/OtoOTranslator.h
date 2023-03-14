@@ -14,14 +14,14 @@ namespace O {
     class OtoOTranslator {
     private:
         struct VariableStored{
-            std::string name;
-            std::string sector;
+            std::wstring name;
+            std::wstring sector;
             int fromEbpOffset = 0;
         };
 
         struct FunctionStored{
-            std::string name;
-            std::string sector;
+            std::wstring name;
+            std::wstring sector;
             std::vector<DataTypes> parameters;
             int stackSize = 0;
             int fromZeroOffset = 0;
@@ -50,7 +50,7 @@ namespace O {
         void LoadVariables(std::vector<Variable> variables, bool add = false);
         void LoadFunctions(std::vector<Function> functions);
         void ProccessInstruction(Instruction inst);
-        void MovVariableToRegister(std::string name, Geneerator::Registers dest);
+        void MovVariableToRegister(std::wstring name, Geneerator::Registers dest);
         void MovConstantToRegister(int constant, Geneerator::Registers dest);
         void SetInstruction(Instruction inst);
         void CallFunction(Instruction inst);
@@ -61,12 +61,12 @@ namespace O {
         void ElseInstruction(Instruction inst);
         void ElifInstruction(Instruction inst);
         void WhileInstruction(Instruction inst);
-        VariableStored getVar(std::string name);
-        FunctionStored getFun(std::string name, std::vector<DataTypes> dt);
+        VariableStored getVar(std::wstring name);
+        FunctionStored getFun(std::wstring name, std::vector<DataTypes> dt);
         int GetValueToInt(Instruction inst);
         bool isStdLogic(Instruction instOP1, Instruction instOP2);
         StdLogicType getLogicType(Instruction instOP1, Instruction instOP2);
-        void ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::string type);
+        void ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::wstring type);
 
         void MathematicalProccess(Instruction inst);
 
@@ -74,7 +74,7 @@ namespace O {
 
     public:
         void Build(File f);
-        void WriteResulToFile(std::string filepath);
+        void WriteResulToFile(std::wstring filepath);
     };
 
 } // O

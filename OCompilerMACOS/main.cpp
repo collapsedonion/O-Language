@@ -9,8 +9,8 @@
 #include <Preproccesor.h>
 #include <mach-o/dyld.h>
 
-const std::string PreInclude =
-        "extern:func:bool operator \"?\" (char a, char b);\n"
+const std::wstring PreInclude =
+        L"extern:func:bool operator \"?\" (char a, char b);\n"
         "extern:func:bool operator \"|\" (bool a, bool b);\n"
         "extern:func:bool operator \"?\" (bool a, bool b);\n"
         "extern:func:bool operator \"&\" (bool a, bool b);\n"
@@ -28,8 +28,8 @@ const std::string PreInclude =
 
 int main(int argC, char* args[]) {
 
-    std::string filepath = "";
-    std::string outfilepath = "";
+    std::string filepath;
+    std::string outfilepath;
 
     char* sourcePath = (char*)malloc(1024);
     uint32_t sourceSize = 1024;
@@ -41,14 +41,14 @@ int main(int argC, char* args[]) {
     }
 
     std::string execPath(sourcePath);
-
     free(sourcePath);
 
     execPath = execPath.substr(0, execPath.rfind('/'));
 
     if (argC == 1) {
         return -1;
-    } else if (argC == 2) {
+    }
+    else if (argC == 2) {
         filepath = args[1];
 
         outfilepath = "a.ovm";
@@ -57,10 +57,14 @@ int main(int argC, char* args[]) {
         outfilepath = args[2];
     }
 
-    std::string filesource;
+    std::wstring realFilePath(filepath.begin(), filepath.end());
+    std::wstring realOutFilePath(outfilepath.begin(), outfilepath.end());
+    std::wstring realExecPath(execPath.begin(), execPath.end());
 
-    std::ifstream f(filepath);
-    std::stringstream inBuffer;
+    std::wstring filesource;
+
+    std::wifstream f(realFilePath);
+    std::wstringstream inBuffer;
     inBuffer << f.rdbuf();
     f.close();
     filesource = inBuffer.str();
@@ -68,7 +72,7 @@ int main(int argC, char* args[]) {
 
     filesource = PreInclude + filesource;
 
-    O::Preproccesor pp(filepath, execPath);
+    O::Preproccesor pp(realFilePath, realExecPath);
 
     filesource = pp.proccess(filesource);
 
@@ -79,7 +83,7 @@ int main(int argC, char* args[]) {
 
     O::OtoOTranslator translator;
     translator.Build(sematiser.getFileRepresantation());
-    translator.WriteResulToFile(outfilepath);
+    translator.WriteResulToFile(realOutFilePath);
 
     return 0;
 }

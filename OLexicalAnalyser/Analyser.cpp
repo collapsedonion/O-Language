@@ -1,7 +1,7 @@
 #include "Analyser.h"
 #include "pch.h"
 
-char O::Analyser::mathOperators[] = {
+wchar_t O::Analyser::mathOperators[] = {
         '|',
         '&',
         '?',
@@ -14,25 +14,25 @@ char O::Analyser::mathOperators[] = {
         '%',
 };
 
-char O::Analyser::unarMathOperators[] = {
+wchar_t O::Analyser::unarMathOperators[] = {
     '@',
     '~',
     '!',
 };
 
-std::string O::Analyser::defaultServiceNames[] = {
-    "int",
-    "bool",
-    "float",
-    "char",
-    "void",
-    "false",
-    "true",
-    "while",
-    "return"
+std::wstring O::Analyser::defaultServiceNames[] = {
+    L"int",
+    L"bool",
+    L"float",
+    L"char",
+    L"void",
+    L"false",
+    L"true",
+    L"while",
+    L"return"
 };
 
-int O::Analyser::charNotInBrackets(std::string str, char c)
+int O::Analyser::charNotInBrackets(std::wstring str, wchar_t c)
 {
     int level = -1;
 
@@ -55,7 +55,7 @@ int O::Analyser::charNotInBrackets(std::string str, char c)
     return -1;
 }
 
-int O::Analyser::charNotInQuets(std::string str, char c)
+int O::Analyser::charNotInQuets(std::wstring str, wchar_t c)
 {
     bool inQuets = false;
 
@@ -72,7 +72,7 @@ int O::Analyser::charNotInQuets(std::string str, char c)
     return -1;
 }
 
-int O::Analyser::charNotInFunction(std::string str, char c)
+int O::Analyser::charNotInFunction(std::wstring str, wchar_t c)
 {
     int level = -1;
     int levelInCube = -1;
@@ -108,17 +108,17 @@ int O::Analyser::charNotInFunction(std::string str, char c)
     return -1;
 }
 
-std::pair<bool, std::pair<std::string, std::string>> O::Analyser::doubleBracketOperator(std::string str, char left, char right)
+std::pair<bool, std::pair<std::wstring, std::wstring>> O::Analyser::doubleBracketOperator(std::wstring str, wchar_t left, wchar_t right)
 {
     int level = -1;
     if ((*(str.end() - 1)) != right || str[0] == left) {
-        return { false, {"", ""} };
+        return { false, {L"", L""} };
     }
 
-    std::string operatorContent = "";
-    std::string leftPart;
+    std::wstring operatorContent = L"";
+    std::wstring leftPart;
 
-    std::string operatorContentRight = "";
+    std::wstring operatorContentRight = L"";
 
     for (int i = str.size() - 1; i >= 0; i--) {
         if (str[i] == right) {
@@ -141,10 +141,10 @@ std::pair<bool, std::pair<std::string, std::string>> O::Analyser::doubleBracketO
     return { true, {leftPart, operatorContentRight.substr(0, operatorContentRight.size() - 1)} };
 }
 
-int O::Analyser::stringNotInFunction(std::string str, std::string toFind)
+int O::Analyser::stringNotInFunction(std::wstring str, std::wstring toFind)
 {
 
-    std::string found = str;
+    std::wstring found = str;
     while (true)
     {
         int id = charNotInFunction(found, toFind[0]);
@@ -163,7 +163,7 @@ int O::Analyser::stringNotInFunction(std::string str, std::string toFind)
     }
 }
 
-bool O::Analyser::isDefaultServiceName(std::string str)
+bool O::Analyser::isDefaultServiceName(std::wstring str)
 {
     for (auto elem : defaultServiceNames){
         if (elem == str) {
@@ -174,7 +174,7 @@ bool O::Analyser::isDefaultServiceName(std::string str)
     return false;
 }
 
-bool O::Analyser::isNumber(std::string str)
+bool O::Analyser::isNumber(std::wstring str)
 {
     for (auto elem : str) {
         if (!std::isdigit(elem) && elem != '.') {
@@ -185,12 +185,12 @@ bool O::Analyser::isNumber(std::string str)
     return true;
 }
 
-bool O::Analyser::isString(std::string str)
+bool O::Analyser::isString(std::wstring str)
 {
     return str[0] == '\"' && ((* (str.end() - 1)) == '\"');
 }
 
-std::string O::Analyser::removeBrackes(std::string str)
+std::wstring O::Analyser::removeBrackes(std::wstring str)
 {
     if (str.size() < 2) {
         return str;
@@ -219,14 +219,14 @@ std::string O::Analyser::removeBrackes(std::string str)
     return str;
 }
 
-std::pair<std::string, std::string> O::Analyser::sliceString(std::string str, int slicePoint)
+std::pair<std::wstring, std::wstring> O::Analyser::sliceString(std::wstring str, int slicePoint)
 {
     return {str.substr(0, slicePoint), str.substr(slicePoint + 1, str.size() - slicePoint)};
 }
 
-std::string O::Analyser::removeSpaceBars(std::string str)
+std::wstring O::Analyser::removeSpaceBars(std::wstring str)
 {
-    std::string res = "";
+    std::wstring res = L"";
 
     bool inQuets = false;
 
@@ -256,7 +256,7 @@ std::string O::Analyser::removeSpaceBars(std::string str)
     return res;
 }
 
-bool O::operator&(std::string str1, std::string str2)
+bool O::operator&(std::wstring str1, std::wstring str2)
 {
     if (str1.size() < str2.size()) {
         return false;
@@ -271,11 +271,11 @@ bool O::operator&(std::string str1, std::string str2)
     return true;
 }
 
-O::Analyser::Token O::Analyser::getMathematicExpression(std::string str)
+O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str)
 {
     Token t;
 
-    for (int i = 0; i < sizeof(mathOperators); i++) {
+    for (int i = 0; i < sizeof(mathOperators) / sizeof(wchar_t); i++) {
         auto op = charNotInFunction(str, mathOperators[i]);
         if (op != -1) {
             auto splited = sliceString(str, op);
@@ -290,12 +290,12 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::string str)
     auto isOp = doubleBracketOperator(str, '[', ']');
     if (isOp.first) {
         t.type = Type::MathematicalOperator;
-        t.token = "[]a";
+        t.token = L"[]a";
         t.childToken = { StringToTree(isOp.second.first), StringToTree(isOp.second.second) };
         return t;
     }
 
-    for (int i = 0; i < sizeof(unarMathOperators); i++) {
+    for (int i = 0; i < sizeof(unarMathOperators)/ sizeof(wchar_t); i++) {
         if (str[0] == unarMathOperators[i]) {
             t.type = Type::MathematicalOperator;
             t.token = unarMathOperators[i];
@@ -307,10 +307,10 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::string str)
     return t;
 }
 
-O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
+O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
 {
-    int idOfVar = stringNotInFunction(str, "var");
-    int idOfFunc = stringNotInFunction(str, "func");
+    int idOfVar = stringNotInFunction(str, L"var");
+    int idOfFunc = stringNotInFunction(str, L"func");
 
     Token res;
 
@@ -321,8 +321,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
 
         return res;
     }
-    if (str & "extern:"){
-        res.token = "extern";
+    if (str & L"extern:"){
+        res.token = L"extern";
         res.type = Type::ServiceName;
         int idOfSpace = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSpace);
@@ -330,8 +330,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         return res;
     }
 
-    if (str & "struct:"){
-        res.token = "structure";
+    if (str & L"struct:"){
+        res.token = L"structure";
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
@@ -346,7 +346,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
             Token r;
             r.type = Type::ServiceName;
             r.twoSided = true;
-            r.token = "var";
+            r.token = L"var";
             splited = sliceString(splited.second, charNotInFunction(splited.second, ' '));
             r.childToken = { StringToTree(splited.first), StringToTree(splited.second) };
             return r;
@@ -356,8 +356,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         int idOfDoubleDot = charNotInFunction(str, ':');
         Token Func;
         Func.type = Type::ServiceName;
-        Func.token = "func";
-        std::string leftFunctionPart = str;
+        Func.token = L"func";
+        std::wstring leftFunctionPart = str;
         if (idOfDoubleDot != -1) {
             auto sliced = sliceString(str, idOfDoubleDot);
             leftFunctionPart = sliced.second;
@@ -366,13 +366,13 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
             leftFunctionPart = sliced.second;
         }
         else {
-            Func.childToken.push_back(StringToTree("void"));
+            Func.childToken.push_back(StringToTree(L"void"));
             leftFunctionPart = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' ')).second;
         }
         int idOfBracket = charNotInQuets(leftFunctionPart, '(');
         auto sliced = sliceString(leftFunctionPart, idOfBracket);
         Token nameAndAntherData;
-        nameAndAntherData.token = "name";
+        nameAndAntherData.token = L"name";
         nameAndAntherData.type = Type::ServiceName;
         sliced.first = removeSpaceBars(sliced.first);
         int idOfSp = charNotInQuets(sliced.first, ' ');
@@ -380,7 +380,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
             auto nameAndSL = sliceString(sliced.first, idOfSp);
             nameAndAntherData.childToken.push_back(StringToTree(nameAndSL.first));
             
-            if (nameAndAntherData.childToken[0].token == "operator") {
+            if (nameAndAntherData.childToken[0].token == L"operator") {
                 nameAndAntherData.childToken[0].type = Type::ServiceName;
             }
 
@@ -422,11 +422,11 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
         return Func;
     }
     else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
-        res.token = "a[]";
+        res.token = L"a[]";
         res.type = Type::ServiceName;
         res.forward = true;
-        std::string leftPart = str.substr(1, str.size() - 2);
-        if (leftPart != " ") {
+        std::wstring leftPart = str.substr(1, str.size() - 2);
+        if (leftPart != L" ") {
             leftPart = removeSpaceBars(leftPart);
             auto isHaveNewElem = charNotInFunction(leftPart, ',');
             while (isHaveNewElem != -1)
@@ -467,7 +467,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
                 res.forward = true;
                 res.type = Type::Name;
                 if (sliced.second.size() > 1) {
-                    std::string last = sliced.second.substr(0, sliced.second.size() - 1);
+                    std::wstring last = sliced.second.substr(0, sliced.second.size() - 1);
                     while (true) {
                         int idOfNext = charNotInFunction(last, ',');
                         if (idOfNext == -1) {
@@ -485,7 +485,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
             else {
                 auto idOfSeparator = charNotInFunction(str, ' ');
                 if(idOfSeparator != -1){
-                    res.token = "__init__";
+                    res.token = L"__init__";
                     auto splited = sliceString(str, idOfSeparator);
                     res.childToken = {StringToTree(splited.first), StringToTree(splited.second)};
                 }else {
@@ -500,12 +500,12 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::string str)
     return res;
 }
 
-std::pair<bool, std::pair<std::string, std::string>> O::Analyser::getEqulitySign(std::string str)
+std::pair<bool, std::pair<std::wstring, std::wstring>> O::Analyser::getEqulitySign(std::wstring str)
 {
     auto equalId = charNotInFunction(str, '=');
 
     if (equalId == -1) {
-        return { false, {"", ""} };
+        return { false, {L"", L""} };
     }
 
     auto splited = sliceString(str, equalId);
@@ -513,22 +513,22 @@ std::pair<bool, std::pair<std::string, std::string>> O::Analyser::getEqulitySign
     return { true, {splited.first, splited.second} };
 }
 
-O::Analyser::Token O::Analyser::StringToTree(std::string str)
+O::Analyser::Token O::Analyser::StringToTree(std::wstring str)
 {
-    std::string withOutSpaces = removeSpaceBars(str);
+    std::wstring withOutSpaces = removeSpaceBars(str);
     withOutSpaces = removeBrackes(withOutSpaces);
     auto isEqual = getEqulitySign(withOutSpaces);
     Token result;
 
     if (isEqual.first) {
-        result.token = "=";
+        result.token = L"=";
         result.twoSided = true;
         result.type = Type::ServiceName;
         result.childToken = { StringToTree(isEqual.second.first), StringToTree(isEqual.second.second) };
     }
     else {
         auto t = getMathematicExpression(withOutSpaces);
-        if (t.token != "") {
+        if (t.token != L"") {
             return t;
         }
         return ProccessNameOrCreation(withOutSpaces);
@@ -537,14 +537,14 @@ O::Analyser::Token O::Analyser::StringToTree(std::string str)
     return result;
 }
 
-O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::string str, std::string name)
+O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std::wstring name)
 {
     StructurisedFile main;
     main.name = name;
 
     StructurisedFile newL;
-    std::string last;
-    std::string newBody;
+    std::wstring last;
+    std::wstring newBody;
 
     int level = -1;
     int levelCurly = -1;
@@ -573,8 +573,8 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::string str, std:
             levelCurly--;
             if (levelCurly == -1) {
                 main.subFile.push_back(StructuriseFile(newBody, last));
-                last = "";
-                newBody = "";
+                last = L"";
+                newBody = L"";
                 continue;
             }
         }
@@ -596,7 +596,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::string str, std:
                 newL.name = last;
                 main.subFile.push_back(newL);
                 newL = StructurisedFile();
-                last = "";
+                last = L"";
             }
             else {
                 last += str[i];
@@ -604,13 +604,13 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::string str, std:
         }
     }
 
-    if (newBody != "") {
+    if (newBody != L"") {
         main.subFile.push_back(StructuriseFile(newBody, last));
-        last = "";
-        newBody = "";
+        last = L"";
+        newBody = L"";
     }
 
-    if (last != "") {
+    if (last != L"") {
         newL.name = last;
         main.subFile.push_back(newL);
     }
@@ -621,9 +621,9 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::string str, std:
 O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
 {
     TokenisedFile tf;
-    if (sf.name == "___MAIN___") {
+    if (sf.name == L"___MAIN___") {
         Token t;
-        t.token = "___MAIN___";
+        t.token = L"___MAIN___";
         t.type = Type::ServiceName;
         tf.name = t;
     }
