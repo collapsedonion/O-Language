@@ -1,0 +1,10 @@
+
+struct:Plane{
+    float x;
+    float y;
+}
+
+struct:Rect{
+    Plane origin;
+    Plane size;
+}

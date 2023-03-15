@@ -503,6 +503,10 @@ namespace O {
                     newInst = G::div(GR::mc1, GR::mc2);
                 } else if (type == L"%") {
                     newInst = G::mod(GR::mc1, GR::mc2);
+                } else if (type == L"&") {
+                    newInst = G::AND(GR::mc1, GR::mc2);
+                } else if (type == L"|") {
+                    newInst = G::OR(GR::mc1, GR::mc2);
                 }
                 break;
             }

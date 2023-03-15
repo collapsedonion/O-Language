@@ -1,6 +1,19 @@
+#include stdGeometry.olf
 
 struct:App{
 }
 
+struct:Window{
+}
+
+var:int WindowStyleMaskBorderLess = 0;
+var:int WindowStyleMaskTitled = 1;
+var:int WindowStyleMaskClosable = 2;
+var:int WindowStyleMaskMiniaturizable = 4;
+var:int NSWindowStyleMaskResizable = 8;
+
 extern:func:App initApplication();
 extern:func:App getSharedApplication();
+extern:func:Window initWindow();
+extern:func setWindowFlags(Window window, int maskFlag);
+extern:func setWindowRect(Window window, Rect rect);
