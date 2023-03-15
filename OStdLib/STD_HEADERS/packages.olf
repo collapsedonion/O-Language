@@ -1,6 +1,19 @@
 extern:func packSend(int~ dest, int source, int index, int length);
 extern:func:int packExtract(int source, int index, int length);
 
+struct:PackageIndexSmartCounter{
+    int packageGlobalIndex;
+    int packageLocalIndex;
+    int base;
+}
+
+func operator "+" (PackageIndexSmartCounter counter, int incWith){
+    var:int newLocalIndex = counter[packageLocalIndex] + incWith;
+    var:int addToGlobal = newLocalIndex / (64 / counter[base]);
+    counter[packageGlobalIndex] = counter[packageGlobalIndex] + addToGlobal;
+    counter[packageLocalIndex] = newLocalIndex % (64 / counter[base]);
+}
+
 struct:PBool64{
 }
 

@@ -113,6 +113,8 @@ namespace O {
         }
         else if(inst.IsFunction){
             CallFunction(inst);
+        }else if(inst.ArithmeticProccess){
+            MathematicalProccess(inst);
         }
     }
 
