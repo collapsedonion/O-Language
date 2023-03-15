@@ -674,6 +674,31 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
 		variables.push_back(v);
         if(!isExtern) {
             variablesCreatedAtThatField.push_back(v);
+            if(dataTypeIsStructure(getType)){
+                Structure structure = containsStructureByDataType(getType).second;
+                if(structure.variables.size() != 0){
+                    Analyser::Token structureMallocToken;
+                    structureMallocToken.token = L"=";
+                    structureMallocToken.twoSided = true;
+                    structureMallocToken.type = Analyser::Type::ServiceName;
+                    Analyser::Token targetVar;
+                    targetVar.type = Analyser::Type::Name;
+                    targetVar.token = v.name;
+                    Analyser::Token mallocToken;
+                    mallocToken.token = MALLOC_INSTRUCTION_TOKEN;
+                    mallocToken.type = Analyser::Type::Name;
+                    Analyser::Token dataTypeToken;
+                    dataTypeToken.token = dataTypeToString(getType, adt);
+                    Analyser::Token elementCount;
+                    elementCount.token = std::to_wstring(structure.variables.size());
+                    elementCount.type = Analyser::Type::Number;
+                    mallocToken.childToken = {dataTypeToken, elementCount};
+                    structureMallocToken.childToken = {targetVar, mallocToken};
+                    Analyser::TokenisedFile fakeFile;
+                    fakeFile.name = structureMallocToken;
+                    ProcessToken(fakeFile);
+                }
+            }
         }
 	}
 	else {
@@ -836,7 +861,6 @@ void O::SematicAnalyser::ProccessTokenisedFile(Analyser::TokenisedFile tf)
 	throw(std::exception());
 }
 
-
 std::pair<bool, Structure> O::SematicAnalyser::containsStructureByDataType(DataTypes dt) {
     for(auto s : definedStructures){
         if(s.myDt == dt){
@@ -993,4 +1017,13 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token)
 				}
 			}
 			return res;
+}
+
+bool O::SematicAnalyser::dataTypeIsStructure(DataTypes dt) {
+    for(auto structure : definedStructures){
+        if(structure.myDt == dt){
+            return true;
+        }
+    }
+    return false;
 }
