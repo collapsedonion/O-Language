@@ -69,6 +69,8 @@ struct Interrupt{
     std::string name;
     InterruptHandler hInt;
 };
+
+//_Omain prototype
 typedef std::vector<Interrupt> (*OVM_MODULE_MAIN)(int last_id);
 
 inline std::vector<int> CreateInterruptCall(int index){

@@ -1,0 +1,6 @@
+
+struct:App{
+}
+
+extern:func:App initApplication();
+extern:func:App getSharedApplication();
