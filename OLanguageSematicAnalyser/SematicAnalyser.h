@@ -36,6 +36,7 @@ namespace O {
 		bool containsOperator(std::wstring op, DataTypes left, DataTypes right);
         bool dataTypeIsStructure(DataTypes dt);
         std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
+        std::vector<Analyser::Token> getComma(Analyser::Token token);
 		DataTypes getReturnDataTypeOfOperator(std::wstring op, DataTypes left, DataTypes right);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
@@ -61,7 +62,6 @@ namespace O {
 		Instruction proccessElseInstruction(Analyser::TokenisedFile token);
 		Instruction proccessFuncInstrucion(Analyser::TokenisedFile token, bool isExtern = false);
 		Instruction proccessVarInstruction(Analyser::Token token, bool isExtern = false);
-		Instruction proccessSetInstruction(Analyser::Token token);
 
 		Instruction ProcessToken(Analyser::TokenisedFile token, bool add = true);
 

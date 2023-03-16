@@ -40,6 +40,8 @@ std::wstring O::Analyser::defaultServiceNames[] = {
     L"false",
     L"true",
     L"while",
+    L"malloc",
+    L"free",
     L"return"
 };
 
@@ -358,8 +360,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
             r.type = Type::ServiceName;
             r.twoSided = true;
             r.token = L"var";
-            splited = sliceString(splited.second, charNotInFunction(splited.second, ' '));
-            r.childToken = { StringToTree(splited.first), StringToTree(splited.second) };
+            r.childToken = { StringToTree(splited.second)};
             return r;
         }
     }
@@ -380,78 +381,26 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
             Func.childToken.push_back(StringToTree(L"void"));
             leftFunctionPart = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' ')).second;
         }
-        int idOfBracket = charNotInQuets(leftFunctionPart, '(');
-        auto sliced = sliceString(leftFunctionPart, idOfBracket);
-        Token nameAndAntherData;
-        nameAndAntherData.token = L"name";
-        nameAndAntherData.type = Type::ServiceName;
-        sliced.first = removeSpaceBars(sliced.first);
-        int idOfSp = charNotInQuets(sliced.first, ' ');
-        if (idOfSp != -1) {
-            auto nameAndSL = sliceString(sliced.first, idOfSp);
-            nameAndAntherData.childToken.push_back(StringToTree(nameAndSL.first));
-            
-            if (nameAndAntherData.childToken[0].token == L"operator") {
-                nameAndAntherData.childToken[0].type = Type::ServiceName;
-            }
+        if(leftFunctionPart & L"operator"){
+            Token name;
+            name.token = L"operator";
+            name.type = Type::ServiceName;
+            int idOfSpace = charNotInFunction(leftFunctionPart, ' ');
+            leftFunctionPart = sliceString(leftFunctionPart, idOfSpace).second;
+            Token subName;
+            subName.type = Type::Name;
+            subName.token = leftFunctionPart;
+            name.childToken.push_back(subName);
+            Func.childToken.push_back(name);
+        }else{
+            Token name;
+            name.token = leftFunctionPart;
+            name.type = Type::Name;
+            Func.childToken.push_back(name);
+        }
 
-            Token nt;
-            nt.type = Type::MathematicalOperator;
-            nt.token = nameAndSL.second;
-            nameAndAntherData.childToken.push_back(nt);
-        }
-        else {
-            nameAndAntherData.childToken.push_back(StringToTree(sliced.first));
-        }
-        leftFunctionPart = sliced.second;
-        if (leftFunctionPart.size() > 1) {
-            leftFunctionPart = leftFunctionPart.substr(0, leftFunctionPart.size() - 1);
-            while (true) {
-                int idOfNext = charNotInFunction(leftFunctionPart, ',');
-                if (idOfNext == -1) {
-                    Token t;
-                    int idOfSpace = charNotInFunction(leftFunctionPart, ' ');
-                    auto slice = sliceString(leftFunctionPart, idOfSpace);
-                    t.token = slice.second;
-                    t.childToken.push_back(StringToTree(slice.first));
-                    nameAndAntherData.childToken.push_back(t);
-                    break;
-                }
-                else {
-                    Token t;
-                    auto slice = sliceString(leftFunctionPart, idOfNext);
-                    int idOfSpace = charNotInFunction(slice.first, ' ');
-                    leftFunctionPart = removeSpaceBars(slice.second);
-                    slice = sliceString(slice.first, idOfSpace);
-                    t.token = slice.second;
-                    t.childToken.push_back(StringToTree(slice.first));
-                    nameAndAntherData.childToken.push_back(t);
-                }
-            }
-        }
-        Func.childToken.push_back(nameAndAntherData);
+        //Func.childToken.push_back();
         return Func;
-    }
-    else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
-        res.token = L"a[]";
-        res.type = Type::ServiceName;
-        res.forward = true;
-        std::wstring leftPart = str.substr(1, str.size() - 2);
-        if (leftPart != L" ") {
-            leftPart = removeSpaceBars(leftPart);
-            auto isHaveNewElem = charNotInFunction(leftPart, ',');
-            while (isHaveNewElem != -1)
-            {
-                auto splited = sliceString(leftPart, isHaveNewElem);
-                res.childToken.push_back(StringToTree(splited.first));
-                leftPart = splited.second;
-                isHaveNewElem = charNotInFunction(leftPart, ',');
-            }
-
-            if (leftPart.size() != 0) {
-                res.childToken.push_back(StringToTree(leftPart));
-            }
-        }
     }
     else {
         if (isDefaultServiceName(str)) {
@@ -639,7 +588,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
                                                          splitOperator.second.size() -
                                                          anOperator.name.size());
                 return {true, {Type::MathematicalOperator,
-                               anOperator.postAnalyseName,
+                               anOperator.name,
                                true,
                                false,
                                {StringToTree(left), StringToTree(right)}
@@ -651,7 +600,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
             if(str & anOperator.name){
                 return {true, {
                     Type::MathematicalOperator,
-                    anOperator.postAnalyseName,
+                    anOperator.name,
                     false,
                     true,
                     {StringToTree(str.substr(anOperator.name.size(), str.size() - anOperator.name.size()))}
@@ -666,7 +615,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
             if(bracketOperator.first){
                 return {true, {
                     Type::MathematicalOperator,
-                    anOperator.postAnalyseName,
+                    anOperator.name,
                     false,
                     true,
                     {StringToTree(bracketOperator.second.first), StringToTree(bracketOperator.second.second)}
