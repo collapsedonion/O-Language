@@ -1,23 +1,34 @@
 #include "Analyser.h"
 #include "pch.h"
 
-wchar_t O::Analyser::mathOperators[] = {
-        '|',
-        '&',
-        '?',
-        '>',
-        '<',
-        '-',
-        '+',
-        '*',
-        '/',
-        '%',
+O::Analyser::Operator O::Analyser::mathOperatorMaxPriority[] = {
+        {L",", L"math_comma", OperatorType::Binary},
+        {L"=", L"math_assign", OperatorType::Binary},
+
 };
 
-wchar_t O::Analyser::unarMathOperators[] = {
-    '@',
-    '~',
-    '!',
+O::Analyser::Operator O::Analyser::mathOperatorMiddlePriority[] = {
+        {L"|", L"math_or", OperatorType::Binary},
+        {L"&", L"math_and", OperatorType::Binary},
+        {L"?", L"math_equ", OperatorType::Binary},
+        {L"<", L"math_less", OperatorType::Binary},
+        {L">", L"math_greater", OperatorType::Binary}
+};
+
+O::Analyser::Operator O::Analyser::mathOperatorLowPriority[] {
+        {L"-", L"math_subtract", OperatorType::Binary},
+        {L"+", L"math_add",OperatorType::Binary},
+        {L"*", L"math_multiply", OperatorType::Binary},
+        {L"/", L"math_divide", OperatorType::Binary},
+        {L"%", L"math_modulo", OperatorType::Binary},
+        {L"()", L"scope_default", OperatorType::Scope},
+        {L"[]", L"scope_square", OperatorType::Scope},
+};
+
+O::Analyser::Operator O::Analyser::mathOperatorUnary[] = {
+        {L"@", L"math_get_pointer", OperatorType::Unary},
+        {L"~", L"math_get_content", OperatorType::Unary},
+        {L"!", L"math_not", OperatorType::Unary},
 };
 
 std::wstring O::Analyser::defaultServiceNames[] = {
@@ -143,7 +154,6 @@ std::pair<bool, std::pair<std::wstring, std::wstring>> O::Analyser::doubleBracke
 
 int O::Analyser::stringNotInFunction(std::wstring str, std::wstring toFind)
 {
-
     std::wstring found = str;
     while (true)
     {
@@ -275,32 +285,33 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str)
 {
     Token t;
 
-    for (int i = 0; i < sizeof(mathOperators) / sizeof(wchar_t); i++) {
-        auto op = charNotInFunction(str, mathOperators[i]);
-        if (op != -1) {
-            auto splited = sliceString(str, op);
-            t.type = Type::MathematicalOperator;
-            t.token = mathOperators[i];
-            t.twoSided = true;
-            t.childToken = { StringToTree(splited.first), StringToTree(splited.second) };
-            return t;
+    std::pair<bool, Token> processedOperator;
+
+    for(const auto& highOperator : mathOperatorMaxPriority){
+        processedOperator = getOperator(str, highOperator);
+        if(processedOperator.first){
+            return processedOperator.second;
         }
     }
 
-    auto isOp = doubleBracketOperator(str, '[', ']');
-    if (isOp.first) {
-        t.type = Type::MathematicalOperator;
-        t.token = L"[]a";
-        t.childToken = { StringToTree(isOp.second.first), StringToTree(isOp.second.second) };
-        return t;
+    for(const auto& midOperator : mathOperatorMiddlePriority){
+        processedOperator = getOperator(str, midOperator);
+        if(processedOperator.first){
+            return processedOperator.second;
+        }
     }
 
-    for (int i = 0; i < sizeof(unarMathOperators)/ sizeof(wchar_t); i++) {
-        if (str[0] == unarMathOperators[i]) {
-            t.type = Type::MathematicalOperator;
-            t.token = unarMathOperators[i];
-            t.childToken = { StringToTree(str.substr(1, str.size() - 1))};
-            return t;
+    for(const auto& lowOperator : mathOperatorLowPriority){
+        processedOperator = getOperator(str, lowOperator);
+        if(processedOperator.first){
+            return processedOperator.second;
+        }
+    }
+
+    for(const auto& unaryOperator : mathOperatorUnary){
+        processedOperator = getOperator(str, unaryOperator);
+        if(processedOperator.first){
+            return processedOperator.second;
         }
     }
 
@@ -500,39 +511,17 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
     return res;
 }
 
-std::pair<bool, std::pair<std::wstring, std::wstring>> O::Analyser::getEqulitySign(std::wstring str)
-{
-    auto equalId = charNotInFunction(str, '=');
-
-    if (equalId == -1) {
-        return { false, {L"", L""} };
-    }
-
-    auto splited = sliceString(str, equalId);
-
-    return { true, {splited.first, splited.second} };
-}
-
-O::Analyser::Token O::Analyser::StringToTree(std::wstring str)
-{
+O::Analyser::Token O::Analyser::StringToTree(std::wstring str) {
     std::wstring withOutSpaces = removeSpaceBars(str);
     withOutSpaces = removeBrackes(withOutSpaces);
-    auto isEqual = getEqulitySign(withOutSpaces);
-    Token result;
 
-    if (isEqual.first) {
-        result.token = L"=";
-        result.twoSided = true;
-        result.type = Type::ServiceName;
-        result.childToken = { StringToTree(isEqual.second.first), StringToTree(isEqual.second.second) };
+    Token result;
+    auto t = getMathematicExpression(withOutSpaces);
+    if (t.token != L"") {
+        return t;
     }
-    else {
-        auto t = getMathematicExpression(withOutSpaces);
-        if (t.token != L"") {
-            return t;
-        }
-        return ProccessNameOrCreation(withOutSpaces);
-    }
+    return ProccessNameOrCreation(withOutSpaces);
+
 
     return result;
 }
@@ -636,4 +625,56 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
     }
 
     return tf;
+}
+
+std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring& str, const Operator& anOperator) {
+
+    switch (anOperator.operatorType) {
+        case OperatorType::Binary:{
+            auto position = stringNotInFunction(str, anOperator.name);
+            if (position != -1) {
+                auto splitOperator = sliceString(str, position);
+                auto left = splitOperator.first;
+                auto right = splitOperator.second.substr(anOperator.name.size(),
+                                                         splitOperator.second.size() -
+                                                         anOperator.name.size());
+                return {true, {Type::MathematicalOperator,
+                               anOperator.postAnalyseName,
+                               true,
+                               false,
+                               {StringToTree(left), StringToTree(right)}
+                }};
+            }
+            break;
+        }
+        case OperatorType::Unary: {
+            if(str & anOperator.name){
+                return {true, {
+                    Type::MathematicalOperator,
+                    anOperator.postAnalyseName,
+                    false,
+                    true,
+                    {StringToTree(str.substr(anOperator.name.size(), str.size() - anOperator.name.size()))}
+                }};
+            }
+            break;
+        }
+        case OperatorType::Scope:
+        {
+            auto bracketOperator = doubleBracketOperator(str, anOperator.name[0], anOperator.name[1]);
+
+            if(bracketOperator.first){
+                return {true, {
+                    Type::MathematicalOperator,
+                    anOperator.postAnalyseName,
+                    false,
+                    true,
+                    {StringToTree(bracketOperator.second.first), StringToTree(bracketOperator.second.second)}
+                }};
+            }
+            break;
+        }
+    }
+
+    return {false, {}};
 }

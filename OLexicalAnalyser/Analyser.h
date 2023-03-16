@@ -1,12 +1,5 @@
 #pragma once
 
-#ifdef OLEXICALANALYSER_EXPORTS
-#define OLEXICALANALYSER_EXPORTS __declspec(dllexport)
-#else
-#define OLEXICALANALYSER_EXPORTS __declspec(dllimport)
-#endif // def OLEXICALANALYSER_EXPORTS
-
-
 #include <vector>
 #include <string>
 
@@ -34,6 +27,19 @@ namespace O {
 			std::vector<Token> childToken;
 		};
 
+        enum class OperatorType{
+            Unary,
+            Binary,
+            Scope,
+        };
+
+        struct Operator{
+        public:
+            std::wstring name;
+            std::wstring postAnalyseName;
+            OperatorType operatorType;
+        };
+
 		struct StructurisedFile {
 			std::wstring name;
 			std::vector<StructurisedFile> subFile;
@@ -46,8 +52,10 @@ namespace O {
 		};
 
 	private:
-		static wchar_t mathOperators[];
-		static wchar_t unarMathOperators[];
+        static Operator mathOperatorMaxPriority[];
+        static Operator mathOperatorMiddlePriority[];
+        static Operator mathOperatorLowPriority[];
+        static Operator mathOperatorUnary[];
 		static std::wstring defaultServiceNames[];
 
 	private:
@@ -61,13 +69,12 @@ namespace O {
 		static bool isString(std::wstring str);
 		static std::wstring removeBrackes(std::wstring str);
 		static std::pair<std::wstring, std::wstring> sliceString(std::wstring str, int slicePoint);
+        static std::pair<bool, Token> getOperator(const std::wstring& str, const Operator& anOperator);
 		static std::wstring removeSpaceBars(std::wstring str);
 
 		static Token getMathematicExpression(std::wstring str);
 
 		static Token ProccessNameOrCreation(std::wstring str);
-
-		static std::pair<bool, std::pair<std::wstring, std::wstring>> getEqulitySign(std::wstring str);
 
 	public:
 		static Token StringToTree(std::wstring str);

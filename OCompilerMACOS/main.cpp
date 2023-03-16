@@ -71,7 +71,7 @@ int main(int argC, char* args[]) {
     filesource = inBuffer.str();
     inBuffer.clear();
 
-    filesource = PreInclude + filesource;
+    //filesource = PreInclude + filesource;
 
     O::Preproccesor pp(realFilePath, realExecPath);
 
