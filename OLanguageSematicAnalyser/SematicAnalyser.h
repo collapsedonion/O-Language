@@ -35,6 +35,7 @@ namespace O {
 		bool containsVariable(std::wstring name);
 		bool containsOperator(std::wstring op, DataTypes left, DataTypes right);
         bool dataTypeIsStructure(DataTypes dt);
+        bool isExternFunction(std::wstring name, std::vector<DataTypes> dt);
         std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
         std::vector<Analyser::Token> getComma(Analyser::Token token);
 		DataTypes getReturnDataTypeOfOperator(std::wstring op, DataTypes left, DataTypes right);

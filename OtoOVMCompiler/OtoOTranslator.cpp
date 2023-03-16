@@ -93,7 +93,7 @@ namespace O {
         if(inst.name == FREE_INSTRUCTION_NAME){
             FreeInstruction(inst);
         }
-        else if(inst.name == SET_VALUE_NAME){
+        else if(inst.name == SET_VALUE_NAME && inst.ArithmeticProccess){
             SetInstruction(inst);
         }else if(inst.name == IF_NAME){
             IfFunction(inst);

@@ -28,5 +28,10 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
     setWindowRect.name = "setWindowRect";
     setWindowRect.hInt = SetWindowRect;
 
-    return {createApplication, getSharedApplication, createWindow, setWindowFlags, setWindowRect};
+    Interrupt makeWindowFront;
+    makeWindowFront.id = last_id + 5;
+    makeWindowFront.name = "setWindowFront";
+    makeWindowFront.hInt = MakeWindowFront;
+
+    return {createApplication, getSharedApplication, createWindow, setWindowFlags, setWindowRect, makeWindowFront};
 }

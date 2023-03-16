@@ -545,6 +545,10 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 
     Function func;
 
+    if(isExtern){
+        func.IsExtern = true;
+    }
+
     if (type == DataTypes::Error) {
         std::wstring exceptionMessage =
                 L"Unexpected return type at function definition \"" + funcFirstDescriptor.token + L"\"";
@@ -559,7 +563,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
         if (nameField.type == O::Analyser::Type::ServiceName
             && nameField.childToken.size() == 1
             && nameField.token== L"operator") {
-            std::wstring resultToken = nameField.childToken[0].token.substr(1, 1);
+            std::wstring resultToken = nameField.childToken[0].token.substr(1, nameField.childToken[0].token.size() - 2);
             func.name = resultToken;
             isOperator = true;
         } else {
@@ -694,26 +698,41 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
             if(dataTypeIsStructure(getType)){
                 Structure structure = containsStructureByDataType(getType).second;
                 if(structure.variables.size() != 0){
+                    Analyser::Token size;
+                    size.token = std::to_wstring(structure.variables.size());
+                    size.type = Analyser::Type::Number;
+
+                    Analyser::Token dataType;
+                    dataType.token = dataTypeToString(structure.myDt, adt);
+                    dataType.type = Analyser::Type::Name;
+
+                    Analyser::Token parameters;
+                    parameters.token = COMMA_OPERATOR;
+                    parameters.type = Analyser::Type::MathematicalOperator;
+                    parameters.twoSided = true;
+                    parameters.childToken = {dataType, size};
+
+                    Analyser::Token mallocName;
+                    mallocName.token = MALLOC_INSTRUCTION_TOKEN;
+                    mallocName.type = Analyser::Type::ServiceName;
+
+                    Analyser::Token malloc;
+                    malloc.token = L"()";
+                    malloc.type = Analyser::Type::MathematicalOperator;
+                    malloc.forward = true;
+                    malloc.childToken = {mallocName, parameters};
+
+                    Analyser::Token destination;
+                    destination.token = v.name;
+                    destination.type = Analyser::Type::Name;
+
                     Analyser::Token structureMallocToken;
                     structureMallocToken.token = MATH_SET;
-                    structureMallocToken.twoSided = true;
                     structureMallocToken.type = Analyser::Type::MathematicalOperator;
-                    Analyser::Token targetVar;
-                    targetVar.type = Analyser::Type::Name;
-                    targetVar.token = v.name;
-                    Analyser::Token mallocToken;
-                    mallocToken.token = MALLOC_INSTRUCTION_TOKEN;
-                    mallocToken.type = Analyser::Type::Name;
-                    Analyser::Token dataTypeToken;
-                    dataTypeToken.token = dataTypeToString(getType, adt);
-                    Analyser::Token elementCount;
-                    elementCount.token = std::to_wstring(structure.variables.size());
-                    elementCount.type = Analyser::Type::Number;
-                    mallocToken.childToken = {dataTypeToken, elementCount};
-                    structureMallocToken.childToken = {targetVar, mallocToken};
-                    Analyser::TokenisedFile fakeFile;
-                    fakeFile.name = structureMallocToken;
-                    ProcessToken(fakeFile);
+                    structureMallocToken.twoSided = true;
+                    structureMallocToken.childToken = {destination, malloc};
+
+                    instructions.push_back(proccessInstCall(structureMallocToken));
                 }
             }
         }
@@ -731,6 +750,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 
     if(token.name.token == VAR_CREATION_NAME){
         inst = proccessVarInstruction(token.name);
+    }else if(token.name.token == STRUCTURE_DEFINITION_TOKEN){
+        proccessStructureCreation(token);
     }
     else if(token.name.token == FUNCTION_CALL &&
     (token.name.childToken[0].token == FUNC_CREATION_NAME ||
@@ -853,7 +874,11 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
 
             bool definedOperator = containsOperator(token.token, t1.type, t2.type);
             if (definedOperator) {
-                res.ArithmeticProccess = true;
+                if(isExternFunction(token.token, {t1.type, t2.type})){
+                    res.ArithmeticProccess = true;
+                }else{
+                    res.IsFunction = true;
+                }
                 res.name = token.token;
                 res.type = getReturnDataTypeOfOperator(token.token, t1.type, t2.type);
                 res.Parameters = {t1, t2};
@@ -862,6 +887,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                 if (token.token == MATH_SET) {
                     if (t1.type == t2.type) {
                         res.name = L"SET_VALUE";
+                        res.ArithmeticProccess = true;
                         res.type = DataTypes::ServiceInstruction;
                         res.Parameters = {t1, t2};
                         return res;
@@ -905,7 +931,11 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                 if (reCreateCheck) {
                     bool exists = containsOperator(token.token, dest.type, secondOp.type);
                     if (exists) {
-                        res.ArithmeticProccess = true;
+                        if(isExternFunction(token.token, {dest.type, secondOp.type})){
+                            res.ArithmeticProccess = true;
+                        }else{
+                            res.IsFunction = true;
+                        }
                         res.name = token.token;
                         res.type = getReturnDataTypeOfOperator(token.token, dest.type, secondOp.type);
                         res.Parameters = {dest, secondOp};
@@ -993,4 +1023,13 @@ std::vector<O::Analyser::Token> O::SematicAnalyser::getComma(O::Analyser::Token 
     }
 
     return result;
+}
+
+bool O::SematicAnalyser::isExternFunction(std::wstring name, std::vector<DataTypes> dt) {
+    for(auto function: functions){
+        if(function.name == name && function.getArgumentsDataTypes() == dt){
+            return function.IsExtern;
+        }
+    }
+    return false;
 }

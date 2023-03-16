@@ -17,7 +17,10 @@ void GetSharedApplication(MEM_POINTER memPointer){
 }
 
 void CreateWindow(MEM_POINTER memPointer){
-    *memPointer.eax = (long)[NSWindow new];
+    CGRect rect = {{0,0}, {200,200}};
+
+    NSWindow* window = [[NSWindow alloc] initWithContentRect:rect styleMask:NSClosableWindowMask|NSTitledWindowMask backing:NSBackingStoreBuffered defer:NO];
+    *memPointer.eax = (long)window;
 }
 
 void SetWindowFlags(MEM_POINTER memPointer){
@@ -34,5 +37,11 @@ void SetWindowRect(MEM_POINTER memPointer){
     long* size = getObjectReferenceByAddress(memPointer, *(rect+1));
 
     CGRect frame = {{*(float*)origin, *(float*)(origin + 1)}, {*(float*)size, *(float*)(size + 1)}};
-    [window setFrame:frame display:YES];
+    [window setFrame:frame display:NO];
+}
+
+void MakeWindowFront(MEM_POINTER memPointer){
+    auto window = (NSWindow*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+
+    [window orderFront:nil];
 }

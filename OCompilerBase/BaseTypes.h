@@ -162,6 +162,7 @@ struct Function {
 	std::vector<Variable> arguments;
 	std::vector<Variable> variables;
 	std::vector<Instruction> body;
+    bool IsExtern = false;
 
 	inline std::vector<DataTypes> getArgumentsDataTypes() {
 		std::vector<DataTypes> dt;

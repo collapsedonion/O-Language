@@ -11,5 +11,6 @@ void GetSharedApplication(MEM_POINTER memPointer);
 void CreateWindow(MEM_POINTER memPointer);
 void SetWindowFlags(MEM_POINTER memPointer);
 void SetWindowRect(MEM_POINTER memPointer);
+void MakeWindowFront(MEM_POINTER memPointer);
 
 #endif //OAPPKIT_INTERRUPTDEFINITIONS_H
