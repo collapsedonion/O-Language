@@ -33,5 +33,28 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
     makeWindowFront.name = "setWindowFront";
     makeWindowFront.hInt = MakeWindowFront;
 
-    return {createApplication, getSharedApplication, createWindow, setWindowFlags, setWindowRect, makeWindowFront};
+    Interrupt getLastWindowEvent;
+    getLastWindowEvent.id = last_id + 6;
+    getLastWindowEvent.name = "getWindowLastEvent";
+    getLastWindowEvent.hInt = GetLastWindowEvent;
+
+    Interrupt dispatch;
+    dispatch.id = last_id + 7;
+    dispatch.name = "dispatchEvent";
+    dispatch.hInt = AppDispatchEvent;
+
+    Interrupt getEventType;
+    getEventType.id = last_id + 8;
+    getEventType.name = "getEventType";
+    getEventType.hInt = GetEventType;
+
+    return {createApplication,
+            getSharedApplication,
+            createWindow,
+            setWindowFlags,
+            setWindowRect,
+            makeWindowFront,
+            getLastWindowEvent,
+            dispatch,
+            getEventType};
 }

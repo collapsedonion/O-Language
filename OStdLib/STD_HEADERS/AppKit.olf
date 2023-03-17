@@ -6,6 +6,10 @@ struct:App{
 struct:Window{
 }
 
+struct:Event{
+
+}
+
 var:int WindowStyleMaskBorderLess = 0;
 var:int WindowStyleMaskTitled = 1;
 var:int WindowStyleMaskClosable = 2;
@@ -18,3 +22,5 @@ extern:func:Window initWindow();
 extern:func setWindowFlags(Window window, int maskFlag);
 extern:func setWindowRect(Window window, Rect rect);
 extern:func setWindowFront(Window window);
+extern:func:Event getWindowLastEvent(Window window, bool dequeue);
+extern:func dispatchEvent(App app, Event event);

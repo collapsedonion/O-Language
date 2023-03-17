@@ -25,6 +25,13 @@ const std::wstring PreInclude =
         "extern:func:bool operator \"<\" (float a, float b);\n"
         "extern:func:bool operator \">\" (float a, float b);\n"
         "extern:func:bool operator \"?\" (float a, float b);\n"
+        "extern:func:bool operator \">\" (int a, int b);\n"
+        "extern:func:bool operator \"<\" (int a, int b);\n"
+        "extern:func:bool operator \"?\" (int a, int b);\n"
+        "extern:func:int operator \"+\" (int a, int b);\n"
+        "extern:func:int operator \"-\" (int a, int b);\n"
+        "extern:func:int operator \"*\" (int a, int b);\n"
+        "extern:func:int operator \"/\" (int a, int b);\n"
         "";
 
 int main(int argC, char* args[]) {

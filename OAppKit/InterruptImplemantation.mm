@@ -8,7 +8,8 @@ void CreateApplication(MEM_POINTER memPointer){
     NSApplication* app = [NSApplication sharedApplication];
     AppDelegate* delegate = [AppDelegate new];
     [app setDelegate:delegate];
-    [app run];
+    [app finishLaunching];
+
     *memPointer.eax = (long)app;
 }
 
@@ -43,5 +44,24 @@ void SetWindowRect(MEM_POINTER memPointer){
 void MakeWindowFront(MEM_POINTER memPointer){
     auto window = (NSWindow*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
 
-    [window orderFront:nil];
+    [window makeKeyAndOrderFront:nil];
+}
+
+void GetLastWindowEvent(MEM_POINTER memPointer){
+    auto window = (NSWindow*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto dequeue = (bool)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    *memPointer.eax = (long)[window nextEventMatchingMask:NSEventMaskAny untilDate:nil inMode:NSDefaultRunLoopMode dequeue:dequeue];
+}
+
+void AppDispatchEvent(MEM_POINTER memPointer){
+    auto app = (NSApplication*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto event = (NSEvent*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    [app sendEvent:event];
+}
+
+void GetEventType(MEM_POINTER memPointer){
+    auto event = (NSEvent*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    *memPointer.eax = event.type;
 }

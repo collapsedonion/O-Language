@@ -1,0 +1,27 @@
+#include AppKit.olf
+
+var:int EventTypeLeftMouseDown = 1;
+var:int EventTypeLeftMouseUp = 2;
+var:int EventTypeRightMouseDown            = 3;
+var:int EventTypeRightMouseUp              = 4;
+var:int EventTypeMouseMoved                = 5;
+var:int EventTypeLeftMouseDragged          = 6;
+var:int EventTypeRightMouseDragged         = 7;
+var:int EventTypeMouseEntered              = 8;
+var:int EventTypeMouseExited               = 9;
+var:int EventTypeKeyDown                   = 10;
+var:int EventTypeKeyUp                     = 11;
+var:int EventTypeFlagsChanged              = 12;
+var:int EventTypeAppKitDefined             = 13;
+var:int EventTypeSystemDefined             = 14;
+var:int EventTypeApplicationDefined        = 15;
+var:int EventTypePeriodic                  = 16;
+var:int EventTypeCursorUpdate              = 17;
+var:int EventTypeScrollWheel               = 22;
+var:int EventTypeTabletPoint               = 23;
+var:int EventTypeTabletProximity           = 24;
+var:int EventTypeOtherMouseDown            = 25;
+var:int EventTypeOtherMouseUp              = 26;
+var:int EventTypeOtherMouseDragged         = 27;
+
+extern:func:int getEventType(Event event);

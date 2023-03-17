@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_library(OAppKit SHARED library.cpp InterruptDefinitions.h InterruptImplemantation.mm AppDelegate.h AppDelegate.mm)
 
-target_link_libraries(OAppKit PRIVATE
+target_link_libraries(OAppKit PUBLIC
         "-framework AppKit"
+        "-framework Foundation"
         )

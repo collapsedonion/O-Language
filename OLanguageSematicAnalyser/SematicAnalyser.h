@@ -19,16 +19,8 @@ namespace O {
         std::vector<Function> functionsCreatedAtThatField;
         std::vector<Function> exportedFunctions;
         std::vector<Structure> definedStructures;
-		std::vector<Operator> operators = {
-			Operator(L"<", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
-			Operator(L">", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
-			Operator(L"?", DataTypes::Integer, DataTypes::Integer, DataTypes::Boolean),
-			Operator(L"+", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-			Operator(L"-", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-			Operator(L"*", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-			Operator(L"/", DataTypes::Integer, DataTypes::Integer, DataTypes::Integer),
-		};
-		
+		std::vector<Operator> operators;
+
 	private:
 		// returns ERROR if not found
 		DataTypes containsFunction(std::wstring name, std::vector<DataTypes> dt);
