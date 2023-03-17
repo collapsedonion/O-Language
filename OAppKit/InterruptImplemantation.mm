@@ -74,3 +74,12 @@ void SetWindowTitle(MEM_POINTER memPointer){
     NSString* nsString = [[NSString alloc] initWithCString:title];
     [window setTitle:nsString];
 }
+
+void GetEventCharacters(MEM_POINTER memPointer){
+    auto event = (NSEvent*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto target = (*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    auto targetReference = (char*)(getObjectReferenceByAddress(memPointer, target));
+    NSString* chatacters = event.characters;
+    [chatacters cString];
+    memcpy(targetReference, [chatacters cString], [chatacters cStringLength]);
+}
