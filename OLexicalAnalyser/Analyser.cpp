@@ -586,7 +586,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
                 auto left = splitOperator.first;
                 auto right = splitOperator.second.substr(anOperator.name.size(),
                                                          splitOperator.second.size() -
-                                                         anOperator.name.size());
+                                                         anOperator.name.size() + 1);
                 return {true, {Type::MathematicalOperator,
                                anOperator.name,
                                true,

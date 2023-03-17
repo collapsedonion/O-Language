@@ -1,6 +1,5 @@
 
 func:int stringSize(char~ str){
-
     var:int index = 0;
     var:int size = 0;
 

@@ -15,5 +15,6 @@ void MakeWindowFront(MEM_POINTER memPointer);
 void GetLastWindowEvent(MEM_POINTER memPointer);
 void AppDispatchEvent(MEM_POINTER memPointer);
 void GetEventType(MEM_POINTER memPointer);
+void SetWindowTitle(MEM_POINTER memPointer);
 
 #endif //OAPPKIT_INTERRUPTDEFINITIONS_H

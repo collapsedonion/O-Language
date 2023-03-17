@@ -48,6 +48,11 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
     getEventType.name = "getEventType";
     getEventType.hInt = GetEventType;
 
+    Interrupt setWindowTitle;
+    setWindowTitle.id = last_id + 9;
+    setWindowTitle.name = "setWindowTitle";
+    setWindowTitle.hInt = SetWindowTitle;
+
     return {createApplication,
             getSharedApplication,
             createWindow,
@@ -56,5 +61,6 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
             makeWindowFront,
             getLastWindowEvent,
             dispatch,
-            getEventType};
+            getEventType,
+            setWindowTitle};
 }

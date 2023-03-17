@@ -65,3 +65,12 @@ void GetEventType(MEM_POINTER memPointer){
     auto event = (NSEvent*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
     *memPointer.eax = event.type;
 }
+
+void SetWindowTitle(MEM_POINTER memPointer){
+    auto window = (NSWindow*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto titlePointer = (long)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    auto title = (char*)(getObjectReferenceByAddress(memPointer, titlePointer));
+
+    NSString* nsString = [[NSString alloc] initWithCString:title];
+    [window setTitle:nsString];
+}

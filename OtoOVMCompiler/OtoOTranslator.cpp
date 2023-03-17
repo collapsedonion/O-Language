@@ -387,7 +387,8 @@ namespace O {
                 auto mm1 = Geneerator::mov(reg, L"", 0, GR::mc1);
                 ADDVTV(Instructions, mm1);
             }else if(inst.name == MALLOC_INSTRUCTION_NAME) {
-                auto malloc = G::malloc(std::stoi(inst.Parameters[0].name));
+                LoadInstToReg(inst.Parameters[0], reg);
+                auto malloc = G::malloc(reg);
                 ADDVTV(Instructions, malloc);
                 auto movRes = G::mov(reg, GR::eax);
                 ADDVTV(Instructions, movRes)

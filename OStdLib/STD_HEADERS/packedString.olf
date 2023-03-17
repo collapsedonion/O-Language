@@ -1,0 +1,38 @@
+#include packages.olf
+#include stdString.olf
+
+func:PChar8~ initPString(int size){
+    var:int maxSize = size / 8;
+    if(((size % 8) ? 0) ? false){
+        maxSize = maxSize + 1;
+    }
+    return(malloc(PChar8~, maxSize));
+}
+
+func setPStringElement(PChar8~ ps, int offset, char source){
+    var:PackageIndexSmartCounter pisc;
+    pisc[base] = 8;
+    pisc + offset;
+    var:PChar8 dest = ps[pisc[packageGlobalIndex]];
+    sendPChar8(@dest, source, pisc[packageLocalIndex]);
+    ps[pisc[packageGlobalIndex]] = dest;
+    free(pisc);
+}
+
+func:char operator "[]" (PChar8~ ps, int offset){
+    var:PackageIndexSmartCounter pisc;
+    pisc[base] = 8;
+    pisc + offset;
+    var:char result = extractPChar8(ps[pisc[packageGlobalIndex]], pisc[packageLocalIndex]);
+    free(pisc);
+    return(result);
+}
+
+func operator "=" (PChar8~ ps, char~ cs){
+    var:int sourceSize = stringSize(cs);
+    var:int index = 0;
+    while(index < sourceSize){
+        setPStringElement(ps, index, cs[index]);
+        index = index + 1;
+    }
+}

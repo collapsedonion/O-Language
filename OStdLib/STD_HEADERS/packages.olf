@@ -43,17 +43,17 @@ func sendPChar8(PChar8~ dest, char source, int index){
 }
 
 func:bool extractPBool64(PBool64 source, int index){
-    return(bool(packExtract(int(source), index, 1));
+    return(bool(packExtract(int(source), index, 1)));
 }
 
 func:float extractPFloat2(PFloat2 source, int index){
-    return(float(packExtract(int(source), index, 32));
+    return(float(packExtract(int(source), index, 32)));
 }
 
 func:int extractPInt2(PInt2 source, int index){
-    return(int(packExtract(int(source), index, 32));
+    return(int(packExtract(int(source), index, 32)));
 }
 
 func:char extractPChar8(PChar8 source, int index){
-    return(char(packExtract(int(source), index, 8));
+    return(char(packExtract(int(source), index, 8)));
 }

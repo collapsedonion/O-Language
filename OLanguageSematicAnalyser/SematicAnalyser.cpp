@@ -116,21 +116,7 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
     auto f = containsFunction(retInst.name, dataTypes);
 
     if (f == DataTypes::Error) {
-        auto check = token.childToken[0].token;
-
-        Analyser::Token checkToken;
-        Analyser::Token *lastCreated = &checkToken;
-
-        while (*(check.end() - 1) == '~') {
-            lastCreated->token = '~';
-            lastCreated->childToken.emplace_back(Analyser::Token());
-            lastCreated = &lastCreated->childToken[0];
-            check = check.substr(0, check.size() - 1);
-        }
-
-        lastCreated->token = check;
-
-        auto dt = getDataType(checkToken);
+        auto dt = getDataType(token.childToken[0]);
 
         if (dt != DataTypes::Error && retInst.Parameters.size() == 1) {
             retInst.Parameters[0].type = dt;
@@ -1017,7 +1003,7 @@ std::vector<O::Analyser::Token> O::SematicAnalyser::getComma(O::Analyser::Token 
 
     if(token.childToken[1].token == COMMA_OPERATOR){
         auto newToken = getComma(token.childToken[1]);
-        result.erase(newToken.begin(), newToken.end());
+        result.insert(result.end(),newToken.begin(), newToken.end());
     }else{
         result.push_back(token.childToken[1]);
     }
