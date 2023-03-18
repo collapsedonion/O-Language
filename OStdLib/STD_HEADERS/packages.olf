@@ -57,3 +57,43 @@ func:int extractPInt2(PInt2 source, int index){
 func:char extractPChar8(PChar8 source, int index){
     return(char(packExtract(int(source), index, 8)));
 }
+
+struct:PArray{
+    void~ content;
+    int base;
+    int size;
+}
+
+func:PArray allocPArray(int size, int base){
+    var:PArray toRet;
+    var:int maxSize = size / (64 / base);
+    if(((size % (64 / base)) ? 0) ? false){
+        maxSize = maxSize + 1;
+    }
+    toRet[size] = size;
+    toRet[base] = base;
+    toRet[content] = malloc(void~, maxSize);
+    return(toRet);
+}
+
+func:int operator "[]" (PArray pPArray, int index){
+    var:PackageIndexSmartCounter pisc;
+    pisc[base] = pPArray[base];
+    pisc + index;
+    var:void~ content = pPArray[content];
+    var:int pElement = int(content[pisc[packageGlobalIndex]]);
+    var:int toRet = packExtract(pElement, pisc[packageLocalIndex], pPArray[base]);
+    free(pisc);
+    return(toRet);
+}
+
+func setPArrayElement(PArray pPArray, int index, int data){
+    var:PackageIndexSmartCounter pisc;
+    pisc[base] = pPArray[base];
+    pisc + index;
+    var:void~ content = pPArray[content];
+    var:int pElement = int(content[pisc[packageGlobalIndex]]);
+    packSend(@pElement, data, pisc[packageLocalIndex], pPArray[base]);
+    (int~(content))[pisc[packageGlobalIndex]] = pElement;
+    free(pisc);
+}
