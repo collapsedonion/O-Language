@@ -173,9 +173,7 @@ namespace O {
         auto start = getFreeHeap();
         _heap.insert({start, std::vector<long>()});
 
-        for(int i = 0; i < value; i++){
-            _heap[start].push_back(0);
-        }
+        _heap[start].resize(value);
 
         SectorDescription sd;
         sd.name = std::to_string(start) + "ALLOC";

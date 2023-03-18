@@ -94,6 +94,14 @@ void ExtractPackage(MEM_POINTER mem){
     }
 }
 
+void Reallocate(MEM_POINTER mem){
+    int pageIndex = ((*mem._mem)[mem.ebp]) >> 32;
+    std::vector<long>* page = &(*mem._heap)[pageIndex];
+    int newSize = ((*mem._mem))[mem.ebp - 1];
+
+    page->resize(newSize);
+}
+
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
 
@@ -154,6 +162,7 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("getHighFloat", GetHighFloat);
     lu.AddNewInterrupt("packSend", LoadPackage);
     lu.AddNewInterrupt("packExtract", ExtractPackage);
+    lu.AddNewInterrupt("realloc", Reallocate);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 

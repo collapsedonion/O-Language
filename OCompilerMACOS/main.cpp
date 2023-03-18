@@ -32,6 +32,7 @@ const std::wstring PreInclude =
         "extern:func:int operator \"-\" (int a, int b);\n"
         "extern:func:int operator \"*\" (int a, int b);\n"
         "extern:func:int operator \"/\" (int a, int b);\n"
+        "extern:func realloc(void~ pMemory, int size);\n"
         "";
 
 int main(int argC, char* args[]) {
