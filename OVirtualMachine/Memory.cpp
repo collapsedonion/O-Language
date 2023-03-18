@@ -14,17 +14,13 @@ namespace O {
         sd.size = registersCount;
         _sectors.push_back(sd);
         registerSectionDescriptor = sd;
-        for(int i = 0; i < registersCount; i++){
-            _mem.push_back(0);
-        }
+        _mem.resize(registersCount);
 
         sd.name = "__STACK__";
         sd.size = stackSize;
         sd.start = _mem.size();
         _sectors.push_back(sd);
-        for (int i = 0; i < stackSize; i++) {
-            _mem.push_back(0);
-        }
+        _mem.resize(stackSize + _mem.size());
         stackStart = sd.start;
         long* esp = GetRegisterAccess(Registers::esp);
         *esp = sd.start + sd.size;
@@ -122,7 +118,7 @@ namespace O {
         return _mem.data();
     }
 
-    int Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
+    long Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
         SectorDescription sd;
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
@@ -134,7 +130,7 @@ namespace O {
                 }
             }
         }
-        int anchor = 0;
+        long anchor = 0;
         if((int)mad.anchor != -1){
             anchor = *GetRegisterAccess(mad.anchor);
         }

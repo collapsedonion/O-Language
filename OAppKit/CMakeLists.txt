@@ -9,4 +9,6 @@ add_library(OAppKit SHARED library.cpp InterruptDefinitions.h InterruptImplemant
 target_link_libraries(OAppKit PUBLIC
         "-framework AppKit"
         "-framework Foundation"
+        "-framework Metal"
+        "-framework MetalKit"
         )

@@ -156,7 +156,7 @@ int main(int argc, char* args[]) {
 
     f.close();
 
-    O::Memory mem(200);
+    O::Memory mem(20000);
     O::LogicUnit lu(&mem);
 
     lu.AddNewInterrupt("getHighFloat", GetHighFloat);

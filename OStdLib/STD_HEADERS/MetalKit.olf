@@ -1,0 +1,12 @@
+#include AppKit.olf
+#include stdGeometry.olf
+#include MetalColorFormats.olf
+
+struct:Device{
+
+}
+
+extern:func:Device getSystemMetalDevice();
+extern:func:View initMTView(Rect rect, Device device);
+extern:func setViewColorPixelFormat(View view, int format);
+extern:func setViewClearColor(View view, float r, float g, float b, float a);

@@ -58,6 +58,31 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
     getEventCharacters.name = "getEventCharacters";
     getEventCharacters.hInt = GetEventCharacters;
 
+    Interrupt getMetalDevice;
+    getMetalDevice.id = last_id + 11;
+    getMetalDevice.name = "getSystemMetalDevice";
+    getMetalDevice.hInt = GetMetalDevice;
+
+    Interrupt initView;
+    initView.id = last_id + 12;
+    initView.name = "initMTView";
+    initView.hInt = InitView;
+
+    Interrupt setColorFormat;
+    setColorFormat.id = last_id + 13;
+    setColorFormat.name = "setViewColorPixelFormat";
+    setColorFormat.hInt = SetViewColorFormat;
+
+    Interrupt setViewClearColor;
+    setViewClearColor.id = last_id + 14;
+    setViewClearColor.name = "setViewClearColor";
+    setViewClearColor.hInt = SetViewClearColor;
+
+    Interrupt setWindowView;
+    setWindowView.id = last_id + 15;
+    setWindowView.name = "setWindowView";
+    setWindowView.hInt = SetWindowView;
+
     return {createApplication,
             getSharedApplication,
             createWindow,
@@ -68,5 +93,10 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
             dispatch,
             getEventType,
             setWindowTitle,
-            getEventCharacters};
+            getEventCharacters,
+            getMetalDevice,
+            initView,
+            setColorFormat,
+            setViewClearColor,
+            setWindowView,};
 }

@@ -57,7 +57,7 @@ namespace O {
         int LoadProgram(std::string sectorName, std::vector<long> content);
         long* GetRegisterAccess(Registers reg);
         long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
-        int GetIdByMAD(MemoryAddressDescriptor mad);
+        long GetIdByMAD(MemoryAddressDescriptor mad);
         int GetSectorIndex(std::string name);
         void push(Registers reg);
         void push(MemoryAddressDescriptor mad);

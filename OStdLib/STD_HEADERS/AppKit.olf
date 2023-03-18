@@ -11,6 +11,10 @@ struct:Event{
 
 }
 
+struct:View{
+
+}
+
 var:int WindowStyleMaskBorderLess = 0;
 var:int WindowStyleMaskTitled = 1;
 var:int WindowStyleMaskClosable = 2;
@@ -26,3 +30,4 @@ extern:func setWindowFront(Window window);
 extern:func:Event getWindowLastEvent(Window window, bool dequeue);
 extern:func dispatchEvent(App app, Event event);
 extern:func setWindowTitle(Window win, PChar8~ title);
+extern:func setWindowView(Window win, View view);

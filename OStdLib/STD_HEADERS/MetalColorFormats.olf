@@ -1,0 +1,175 @@
+var:int PixelFormatInvalid = 0;
+
+var:int PixelFormatA8Unorm = 1;
+
+var:int PixelFormatR8Unorm = 10;
+var:int PixelFormatR8Unorm_sRGB = 11;
+var:int PixelFormatR8Snorm      = 12;
+var:int PixelFormatR8Uint       = 13;
+var:int PixelFormatR8Sint       = 14;
+
+
+var:int PixelFormatR16Unorm     = 20;
+var:int PixelFormatR16Snorm     = 22;
+var:int PixelFormatR16Uint      = 23;
+var:int PixelFormatR16Sint      = 24;
+var:int PixelFormatR16Float     = 25;
+
+var:int PixelFormatRG8Unorm                            = 30;
+var:int PixelFormatRG8Unorm_sRGB = 31;
+var:int PixelFormatRG8Snorm                            = 32;
+var:int PixelFormatRG8Uint                             = 33;
+var:int PixelFormatRG8Sint                             = 34;
+
+
+var:int PixelFormatB5G6R5Unorm = 40;
+var:int PixelFormatA1BGR5Unorm = 41;
+var:int PixelFormatABGR4Unorm = 42;
+var:int PixelFormatBGR5A1Unorm = 43;
+
+var:int PixelFormatR32Uint  = 53;
+var:int PixelFormatR32Sint  = 54;
+var:int PixelFormatR32Float = 55;
+
+var:int PixelFormatRG16Unorm  = 60;
+var:int PixelFormatRG16Snorm  = 62;
+var:int PixelFormatRG16Uint   = 63;
+var:int PixelFormatRG16Sint   = 64;
+var:int PixelFormatRG16Float  = 65;
+
+var:int PixelFormatRGBA8Unorm      = 70;
+var:int PixelFormatRGBA8Unorm_sRGB = 71;
+var:int PixelFormatRGBA8Snorm      = 72;
+var:int PixelFormatRGBA8Uint       = 73;
+var:int PixelFormatRGBA8Sint       = 74;
+
+var:int PixelFormatBGRA8Unorm      = 80;
+var:int PixelFormatBGRA8Unorm_sRGB = 81;
+
+var:int PixelFormatRGB10A2Unorm = 90;
+var:int PixelFormatRGB10A2Uint  = 91;
+
+var:int PixelFormatRG11B10Float = 92;
+var:int PixelFormatRGB9E5Float = 93;
+
+var:int PixelFormatBGR10A2Unorm = 94;
+
+var:int PixelFormatBGR10_XR = 554;
+var:int PixelFormatBGR10_XR_sRGB = 555;
+
+var:int PixelFormatRG32Uint  = 103;
+var:int PixelFormatRG32Sint  = 104;
+var:int PixelFormatRG32Float = 105;
+
+var:int PixelFormatRGBA16Unorm  = 110;
+var:int PixelFormatRGBA16Snorm  = 112;
+var:int PixelFormatRGBA16Uint   = 113;
+var:int PixelFormatRGBA16Sint   = 114;
+var:int PixelFormatRGBA16Float  = 115;
+
+var:int PixelFormatBGRA10_XR = 552;
+var:int PixelFormatBGRA10_XR_sRGB = 553;
+
+
+var:int PixelFormatRGBA32Uint  = 123;
+var:int PixelFormatRGBA32Sint  = 124;
+var:int PixelFormatRGBA32Float = 125;
+
+var:int PixelFormatBC1_RGBA = 130;
+var:int PixelFormatBC1_RGBA_sRGB = 131;
+var:int PixelFormatBC2_RGBA = 132;
+var:int PixelFormatBC2_RGBA_sRGB = 133;
+var:int PixelFormatBC3_RGBA = 134;
+var:int PixelFormatBC3_RGBA_sRGB = 135;
+
+var:int PixelFormatBC4_RUnorm = 140;
+var:int PixelFormatBC4_RSnorm = 141;
+var:int PixelFormatBC5_RGUnorm = 142;
+var:int PixelFormatBC5_RGSnorm = 143;
+
+var:int PixelFormatBC6H_RGBFloat = 150;
+var:int PixelFormatBC6H_RGBUfloat = 151;
+var:int PixelFormatBC7_RGBAUnorm = 152;
+var:int PixelFormatBC7_RGBAUnorm_sRGB = 153;
+
+var:int PixelFormatPVRTC_RGB_2BPP = 160;
+var:int PixelFormatPVRTC_RGB_2BPP_sRGB    = 161;
+var:int PixelFormatPVRTC_RGB_4BPP = 162;
+var:int PixelFormatPVRTC_RGB_4BPP_sRGB = 163;
+var:int PixelFormatPVRTC_RGBA_2BPP        = 164;
+var:int PixelFormatPVRTC_RGBA_2BPP_sRGB   = 165;
+var:int PixelFormatPVRTC_RGBA_4BPP        = 166;
+var:int PixelFormatPVRTC_RGBA_4BPP_sRGB   = 167;
+
+var:int PixelFormatEAC_R11Unorm           = 170;
+var:int PixelFormatEAC_R11Snorm           = 172;
+var:int PixelFormatEAC_RG11Unorm          = 174;
+var:int PixelFormatEAC_RG11Snorm          = 176;
+var:int PixelFormatEAC_RGBA8              = 178;
+var:int PixelFormatEAC_RGBA8_sRGB         = 179;
+
+var:int PixelFormatETC2_RGB8              = 180;
+var:int PixelFormatETC2_RGB8_sRGB         = 181;
+var:int PixelFormatETC2_RGB8A1            = 182;
+var:int PixelFormatETC2_RGB8A1_sRGB       = 183;
+
+var:int PixelFormatASTC_4x4_sRGB          = 186;
+var:int PixelFormatASTC_5x4_sRGB          = 187;
+var:int PixelFormatASTC_5x5_sRGB          = 188;
+var:int PixelFormatASTC_6x5_sRGB          = 189;
+var:int PixelFormatASTC_6x6_sRGB          = 190;
+var:int PixelFormatASTC_8x5_sRGB          = 192;
+var:int PixelFormatASTC_8x6_sRGB          = 193;
+var:int PixelFormatASTC_8x8_sRGB          = 194;
+var:int PixelFormatASTC_10x5_sRGB         = 195;
+var:int PixelFormatASTC_10x6_sRGB         = 196;
+var:int PixelFormatASTC_10x8_sRGB         = 197;
+var:int PixelFormatASTC_10x10_sRGB        = 198;
+var:int PixelFormatASTC_12x10_sRGB        = 199;
+var:int PixelFormatASTC_12x12_sRGB        = 200;
+
+var:int PixelFormatASTC_4x4_LDR           = 204;
+var:int PixelFormatASTC_5x4_LDR           = 205;
+var:int PixelFormatASTC_5x5_LDR           = 206;
+var:int PixelFormatASTC_6x5_LDR           = 207;
+var:int PixelFormatASTC_6x6_LDR           = 208;
+var:int PixelFormatASTC_8x5_LDR           = 210;
+var:int PixelFormatASTC_8x6_LDR           = 211;
+var:int PixelFormatASTC_8x8_LDR           = 212;
+var:int PixelFormatASTC_10x5_LDR          = 213;
+var:int PixelFormatASTC_10x6_LDR          = 214;
+var:int PixelFormatASTC_10x8_LDR          = 215;
+var:int PixelFormatASTC_10x10_LDR         = 216;
+var:int PixelFormatASTC_12x10_LDR         = 217;
+var:int PixelFormatASTC_12x12_LDR         = 218;
+
+var:int PixelFormatASTC_4x4_HDR = 222;
+var:int PixelFormatASTC_5x4_HDR = 223;
+var:int PixelFormatASTC_5x5_HDR = 224;
+var:int PixelFormatASTC_6x5_HDR = 225;
+var:int PixelFormatASTC_6x6_HDR = 226;
+var:int PixelFormatASTC_8x5_HDR = 228;
+var:int PixelFormatASTC_8x6_HDR = 229;
+var:int PixelFormatASTC_8x8_HDR = 230;
+var:int PixelFormatASTC_10x5_HDR = 231;
+var:int PixelFormatASTC_10x6_HDR = 232;
+var:int PixelFormatASTC_10x8_HDR = 233;
+var:int PixelFormatASTC_10x10_HDR = 234;
+var:int PixelFormatASTC_12x10_HDR = 235;
+var:int PixelFormatASTC_12x12_HDR = 236;
+
+var:int PixelFormatGBGR422 = 240;
+
+var:int PixelFormatBGRG422 = 241;
+
+var:int PixelFormatDepth16Unorm = 250;
+var:int PixelFormatDepth32Float = 252;
+
+var:int PixelFormatStencil8 = 253;
+
+var:int PixelFormatDepth24Unorm_Stencil8 = 255;
+var:int PixelFormatDepth32Float_Stencil8 = 260;
+
+var:int PixelFormatX32_Stencil8 = 261;
+var:int PixelFormatX24_Stencil8 = 262;
+

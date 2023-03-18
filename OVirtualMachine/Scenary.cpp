@@ -10,8 +10,8 @@
 
 namespace O{
 
-    std::pair<int, Scenary::ScriptWord> Scenary::generateScript(long *a, int id) {
-        int readSize = 0;
+    std::pair<int, Scenary::ScriptWord> Scenary::generateScript(long *a, long id) {
+        long readSize = 0;
         auto type = (InstructionType)a[id];
         readSize += 1;
         auto opT1 = (OperandType)a[id + readSize];
@@ -32,8 +32,8 @@ namespace O{
         return {readSize, sw};
     }
 
-    std::pair<int, Scenary::Operand> Scenary::readOperand(Scenary::OperandType opT, long *a, int id) {
-        int readSize = 0;
+    std::pair<int, Scenary::Operand> Scenary::readOperand(Scenary::OperandType opT, long *a, long id) {
+        long readSize = 0;
         Scenary::Operand toRet;
         switch (opT) {
             case OperandType::value:

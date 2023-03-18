@@ -17,5 +17,10 @@ void AppDispatchEvent(MEM_POINTER memPointer);
 void GetEventType(MEM_POINTER memPointer);
 void SetWindowTitle(MEM_POINTER memPointer);
 void GetEventCharacters(MEM_POINTER memPointer);
+void GetMetalDevice(MEM_POINTER memPointer);
+void InitView(MEM_POINTER memPointer);
+void SetViewColorFormat(MEM_POINTER memPointer);
+void SetViewClearColor(MEM_POINTER memPointer);
+void SetWindowView(MEM_POINTER memPointer);
 
 #endif //OAPPKIT_INTERRUPTDEFINITIONS_H

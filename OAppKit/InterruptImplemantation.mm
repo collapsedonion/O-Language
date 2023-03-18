@@ -3,6 +3,8 @@
 #include <AppKit/AppKit.h>
 #include "InterruptDefinitions.h"
 #include "AppDelegate.h"
+#include <MetalKit/MetalKit.h>
+#include <Metal/Metal.h>
 
 void CreateApplication(MEM_POINTER memPointer){
     NSApplication* app = [NSApplication sharedApplication];
@@ -82,4 +84,43 @@ void GetEventCharacters(MEM_POINTER memPointer){
     NSString* chatacters = event.characters;
     [chatacters cString];
     memcpy(targetReference, [chatacters cString], [chatacters cStringLength]);
+}
+
+void GetMetalDevice(MEM_POINTER memPointer){
+    auto device = MTLCreateSystemDefaultDevice();
+    *memPointer.eax = (long)device;
+}
+
+void InitView(MEM_POINTER memPointer){
+    long* rectP = getObjectReferenceByAddress(memPointer, memPointer.ebp);
+    long* rect = getObjectReferenceByAddress(memPointer, *rectP);
+    long* origin = getObjectReferenceByAddress(memPointer, *rect);
+    long* size = getObjectReferenceByAddress(memPointer, *(rect+1));
+    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    CGRect cgRect = {{*(float*)origin, *(float*)(origin+1)}, {*(float*)size, *(float*)(size + 1)}};
+    MTKView* view = [[MTKView alloc] initWithFrame:cgRect device:device];
+    *memPointer.eax = (long)view;
+}
+
+void SetViewColorFormat(MEM_POINTER memPointer){
+    auto view = (MTKView*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto format = (int)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    [view setColorPixelFormat:static_cast<MTLPixelFormat>(format)];
+}
+
+void SetViewClearColor(MEM_POINTER memPointer){
+    auto view = (MTKView*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto r = (float)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    auto g = (float)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 2));
+    auto b = (float)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 3));
+    auto a = (float)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 4));
+    view.clearColor = MTLClearColorMake(r,g,b,a);
+}
+
+void SetWindowView(MEM_POINTER memPointer){
+    auto window = (NSWindow*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto view = (NSView*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    [window setContentView:view];
 }
