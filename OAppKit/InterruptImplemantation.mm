@@ -124,3 +124,52 @@ void SetWindowView(MEM_POINTER memPointer){
     auto view = (NSView*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
     [window setContentView:view];
 }
+
+void CreateCommandQueue(MEM_POINTER memPointer){
+    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    id<MTLCommandQueue> queue = [device newCommandQueue];
+    *memPointer.eax = (long)queue;
+}
+
+void GetRenderPassDescriptor(MEM_POINTER memPointer){
+    auto view = (MTKView*)(*getObjectReferenceByAddress(memPointer,memPointer.ebp));
+    auto renderPassDescriptor = [view currentRenderPassDescriptor];
+    *memPointer.eax = (long)renderPassDescriptor;
+}
+
+void GetRenderCommandEncoder(MEM_POINTER memPointer){
+    auto commandBuffer = (id<MTLCommandBuffer>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto renderPassDescriptor = (MTLRenderPassDescriptor*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+    *memPointer.eax = (long)commandEncoder;
+}
+
+void GetCommandBuffer(MEM_POINTER memPointer){
+    auto commandQueue = (id<MTLCommandQueue>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    id<MTLCommandBuffer> buffer = [commandQueue commandBuffer];
+    *memPointer.eax = (long)buffer;
+}
+
+void EndEncoding(MEM_POINTER memPointer){
+    auto commandEncoder = (id<MTLRenderCommandEncoder>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    [commandEncoder endEncoding];
+}
+
+void GetCurrentDrawable(MEM_POINTER memPointer){
+    auto view = (MTKView*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    id<MTLDrawable> drawAble = [view currentDrawable];
+    *memPointer.eax = (long)drawAble;
+}
+
+void PresentDrawable(MEM_POINTER memPointer){
+    auto commandBuffer = (id<MTLCommandBuffer>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto drawable = (id<MTLDrawable>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    [commandBuffer presentDrawable:drawable];
+}
+
+void CommitCommandBuffer(MEM_POINTER memPointer){
+    auto commandBuffer = (id<MTLCommandBuffer>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    [commandBuffer commit];
+}

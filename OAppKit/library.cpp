@@ -83,6 +83,46 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
     setWindowView.name = "setWindowView";
     setWindowView.hInt = SetWindowView;
 
+    Interrupt createNewCommandQueue;
+    createNewCommandQueue.id = last_id + 16;
+    createNewCommandQueue.name = "createNewCommandQueue";
+    createNewCommandQueue.hInt = CreateCommandQueue;
+
+    Interrupt getCurrentRenderPassDescriptor;
+    getCurrentRenderPassDescriptor.id = last_id + 17;
+    getCurrentRenderPassDescriptor.name = "getCurrentRenderPassDescriptor";
+    getCurrentRenderPassDescriptor.hInt = GetRenderPassDescriptor;
+
+    Interrupt getRenderCommandEncoder;
+    getRenderCommandEncoder.id = last_id + 18;
+    getRenderCommandEncoder.name = "getRenderCommandEncoder";
+    getRenderCommandEncoder.hInt = GetRenderCommandEncoder;
+
+    Interrupt getCommandBuffer;
+    getCommandBuffer.id = last_id + 19;
+    getCommandBuffer.name = "getCommandBuffer";
+    getCommandBuffer.hInt = GetCommandBuffer;
+
+    Interrupt endEncoding;
+    endEncoding.id = last_id + 20;
+    endEncoding.name = "endEncoding";
+    endEncoding.hInt = EndEncoding;
+
+    Interrupt currentDrawable;
+    currentDrawable.id = last_id + 21;
+    currentDrawable.name = "getCurrentDrawable";
+    currentDrawable.hInt = GetCurrentDrawable;
+
+    Interrupt presentDrawable;
+    presentDrawable.id = last_id + 22;
+    presentDrawable.name = "presentDrawable";
+    presentDrawable.hInt = PresentDrawable;
+
+    Interrupt commitBuffer;
+    commitBuffer.id = last_id + 23;
+    commitBuffer.name = "commitCommandBuffer";
+    commitBuffer.hInt = CommitCommandBuffer;
+
     return {createApplication,
             getSharedApplication,
             createWindow,
@@ -98,5 +138,13 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
             initView,
             setColorFormat,
             setViewClearColor,
-            setWindowView,};
+            setWindowView,
+            createNewCommandQueue,
+            getCurrentRenderPassDescriptor,
+            getRenderCommandEncoder,
+            getCommandBuffer,
+            endEncoding,
+            currentDrawable,
+            presentDrawable,
+            commitBuffer};
 }

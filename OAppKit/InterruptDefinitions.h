@@ -22,5 +22,13 @@ void InitView(MEM_POINTER memPointer);
 void SetViewColorFormat(MEM_POINTER memPointer);
 void SetViewClearColor(MEM_POINTER memPointer);
 void SetWindowView(MEM_POINTER memPointer);
+void CreateCommandQueue(MEM_POINTER memPointer);
+void GetRenderPassDescriptor(MEM_POINTER memPointer);
+void GetRenderCommandEncoder(MEM_POINTER memPointer);
+void GetCommandBuffer(MEM_POINTER memPointer);
+void EndEncoding(MEM_POINTER memPointer);
+void GetCurrentDrawable(MEM_POINTER memPointer);
+void PresentDrawable(MEM_POINTER memPointer);
+void CommitCommandBuffer(MEM_POINTER memPointer);
 
 #endif //OAPPKIT_INTERRUPTDEFINITIONS_H

@@ -6,7 +6,35 @@ struct:Device{
 
 }
 
+struct:CommandQueue{
+
+}
+
+struct:RenderPassDescriptor{
+
+}
+
+struct:RenderCommandEncoder{
+
+}
+
+struct:CommandBuffer{
+
+}
+
+struct:Drawable{
+
+}
+
 extern:func:Device getSystemMetalDevice();
 extern:func:View initMTView(Rect rect, Device device);
 extern:func setViewColorPixelFormat(View view, int format);
 extern:func setViewClearColor(View view, float r, float g, float b, float a);
+extern:func:CommandQueue createNewCommandQueue(Device device);
+extern:func:RenderPassDescriptor getCurrentRenderPassDescriptor(View view);
+extern:func:RenderCommandEncoder getRenderCommandEncoder(CommandBuffer commandBuffer, RenderPassDescriptor renderPassDescriptor);
+extern:func:CommandBuffer getCommandBuffer(CommandQueue commandQueue);
+extern:func endEncoding(RenderCommandEncoder commandEncoder);
+extern:func:Drawable getCurrentDrawable(View view);
+extern:func presentDrawable(CommandBuffer commandBuffer, Drawable drawable);
+extern:func commitCommandBuffer(CommandBuffer commandBuffer);
