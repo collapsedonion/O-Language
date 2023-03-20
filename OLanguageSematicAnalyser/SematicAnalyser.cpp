@@ -332,21 +332,30 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 			throw(std::exception());
 		}
 
+        std::vector<Analyser::Token> tokens;
+
+        if(token.childToken[0].token == COMMA_OPERATOR){
+            tokens = getComma(token.childToken[0]);
+        } else{
+            tokens = token.childToken;
+        }
+
 		Instruction toRet;
 		toRet.name = ARRAY_CREATION_NAME;
 		Instruction instSize;
-		instSize.name = token.childToken.size();
+		instSize.name = tokens.size();
 		instSize.type = DataTypes::Integer;
 		toRet.Parameters.push_back(instSize);
 
-		for (int i = 0; i < token.childToken.size(); i++) {
-			toRet.Parameters.push_back(proccessInstCall(token.childToken[i]));
+		for (int i = 0; i < tokens.size(); i++) {
+			toRet.Parameters.push_back(proccessInstCall(tokens[i]));
 			if (i != 0 && i != 1) {
 				if (toRet.Parameters[i - 1].type != toRet.Parameters[i].type) {
 					throw(std::exception());
 				}
 			}
 		}
+
 		Analyser::Token typeToken;
 		typeToken.token = L"~";
 		Analyser::Token instTypeToken;
@@ -904,35 +913,39 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                 }
             }
             else if (token.token == SQUARE_OPERATOR) {
-                Instruction dest = proccessInstCall(token.childToken[0]);
-                bool reCreateCheck = true;
-                Instruction secondOp;
-                try {
-                    secondOp = proccessInstCall(token.childToken[1]);
+                if(token.childToken.size() == 1){
+                   res = proccessArrayCreationInstruction(token);
                 }
-                catch (...) {
-                    reCreateCheck = false;
-                }
+                else{
+                    Instruction dest = proccessInstCall(token.childToken[0]);
+                    bool reCreateCheck = true;
+                    Instruction secondOp;
+                    try {
+                        secondOp = proccessInstCall(token.childToken[1]);
+                    }
+                    catch (...) {
+                        reCreateCheck = false;
+                    }
 
-                if (reCreateCheck) {
-                    bool exists = containsOperator(token.token, dest.type, secondOp.type);
-                    if (exists) {
-                        if(isExternFunction(token.token, {dest.type, secondOp.type})){
-                            res.ArithmeticProccess = true;
-                        }else{
-                            res.IsFunction = true;
+                    if (reCreateCheck) {
+                        bool exists = containsOperator(token.token, dest.type, secondOp.type);
+                        if (exists) {
+                            if(isExternFunction(token.token, {dest.type, secondOp.type})){
+                                res.ArithmeticProccess = true;
+                            }else{
+                                res.IsFunction = true;
+                            }
+                            res.name = token.token;
+                            res.type = getReturnDataTypeOfOperator(token.token, dest.type, secondOp.type);
+                            res.Parameters = {dest, secondOp};
+                        } else {
+                            res = proccessArrayAccessInstruction(token);
                         }
-                        res.name = token.token;
-                        res.type = getReturnDataTypeOfOperator(token.token, dest.type, secondOp.type);
-                        res.Parameters = {dest, secondOp};
+
                     } else {
                         res = proccessArrayAccessInstruction(token);
                     }
-
-                } else {
-                    res = proccessArrayAccessInstruction(token);
                 }
-
             }
             else if (token.token == POINTER_GET_INSTRUCTION_TOKEN){
                 res = proccessPointerGet(token);

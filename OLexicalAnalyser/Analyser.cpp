@@ -402,6 +402,13 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         //Func.childToken.push_back();
         return Func;
     }
+    else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
+        res.token = L"[]";
+        res.type = Type::MathematicalOperator;
+        res.forward = true;
+        std::wstring leftPart = str.substr(1, str.size() - 2);
+        res.childToken = {StringToTree(leftPart)};
+    }
     else {
         if (isDefaultServiceName(str)) {
             res.token = str;

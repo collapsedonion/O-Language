@@ -97,3 +97,12 @@ func setPArrayElement(PArray pPArray, int index, int data){
     (int~(content))[pisc[packageGlobalIndex]] = pElement;
     free(pisc);
 }
+
+func copyArrayToPArray(PArray pPArray, void~ pArray, int copySize){
+    var:int index = 0;
+
+    while(index < copySize){
+        setPArrayElement(pPArray, index, int(pArray[index]));
+        index = index + 1;
+    }
+}
