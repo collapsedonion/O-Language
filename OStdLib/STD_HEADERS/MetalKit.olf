@@ -1,6 +1,7 @@
 #include AppKit.olf
 #include stdGeometry.olf
 #include MetalColorFormats.olf
+#include packedString.olf
 
 struct:Device{
 
@@ -26,6 +27,22 @@ struct:Drawable{
 
 }
 
+struct:MTLLib{
+
+}
+
+struct:MTLFunction{
+
+}
+
+struct:RenderPipelineDescriptor{
+
+}
+
+struct:PipelineState{
+
+}
+
 extern:func:Device getSystemMetalDevice();
 extern:func:View initMTView(Rect rect, Device device);
 extern:func setViewColorPixelFormat(View view, int format);
@@ -38,3 +55,12 @@ extern:func endEncoding(RenderCommandEncoder commandEncoder);
 extern:func:Drawable getCurrentDrawable(View view);
 extern:func presentDrawable(CommandBuffer commandBuffer, Drawable drawable);
 extern:func commitCommandBuffer(CommandBuffer commandBuffer);
+extern:func:MTLLib initMTLLibWithFile(Device device, PChar8~ pPStr);
+extern:func:MTLFunction getMTLFunction(MTLLib lib, PChar8~ pPStr);
+extern:func:RenderPipelineDescriptor initRenderPipelineDescriptor();
+extern:func setPipelineVertexFunction(RenderPipelineDescriptor pipelineDescriptor, MTLFunction function);
+extern:func setPipelineFragmentFunction(RenderPipelineDescriptor pipelineDescriptor, MTLFunction function);
+extern:func setPipelineLabel(RenderPipelineDescriptor pipelineDescriptor, PChar8~ pPStr);
+extern:func setPipelinePixelFormat(RenderPipelineDescriptor pipelineDescriptor, int pixelFormat);
+extern:func:PipelineState initRenderPipelineState(Device device, RenderPipelineDescriptor rpd);
+extern:func setEncoderPipelineState(RenderCommandEncoder rce, PipelineState ps);

@@ -173,3 +173,68 @@ void CommitCommandBuffer(MEM_POINTER memPointer){
     auto commandBuffer = (id<MTLCommandBuffer>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
     [commandBuffer commit];
 }
+
+void CreateMTLLibWithFile(MEM_POINTER memPointer){
+    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto path = (char*)(getObjectReferenceByAddress(memPointer ,*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1)));
+
+    NSString* str = [[NSString alloc] initWithCString:path];
+    id<MTLLibrary> library = [device newLibraryWithFile:str error:nil];
+    *memPointer.eax = (long)library;
+}
+
+void GetMTLFunction(MEM_POINTER memPointer){
+    auto lib = (id<MTLLibrary>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto name = (char*)(getObjectReferenceByAddress(memPointer ,*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1)));
+
+    NSString* str = [[NSString alloc] initWithCString:name];
+
+    id<MTLFunction> function = [lib newFunctionWithName:str];
+    *memPointer.eax = (long)function;
+}
+
+void InitRenderPipelineDescriptor(MEM_POINTER memPointer){
+    *memPointer.eax = (long)[[MTLRenderPipelineDescriptor alloc] init];
+}
+
+void SetPipelineVertexFunction(MEM_POINTER memPointer){
+    auto pipeline = (MTLRenderPipelineDescriptor*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto function = (id<MTLFunction>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    [pipeline setVertexFunction:function];
+}
+void SetPipelineFragmentFunction(MEM_POINTER memPointer){
+    auto pipeline = (MTLRenderPipelineDescriptor*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto function = (id<MTLFunction>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    [pipeline setFragmentFunction:function];
+}
+
+void SetPipelineLabel(MEM_POINTER memPointer){
+    auto pipeline = (MTLRenderPipelineDescriptor*)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto label = (char*)(getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    NSString* nLabel = [[NSString alloc] initWithCString:label];
+    [pipeline setLabel:nLabel];
+}
+
+void SetPipelinePixelFormat(MEM_POINTER memPointer){
+    auto pipeline = (MTLRenderPipelineDescriptor*)(*getObjectReferenceByAddress(memPointer,memPointer.ebp));
+    auto format = (int)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    pipeline.colorAttachments[0].pixelFormat = static_cast<MTLPixelFormat>(format);
+}
+
+void InitRenderPipeState(MEM_POINTER memPointer){
+    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto pipeline = (MTLRenderPipelineDescriptor*)(*getObjectReferenceByAddress(memPointer,memPointer.ebp - 1));
+    id<MTLRenderPipelineState> rps = [device newRenderPipelineStateWithDescriptor:pipeline error:nil];
+    *memPointer.eax = (long)rps;
+}
+
+INTERRUPT_DEFINITION(SetRenderPipeState){
+    auto encoder = (id<MTLRenderCommandEncoder>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto state = (id<MTLRenderPipelineState>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    [encoder setRenderPipelineState:state];
+}

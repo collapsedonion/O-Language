@@ -6,6 +6,8 @@
 #define OAPPKIT_INTERRUPTDEFINITIONS_H
 #include <OVM_SDK.h>
 
+#define INTERRUPT_DEFINITION(NAME) void NAME (MEM_POINTER memPointer)
+
 void CreateApplication(MEM_POINTER memPointer);
 void GetSharedApplication(MEM_POINTER memPointer);
 void CreateWindow(MEM_POINTER memPointer);
@@ -30,5 +32,15 @@ void EndEncoding(MEM_POINTER memPointer);
 void GetCurrentDrawable(MEM_POINTER memPointer);
 void PresentDrawable(MEM_POINTER memPointer);
 void CommitCommandBuffer(MEM_POINTER memPointer);
+void CreateMTLLibWithFile(MEM_POINTER memPointer);
+void GetMTLFunction(MEM_POINTER memPointer);
+void InitRenderPipelineDescriptor(MEM_POINTER memPointer);
+void SetPipelineVertexFunction(MEM_POINTER memPointer);
+void SetPipelineFragmentFunction(MEM_POINTER memPointer);
+void SetPipelineLabel(MEM_POINTER memPointer);
+void SetPipelinePixelFormat(MEM_POINTER memPointer);
+void InitRenderPipeState(MEM_POINTER memPointer);
+
+INTERRUPT_DEFINITION(SetRenderPipeState);
 
 #endif //OAPPKIT_INTERRUPTDEFINITIONS_H

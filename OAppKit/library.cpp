@@ -2,6 +2,8 @@
 #include <OVM_SDK.h>
 #include "InterruptDefinitions.h"
 
+#define NEW_INTERRUPT(NAME, HANDLER, ID) Interrupt NAME; NAME.name = #NAME; NAME.hInt = HANDLER; NAME.id = last_id + ID;
+
 extern "C" std::vector<Interrupt> _Omain(int last_id){
     Interrupt createApplication;
     createApplication.name = "initApplication";
@@ -123,6 +125,45 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
     commitBuffer.name = "commitCommandBuffer";
     commitBuffer.hInt = CommitCommandBuffer;
 
+    Interrupt createNewLib;
+    createNewLib.id = last_id + 24;
+    createNewLib.name = "initMTLLibWithFile";
+    createNewLib.hInt = CreateMTLLibWithFile;
+
+    Interrupt getMTLFunction;
+    getMTLFunction.id = last_id + 25;
+    getMTLFunction.name = "getMTLFunction";
+    getMTLFunction.hInt = GetMTLFunction;
+
+    Interrupt initRenderPipelineDescriptor;
+    initRenderPipelineDescriptor.id = last_id + 26;
+    initRenderPipelineDescriptor.name = "initRenderPipelineDescriptor";
+    initRenderPipelineDescriptor.hInt = InitRenderPipelineDescriptor;
+
+    Interrupt setFragmentFunction;
+    setFragmentFunction.id = last_id + 27;
+    setFragmentFunction.name = "setPipelineFragmentFunction";
+    setFragmentFunction.hInt = SetPipelineFragmentFunction;
+
+    Interrupt setVertexFunction;
+    setVertexFunction.id = last_id + 28;
+    setVertexFunction.name = "setPipelineVertexFunction";
+    setVertexFunction.hInt = SetPipelineVertexFunction;
+
+    Interrupt setPipeLineLabel;
+    setPipeLineLabel.id = last_id + 29;
+    setPipeLineLabel.hInt = SetPipelineLabel;
+    setPipeLineLabel.name = "setPipelineLabel";
+
+    Interrupt setPipelinePixelFormat;
+    setPipelinePixelFormat.id = last_id + 30;
+    setPipelinePixelFormat.name = "setPipelinePixelFormat";
+    setPipelinePixelFormat.hInt = SetPipelinePixelFormat;
+
+    NEW_INTERRUPT(initRenderPipelineState, InitRenderPipeState, 31)
+
+    NEW_INTERRUPT(setEncoderPipelineState, SetRenderPipeState, 32)
+
     return {createApplication,
             getSharedApplication,
             createWindow,
@@ -146,5 +187,14 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
             endEncoding,
             currentDrawable,
             presentDrawable,
-            commitBuffer};
+            commitBuffer,
+            createNewLib,
+            getMTLFunction,
+            initRenderPipelineDescriptor,
+            setFragmentFunction,
+            setVertexFunction,
+            setPipeLineLabel,
+            setPipelinePixelFormat,
+            initRenderPipelineState,
+            setEncoderPipelineState,};
 }
