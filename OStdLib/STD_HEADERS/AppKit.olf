@@ -15,11 +15,13 @@ struct:View{
 
 }
 
-var:int WindowStyleMaskBorderLess = 0;
-var:int WindowStyleMaskTitled = 1;
-var:int WindowStyleMaskClosable = 2;
-var:int WindowStyleMaskMiniaturizable = 4;
-var:int WindowStyleMaskResizable = 8;
+enum {
+    WindowStyleMaskBorderLess = 0,
+    WindowStyleMaskTitled = 1,
+    WindowStyleMaskClosable = 2,
+    WindowStyleMaskMiniaturizable = 4,
+    WindowStyleMaskResizable = 8
+}
 
 extern:func:App initApplication();
 extern:func:App getSharedApplication();

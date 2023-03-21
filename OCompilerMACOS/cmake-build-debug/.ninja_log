@@ -68,3 +68,13 @@
 7	290	1679307190116360746	OCompilerMAC	5de1dcb57fd881a7
 5	233	1679309102445024454	OCompilerMAC	5de1dcb57fd881a7
 4	218	1679388791097682284	OCompilerMAC	5de1dcb57fd881a7
+5	690	1679397341758232022	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+4	755	1679397341823561513	CMakeFiles/OLanguageSematicAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/SematicAnalyser.cpp.o	e4992e60d5640522
+756	780	1679397341851864000	libOLanguageSematicAnalyser.a	d09d2e70b46cdd4c
+780	844	1679397341905787157	OCompilerMAC	5de1dcb57fd881a7
+4	745	1679397580487382804	CMakeFiles/OLanguageSematicAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/SematicAnalyser.cpp.o	e4992e60d5640522
+745	769	1679397580515076000	libOLanguageSematicAnalyser.a	d09d2e70b46cdd4c
+769	832	1679397580568271874	OCompilerMAC	5de1dcb57fd881a7
+4	841	1679398004495343900	CMakeFiles/OLanguageSematicAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/SematicAnalyser.cpp.o	e4992e60d5640522
+842	865	1679398004522732000	libOLanguageSematicAnalyser.a	d09d2e70b46cdd4c
+865	930	1679398004577358996	OCompilerMAC	5de1dcb57fd881a7

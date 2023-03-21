@@ -4,11 +4,13 @@
 #include packedString.olf
 #include packages.olf
 
-var:int PrimitiveTypePoint = 0;
-var:int PrimitiveTypeLine = 1;
-var:int PrimitiveTypeLineStrip = 2;
-var:int PrimitiveTypeTriangle = 3;
-var:int PrimitiveTypeTriangleStrip = 4;
+enum {
+    PrimitiveTypePoint = 0,
+    PrimitiveTypeLine = 1,
+    PrimitiveTypeLineStrip = 2,
+    PrimitiveTypeTriangle = 3,
+    PrimitiveTypeTriangleStrip = 4
+}
 
 struct:Device{
 

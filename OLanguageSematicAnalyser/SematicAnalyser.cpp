@@ -15,6 +15,7 @@
 #define FUNCTION_CALL L"()"
 #define SQUARE_OPERATOR L"[]"
 #define MATH_SET L"="
+#define ENUM_NAME L"enum"
 
 #define POINTER_GET_INSTRUCTION_NAME L"GET_POINTER"
 
@@ -262,6 +263,7 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 		sa.functions = std::vector<Function>(functions);
 		sa.variables = std::vector<Variable>(variables);
         sa.returnType = returnType;
+        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
 		for(auto elem : token.subToken){
@@ -427,6 +429,7 @@ Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile to
         sa.variables = std::vector<Variable>(variables);
         sa.returnType = returnType;
         sa.definedStructures = std::vector<Structure>(definedStructures);
+        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
 
         for(auto elem : token.subToken){
             sa.ProcessToken(elem);
@@ -471,6 +474,7 @@ Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFil
         sa.functions = std::vector<Function>(functions);
         sa.variables = std::vector<Variable>(variables);
         sa.returnType = returnType;
+        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
         for(auto elem : token.subToken){
@@ -504,6 +508,7 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
         sa.functions = std::vector<Function>(functions);
         sa.variables = std::vector<Variable>(variables);
         sa.returnType = returnType;
+        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
         sa.definedStructures = std::vector<Structure>(definedStructures);
 
         for(auto elem : token.subToken){
@@ -615,6 +620,8 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
             subSematicAnalyser.functions = std::vector<Function>(functions);
             subSematicAnalyser.operators = std::vector<Operator>(operators);
             subSematicAnalyser.definedStructures = std::vector<Structure>(definedStructures);
+            subSematicAnalyser.enumerations = std::map<std::wstring, Instruction>(enumerations);
+
             for (auto elem: func.arguments) {
                 subSematicAnalyser.variables.push_back(elem);
             }
@@ -747,6 +754,9 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
         inst = proccessVarInstruction(token.name);
     }else if(token.name.token == STRUCTURE_DEFINITION_TOKEN){
         proccessStructureCreation(token);
+    }
+    else if(token.name.token == ENUM_NAME){
+        processEnumeration(token);
     }
     else if(token.name.token == FUNCTION_CALL &&
     (token.name.childToken[0].token == FUNC_CREATION_NAME ||
@@ -978,6 +988,8 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
     else if (token.type == Analyser::Type::Name) {
         if (containsVariable(token.token)) {
             return getVariableAsInstruction(token.token);
+        }else if(enumerations.find(token.token) != enumerations.end()){
+            return enumerations[token.token];
         }
         else {
             std::wstring message = L"Undefined variable with name \"" + token.token + L"\"";
@@ -1031,4 +1043,21 @@ bool O::SematicAnalyser::isExternFunction(std::wstring name, std::vector<DataTyp
         }
     }
     return false;
+}
+
+Instruction O::SematicAnalyser::processEnumeration(O::Analyser::TokenisedFile tokenFile) {
+    if(tokenFile.subToken.size() != 1){
+        throw std::exception();
+    }
+
+    std::vector<Analyser::Token> tokens = getComma(tokenFile.subToken[0].name);
+
+    for(auto elem : tokens){
+        auto replaceInst = proccessInstCall(elem.childToken[1]);
+        auto name = elem.childToken[0].token;
+
+        enumerations.insert({name, replaceInst});
+    }
+
+    return {};
 }

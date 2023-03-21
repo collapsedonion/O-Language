@@ -2,6 +2,7 @@
 #include <Analyser.h>
 #include <exception>
 #include <BaseTypes.h>
+#include <map>
 
 namespace O {
 	class SematicAnalyser
@@ -20,6 +21,7 @@ namespace O {
         std::vector<Function> exportedFunctions;
         std::vector<Structure> definedStructures;
 		std::vector<Operator> operators;
+        std::map<std::wstring, Instruction> enumerations;
 
 	private:
 		// returns ERROR if not found
@@ -33,6 +35,8 @@ namespace O {
 		DataTypes getReturnDataTypeOfOperator(std::wstring op, DataTypes left, DataTypes right);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
+
+        Instruction processEnumeration(Analyser::TokenisedFile tokenFile);
 
 		Instruction proccessPointerGet(Analyser::Token token);
 
