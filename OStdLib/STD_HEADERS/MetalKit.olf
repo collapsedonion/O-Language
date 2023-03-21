@@ -2,6 +2,13 @@
 #include stdGeometry.olf
 #include MetalColorFormats.olf
 #include packedString.olf
+#include packages.olf
+
+var:int PrimitiveTypePoint = 0;
+var:int PrimitiveTypeLine = 1;
+var:int PrimitiveTypeLineStrip = 2;
+var:int PrimitiveTypeTriangle = 3;
+var:int PrimitiveTypeTriangleStrip = 4;
 
 struct:Device{
 
@@ -43,24 +50,57 @@ struct:PipelineState{
 
 }
 
+struct:Buffer{
+
+}
+
+
 extern:func:Device getSystemMetalDevice();
+
 extern:func:View initMTView(Rect rect, Device device);
+
 extern:func setViewColorPixelFormat(View view, int format);
+
 extern:func setViewClearColor(View view, float r, float g, float b, float a);
+
 extern:func:CommandQueue createNewCommandQueue(Device device);
+
 extern:func:RenderPassDescriptor getCurrentRenderPassDescriptor(View view);
+
 extern:func:RenderCommandEncoder getRenderCommandEncoder(CommandBuffer commandBuffer, RenderPassDescriptor renderPassDescriptor);
+
 extern:func:CommandBuffer getCommandBuffer(CommandQueue commandQueue);
+
 extern:func endEncoding(RenderCommandEncoder commandEncoder);
+
 extern:func:Drawable getCurrentDrawable(View view);
+
 extern:func presentDrawable(CommandBuffer commandBuffer, Drawable drawable);
+
 extern:func commitCommandBuffer(CommandBuffer commandBuffer);
+
 extern:func:MTLLib initMTLLibWithFile(Device device, PChar8~ pPStr);
+
 extern:func:MTLFunction getMTLFunction(MTLLib lib, PChar8~ pPStr);
+
 extern:func:RenderPipelineDescriptor initRenderPipelineDescriptor();
+
 extern:func setPipelineVertexFunction(RenderPipelineDescriptor pipelineDescriptor, MTLFunction function);
+
 extern:func setPipelineFragmentFunction(RenderPipelineDescriptor pipelineDescriptor, MTLFunction function);
+
 extern:func setPipelineLabel(RenderPipelineDescriptor pipelineDescriptor, PChar8~ pPStr);
+
 extern:func setPipelinePixelFormat(RenderPipelineDescriptor pipelineDescriptor, int pixelFormat);
+
 extern:func:PipelineState initRenderPipelineState(Device device, RenderPipelineDescriptor rpd);
+
 extern:func setEncoderPipelineState(RenderCommandEncoder rce, PipelineState ps);
+
+extern:func:Buffer initMTLBuffer(Device device, int size);
+
+extern:func copyPArrayToBuffer(Buffer buffer, PArray pArray);
+
+extern:func setEncoderVertexBuffer(RenderCommandEncoder rce, Buffer buffer, int offset, int atIndex);
+
+extern:func encoderDrawPrimitives(RenderCommandEncoder rce, int type, int offset, int count);

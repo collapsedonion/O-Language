@@ -43,4 +43,12 @@ void InitRenderPipeState(MEM_POINTER memPointer);
 
 INTERRUPT_DEFINITION(SetRenderPipeState);
 
+INTERRUPT_DEFINITION(CreateBuffer);
+
+INTERRUPT_DEFINITION(CopyDataToBuffer);
+
+INTERRUPT_DEFINITION(SetVertexBuffer);
+
+INTERRUPT_DEFINITION(DrawPrimitives);
+
 #endif //OAPPKIT_INTERRUPTDEFINITIONS_H

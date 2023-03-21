@@ -164,6 +164,14 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
 
     NEW_INTERRUPT(setEncoderPipelineState, SetRenderPipeState, 32)
 
+    NEW_INTERRUPT(initMTLBuffer, CreateBuffer, 33)
+
+    NEW_INTERRUPT(copyPArrayToBuffer, CopyDataToBuffer, 34);
+
+    NEW_INTERRUPT(setEncoderVertexBuffer, SetVertexBuffer, 35);
+
+    NEW_INTERRUPT(encoderDrawPrimitives, DrawPrimitives, 36);
+
     return {createApplication,
             getSharedApplication,
             createWindow,
@@ -196,5 +204,9 @@ extern "C" std::vector<Interrupt> _Omain(int last_id){
             setPipeLineLabel,
             setPipelinePixelFormat,
             initRenderPipelineState,
-            setEncoderPipelineState,};
+            setEncoderPipelineState,
+            initMTLBuffer,
+            copyPArrayToBuffer,
+            setEncoderVertexBuffer,
+            encoderDrawPrimitives};
 }

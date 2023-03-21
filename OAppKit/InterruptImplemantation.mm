@@ -238,3 +238,45 @@ INTERRUPT_DEFINITION(SetRenderPipeState){
 
     [encoder setRenderPipelineState:state];
 }
+
+INTERRUPT_DEFINITION(CreateBuffer){
+    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto size = (long)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    id<MTLBuffer> buffer = [device newBufferWithLength:size options:MTLResourceStorageModeManaged];
+
+    *memPointer.eax = (long)buffer;
+}
+
+INTERRUPT_DEFINITION(CopyDataToBuffer){
+    auto buffer = (id<MTLBuffer>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto PArray = (long)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+
+    auto PArrayRealPointer = (long*)(getObjectReferenceByAddress(memPointer, PArray));
+    auto ContentRealPointer = (long*)(getObjectReferenceByAddress(memPointer, *PArrayRealPointer));
+    auto base = (long)*(PArrayRealPointer + 1);
+    auto size = (long)*(PArrayRealPointer + 2);
+
+    auto elementSize = base / 8;
+    auto arraySize = size * elementSize;
+
+    memcpy(buffer.contents, ContentRealPointer, arraySize);
+}
+
+INTERRUPT_DEFINITION(SetVertexBuffer){
+    auto encoder = (id<MTLRenderCommandEncoder>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto buffer = (id<MTLBuffer>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    auto offset = (long)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 2));
+    auto atIndex = (long)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 3));
+
+    [encoder setVertexBuffer:buffer offset:offset atIndex:atIndex];
+}
+
+INTERRUPT_DEFINITION(DrawPrimitives){
+    auto encoder = (id<MTLRenderCommandEncoder>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
+    auto type = (int)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    auto start = (int)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 2));
+    auto count = (int)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 3));
+
+    [encoder drawPrimitives:static_cast<MTLPrimitiveType>(type) vertexStart:start vertexCount:count];
+}
