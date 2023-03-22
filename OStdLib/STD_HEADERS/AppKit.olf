@@ -1,18 +1,25 @@
 #include stdGeometry.olf
 #include packedString.olf
 
-struct:App{
-}
-
-struct:Window{
-}
-
 struct:Event{
 
 }
 
 struct:View{
 
+}
+
+struct:App{
+    extern:func dispatchEvent(Event event);
+}
+
+struct:Window{
+    extern:func setWindowFlags(int maskFlag);
+    extern:func setWindowRect(Rect rect);
+    extern:func:Event getWindowLastEvent(bool dequeue);
+    extern:func setWindowTitle(PChar8~ title);
+    extern:func setWindowView(View view);
+    extern:func setWindowFront();
 }
 
 enum {
@@ -26,10 +33,3 @@ enum {
 extern:func:App initApplication();
 extern:func:App getSharedApplication();
 extern:func:Window initWindow();
-extern:func setWindowFlags(Window window, int maskFlag);
-extern:func setWindowRect(Window window, Rect rect);
-extern:func setWindowFront(Window window);
-extern:func:Event getWindowLastEvent(Window window, bool dequeue);
-extern:func dispatchEvent(App app, Event event);
-extern:func setWindowTitle(Window win, PChar8~ title);
-extern:func setWindowView(Window win, View view);

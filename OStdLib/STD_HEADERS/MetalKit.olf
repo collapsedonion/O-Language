@@ -12,12 +12,49 @@ enum {
     PrimitiveTypeTriangleStrip = 4
 }
 
-struct:Device{
+struct:Drawable{
 
 }
 
-struct:CommandQueue{
+struct:CommandBuffer{
+    extern:func presentDrawable(Drawable drawable);
+    extern:func commitCommandBuffer();
+}
 
+struct:CommandQueue{
+    extern:func:CommandBuffer getCommandBuffer();
+}
+
+struct:Buffer{
+    extern:func copyPArrayToBuffer(PArray pArray);
+}
+
+
+struct:MTLFunction{
+
+}
+
+struct:MTLLib{
+    extern:func:MTLFunction getMTLFunction(PChar8~ pPStr);
+}
+
+struct:RenderPipelineDescriptor{
+    extern:func setPipelineVertexFunction(MTLFunction function);
+    extern:func setPipelineFragmentFunction(MTLFunction function);
+    extern:func setPipelineLabel(PChar8~ pPStr);
+    extern:func setPipelinePixelFormat(int pixelFormat);
+}
+
+struct:PipelineState{
+
+}
+
+struct:Device{
+    extern:func:MTLLib initMTLLibWithFile(PChar8~ pPStr);
+    extern:func:PipelineState initRenderPipelineState(RenderPipelineDescriptor rpd);
+    extern:func:View initMTView(Rect rect);
+    extern:func:Buffer initMTLBuffer(int size);
+    extern:func:CommandQueue createNewCommandQueue();
 }
 
 struct:RenderPassDescriptor{
@@ -25,84 +62,22 @@ struct:RenderPassDescriptor{
 }
 
 struct:RenderCommandEncoder{
-
+    extern:func setEncoderVertexBuffer(Buffer buffer, int offset, int atIndex);
+    extern:func setEncoderPipelineState(PipelineState ps);
+    extern:func encoderDrawPrimitives(int type, int offset, int count);
+    extern:func endEncoding();
 }
-
-struct:CommandBuffer{
-
-}
-
-struct:Drawable{
-
-}
-
-struct:MTLLib{
-
-}
-
-struct:MTLFunction{
-
-}
-
-struct:RenderPipelineDescriptor{
-
-}
-
-struct:PipelineState{
-
-}
-
-struct:Buffer{
-
-}
-
 
 extern:func:Device getSystemMetalDevice();
-
-extern:func:View initMTView(Device device, Rect rect);
 
 extern:func setViewColorPixelFormat(View view, int format);
 
 extern:func setViewClearColor(View view, float r, float g, float b, float a);
 
-extern:func:CommandQueue createNewCommandQueue(Device device);
-
 extern:func:RenderPassDescriptor getCurrentRenderPassDescriptor(View view);
 
 extern:func:RenderCommandEncoder getRenderCommandEncoder(CommandBuffer commandBuffer, RenderPassDescriptor renderPassDescriptor);
 
-extern:func:CommandBuffer getCommandBuffer(CommandQueue commandQueue);
-
-extern:func endEncoding(RenderCommandEncoder commandEncoder);
-
 extern:func:Drawable getCurrentDrawable(View view);
 
-extern:func presentDrawable(CommandBuffer commandBuffer, Drawable drawable);
-
-extern:func commitCommandBuffer(CommandBuffer commandBuffer);
-
-extern:func:MTLLib initMTLLibWithFile(Device device, PChar8~ pPStr);
-
-extern:func:MTLFunction getMTLFunction(MTLLib lib, PChar8~ pPStr);
-
 extern:func:RenderPipelineDescriptor initRenderPipelineDescriptor();
-
-extern:func setPipelineVertexFunction(RenderPipelineDescriptor pipelineDescriptor, MTLFunction function);
-
-extern:func setPipelineFragmentFunction(RenderPipelineDescriptor pipelineDescriptor, MTLFunction function);
-
-extern:func setPipelineLabel(RenderPipelineDescriptor pipelineDescriptor, PChar8~ pPStr);
-
-extern:func setPipelinePixelFormat(RenderPipelineDescriptor pipelineDescriptor, int pixelFormat);
-
-extern:func:PipelineState initRenderPipelineState(Device device, RenderPipelineDescriptor rpd);
-
-extern:func setEncoderPipelineState(RenderCommandEncoder rce, PipelineState ps);
-
-extern:func:Buffer initMTLBuffer(Device device, int size);
-
-extern:func copyPArrayToBuffer(Buffer buffer, PArray pArray);
-
-extern:func setEncoderVertexBuffer(RenderCommandEncoder rce, Buffer buffer, int offset, int atIndex);
-
-extern:func encoderDrawPrimitives(RenderCommandEncoder rce, int type, int offset, int count);

@@ -840,6 +840,8 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
 
     newStruct.name = token.name.childToken[0].token;
 
+    std::vector<Analyser::TokenisedFile> methods;
+
     if(stringToDataType(newStruct.name, adt) != DataTypes::Error){
         throw std::exception();
     }
@@ -853,6 +855,8 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
             v.type = getDataType(elem.name.childToken[0]);
             v.name = elem.name.childToken[1].token;
             newStruct.variables.push_back(v);
+        }else{
+            methods.push_back(elem);
         }
     }
 
@@ -862,6 +866,37 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     newStruct.myDt = stringToDataType(newStruct.name, adt);
 
     definedStructures.push_back(newStruct);
+
+    for(auto newMethod : methods){
+        if(newMethod.name.token == FUNCTION_CALL){
+            Analyser::TokenisedFile tf = newMethod;
+
+            Analyser::Token me;
+            me.token = L"__init__";
+            Analyser::Token dt;
+            dt.type = Analyser::Type::Name;
+            dt.token = newStruct.name;
+            Analyser::Token meName;
+            meName.token = L"me";
+            meName.type = Analyser::Type::Name;
+            me.childToken = {dt, meName};
+
+            if(tf.name.childToken[1].token == L""){
+                tf.name.childToken[1] = me;
+            }else{
+                Analyser::Token comma;
+                comma.token = COMMA_OPERATOR;
+                comma.type = Analyser::Type::MathematicalOperator;
+                comma.forward = true;
+                comma.childToken = {me, tf.name.childToken[1]};
+                tf.name.childToken[1] = comma;
+            }
+
+            proccessFuncInstrucion(tf, tf.name.childToken[0].token == L"extern");
+        }else{
+            throw std::exception();
+        }
+    }
 
     Instruction toRet;
 
@@ -1085,6 +1120,7 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
         O::Analyser::Token comma;
         comma.token = L",";
         comma.forward = true;
+        comma.type = Analyser::Type::MathematicalOperator;
         comma.childToken = {me, token.childToken[0].childToken[1]};
         converted.childToken = {funName, comma};
     }
