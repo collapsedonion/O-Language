@@ -752,7 +752,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 
     if(token.name.token == VAR_CREATION_NAME){
         inst = proccessVarInstruction(token.name);
-    }else if(token.name.token == STRUCTURE_DEFINITION_TOKEN){
+    }
+    else if(token.name.token == STRUCTURE_DEFINITION_TOKEN){
         proccessStructureCreation(token);
     }
     else if(token.name.token == ENUM_NAME){
@@ -784,6 +785,9 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
     }
     else if(token.name.token == ELSE_NAME){
         inst = proccessElseInstruction(token);
+    }
+    else if(token.name.token == SQUARE_OPERATOR && token.name.childToken.size() == 1 && token.name.childToken[0].token == FUNCTION_CALL){
+        inst = processElementCall(token.name);
     }
     else {
         inst = proccessInstCall(token.name);
@@ -1060,4 +1064,31 @@ Instruction O::SematicAnalyser::processEnumeration(O::Analyser::TokenisedFile to
     }
 
     return {};
+}
+
+Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
+
+    O::Analyser::Token converted;
+    converted.token = L"()";
+    converted.forward = true;
+
+    if(token.childToken[0].childToken[0].token != L"__init__"){
+        throw std::exception();
+    }
+
+    O::Analyser::Token me = token.childToken[0].childToken[0].childToken[0];
+    O::Analyser::Token funName = token.childToken[0].childToken[0].childToken[1];
+
+    if(token.childToken[0].childToken[1].token == L""){
+        converted.childToken = {funName, me};
+    }else{
+        O::Analyser::Token comma;
+        comma.token = L",";
+        comma.forward = true;
+        comma.childToken = {me, token.childToken[0].childToken[1]};
+        converted.childToken = {funName, comma};
+    }
+
+
+    return checkAndGetFunction(converted);
 }

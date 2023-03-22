@@ -48,6 +48,8 @@ namespace O {
 	
 		Instruction proccessPointerAccess(Analyser::Token token);
 
+        Instruction processElementCall(Analyser::Token token);
+
 		Instruction proccessString(Analyser::Token token);
         Instruction proccessStructureCreation(Analyser::TokenisedFile token);
 		Instruction proccessWhileCycleInstruction(Analyser::TokenisedFile token);

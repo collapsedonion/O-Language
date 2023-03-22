@@ -92,11 +92,11 @@ void GetMetalDevice(MEM_POINTER memPointer){
 }
 
 void InitView(MEM_POINTER memPointer){
-    long* rectP = getObjectReferenceByAddress(memPointer, memPointer.ebp);
+    long* rectP = getObjectReferenceByAddress(memPointer, memPointer.ebp - 1);
     long* rect = getObjectReferenceByAddress(memPointer, *rectP);
     long* origin = getObjectReferenceByAddress(memPointer, *rect);
     long* size = getObjectReferenceByAddress(memPointer, *(rect+1));
-    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp - 1));
+    auto device = (id<MTLDevice>)(*getObjectReferenceByAddress(memPointer, memPointer.ebp));
 
     CGRect cgRect = {{*(float*)origin, *(float*)(origin+1)}, {*(float*)size, *(float*)(size + 1)}};
     MTKView* view = [[MTKView alloc] initWithFrame:cgRect device:device];

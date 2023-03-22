@@ -30,7 +30,6 @@ enum class Registers{
 };
 
 struct SectorDescription{
-    std::string name;
     int start;
     int size;
 };
@@ -47,7 +46,7 @@ inline std::pair<bool, std::pair<int, int>> decodeAddress(long address){
 struct MEM_POINTER{
     std::vector<long>* _mem;
     std::map<int, std::vector<long>>* _heap;
-    std::vector<SectorDescription>* sectors;
+    std::map<std::string, SectorDescription>* sectors;
     long esp;
     long ebp;
     long* eax;

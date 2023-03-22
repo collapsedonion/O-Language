@@ -9,17 +9,15 @@ namespace O {
 
     Memory::Memory(int stackSize) {
         SectorDescription sd;
-        sd.name = "__REGISTERS__";
         sd.start = _mem.size();
         sd.size = registersCount;
-        _sectors.push_back(sd);
+        _sectors.insert({"__REGISTERS__", sd});
         registerSectionDescriptor = sd;
         _mem.resize(registersCount);
 
-        sd.name = "__STACK__";
         sd.size = stackSize;
         sd.start = _mem.size();
-        _sectors.push_back(sd);
+        _sectors.insert({"__STACK__",  sd});
         _mem.resize(stackSize + _mem.size());
         stackStart = sd.start;
         long* esp = GetRegisterAccess(Registers::esp);
@@ -29,13 +27,12 @@ namespace O {
     int Memory::LoadProgram(std::string sectorName, std::vector<long> content) {
         int lastId = _mem.size();
         SectorDescription sd;
-        sd.name = sectorName;
         sd.start = lastId;
         sd.size = content.size();
 
         _mem.insert(_mem.end(), content.begin(), content.end());
 
-        _sectors.push_back(sd);
+        _sectors.insert({sectorName,sd});
 
         return lastId;
     }
@@ -78,11 +75,8 @@ namespace O {
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
         }else{
-            for(auto s : _sectors){
-                if(s.name == mad.sectorName){
-                    sd = s;
-                    break;
-                }
+            if(_sectors.find(mad.sectorName) != _sectors.end()){
+                sd = _sectors[mad.sectorName];
             }
         }
 
@@ -123,11 +117,8 @@ namespace O {
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
         }else {
-            for (auto s: _sectors) {
-                if (s.name == mad.sectorName) {
-                    sd = s;
-                    break;
-                }
+            if(_sectors.find(mad.sectorName) != _sectors.end()){
+                sd = _sectors[mad.sectorName];
             }
         }
         long anchor = 0;
@@ -172,10 +163,9 @@ namespace O {
         _heap[start].resize(value);
 
         SectorDescription sd;
-        sd.name = std::to_string(start) + "ALLOC";
         sd.size = value;
         sd.start = start;
-        _sectors.push_back(sd);
+        _sectors.insert({std::to_string(start) + "ALLOC", sd});
 
         long result = start;
         result <<= 32;
@@ -185,9 +175,8 @@ namespace O {
 
     void Memory::free(long value) {
         auto name = std::to_string(value >> 32) + "ALLOC";
-        int id = GetSectorIndex(name);
         _heap.erase(int(value >> 32));
-        _sectors.erase(_sectors.begin() + id);
+        _sectors.erase(name);
     }
 
     void Memory::free(Memory::Registers reg) {
@@ -196,16 +185,6 @@ namespace O {
 
     void Memory::free(Memory::MemoryAddressDescriptor mad) {
         free(*GetAccessByMemoryDescriptor(mad));
-    }
-
-    int Memory::GetSectorIndex(std::string name) {
-        for(int i = 0; i < _sectors.size(); i++){
-            if(_sectors[i].name == name){
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     MEM_POINTER Memory::getMemPointer() {

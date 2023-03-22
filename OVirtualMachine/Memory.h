@@ -48,7 +48,7 @@ namespace O {
         std::map<int, std::vector<long>> _heap;
         std::stack<int> heapFree;
         SectorDescription registerSectionDescriptor;
-        std::vector<SectorDescription> _sectors;
+        std::map<std::string, SectorDescription> _sectors;
         int stackStart = -1;
 
     public:
@@ -58,7 +58,6 @@ namespace O {
         long* GetRegisterAccess(Registers reg);
         long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
         long GetIdByMAD(MemoryAddressDescriptor mad);
-        int GetSectorIndex(std::string name);
         void push(Registers reg);
         void push(MemoryAddressDescriptor mad);
         void push(int value);

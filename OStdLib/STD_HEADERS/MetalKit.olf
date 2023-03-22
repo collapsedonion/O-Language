@@ -59,7 +59,7 @@ struct:Buffer{
 
 extern:func:Device getSystemMetalDevice();
 
-extern:func:View initMTView(Rect rect, Device device);
+extern:func:View initMTView(Device device, Rect rect);
 
 extern:func setViewColorPixelFormat(View view, int format);
 
