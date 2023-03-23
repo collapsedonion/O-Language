@@ -3,7 +3,12 @@
 
 O::Analyser::Operator O::Analyser::mathOperatorMaxPriority[] = {
         {L",", L"math_comma", OperatorType::Binary},
-        {L"=", L"math_assign", OperatorType::Binary},
+        {L"+=", L"math_assign_add", OperatorType::Binary},
+        {L"-=", L"math_assign_sub", OperatorType::Binary},
+        {L"*=", L"math_assign_multiply", OperatorType::Binary},
+        {L"/=", L"math_assign_divide", OperatorType::Binary},
+        {L"%=", L"math_assign_modulo", OperatorType::Binary},
+        {L"=", L"math_assign", OperatorType::Binary}
 
 };
 

@@ -10,30 +10,7 @@
 #include <mach-o/dyld.h>
 
 const std::wstring PreInclude =
-        L"extern:func:bool operator \"?\" (char a, char b);\n"
-        "extern:func:bool operator \"|\" (bool a, bool b);\n"
-        "extern:func:bool operator \"?\" (bool a, bool b);\n"
-        "extern:func:bool operator \"&\" (bool a, bool b);\n"
-        "extern:func:int operator \"%\" (int a, int b);\n"
-        "extern:func:int operator \"|\" (int a, int b);\n"
-        "extern:func:char operator \"-\" (char a, char b);\n"
-        "extern:func:char operator \"+\" (char a, char b);\n"
-        "extern:func:float operator \"+\" (float a, float b);\n"
-        "extern:func:float operator \"-\" (float a, float b);\n"
-        "extern:func:float operator \"*\" (float a, float b);\n"
-        "extern:func:float operator \"/\" (float a, float b);\n"
-        "extern:func:bool operator \"<\" (float a, float b);\n"
-        "extern:func:bool operator \">\" (float a, float b);\n"
-        "extern:func:bool operator \"?\" (float a, float b);\n"
-        "extern:func:bool operator \">\" (int a, int b);\n"
-        "extern:func:bool operator \"<\" (int a, int b);\n"
-        "extern:func:bool operator \"?\" (int a, int b);\n"
-        "extern:func:int operator \"+\" (int a, int b);\n"
-        "extern:func:int operator \"-\" (int a, int b);\n"
-        "extern:func:int operator \"*\" (int a, int b);\n"
-        "extern:func:int operator \"/\" (int a, int b);\n"
-        "extern:func realloc(void~ pMemory, int size);\n"
-        "";
+        L"#include std.olf\n";
 
 int main(int argC, char* args[]) {
 

@@ -1,0 +1,43 @@
+extern:func:bool operator "?" (char a, char b);
+extern:func:bool operator "|" (bool a, bool b);
+extern:func:bool operator "?" (bool a, bool b);
+extern:func:bool operator "&" (bool a, bool b);
+extern:func:int operator "%" (int a, int b);
+extern:func:int operator "|" (int a, int b);
+extern:func:char operator "-" (char a, char b);
+extern:func:char operator "+" (char a, char b);
+extern:func:float operator "+" (float a, float b);
+extern:func:float operator "-" (float a, float b);
+extern:func:float operator "*" (float a, float b);
+extern:func:float operator "/" (float a, float b);
+extern:func:bool operator "<" (float a, float b);
+extern:func:bool operator ">" (float a, float b);
+extern:func:bool operator "?" (float a, float b);
+extern:func:bool operator ">" (int a, int b);
+extern:func:bool operator "<" (int a, int b);
+extern:func:bool operator "?" (int a, int b);
+extern:func:int operator "+" (int a, int b);
+extern:func:int operator "-" (int a, int b);
+extern:func:int operator "*" (int a, int b);
+extern:func:int operator "/" (int a, int b);
+extern:func realloc(void~ pMemory, int size);
+
+func operator "+=" (int~ a, int b){
+    ~a = ~a + b;
+}
+
+func operator "-=" (int~ a, int b){
+    ~a = ~a - b;
+}
+
+func operator "*=" (int~ a, int b){
+    ~a = ~a * b;
+}
+
+func operator "/=" (int~ a, int b){
+    ~a = ~a / b;
+}
+
+func operator "%=" (int~ a, int b){
+    ~a = ~a % b;
+}
