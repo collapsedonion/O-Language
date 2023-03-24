@@ -356,6 +356,15 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         res.childToken.push_back(StringToTree(splited.second));
         return res;
     }
+
+    if(str & L"template:"){
+        res.token = L"template";
+        res.type = Type::ServiceName;
+        int idOfSeparator = charNotInFunction(str, ':');
+        auto splited = sliceString(str, idOfSeparator);
+        res.childToken.push_back(StringToTree(splited.second));
+        return res;
+    }
     
     if (idOfVar == 0) {
         int idOfDoubleDot = charNotInFunction(str, ':');

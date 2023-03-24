@@ -9,6 +9,8 @@
 
 #define RETURN_NAME L"return"
 
+#define TEMPLATE_TOKEN L"template"
+
 #define POINTER_GET_INSTRUCTION_TOKEN L"@"
 #define POINTER_ACCESS_INSTRUCTION_TOKEN L"~"
 #define COMMA_OPERATOR L","
@@ -755,6 +757,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
     }
     else if(token.name.token == STRUCTURE_DEFINITION_TOKEN){
         proccessStructureCreation(token);
+    }else if(token.name.token == TEMPLATE_TOKEN){
+        processTemplate(token);
     }
     else if(token.name.token == ENUM_NAME){
         processEnumeration(token);
@@ -1127,4 +1131,9 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
 
 
     return checkAndGetFunction(converted);
+}
+
+Instruction O::SematicAnalyser::processTemplate(O::Analyser::TokenisedFile tokenisedFile) {
+    templates.insert({tokenisedFile.name.childToken[0].token, tokenisedFile.subToken});
+    return {};
 }

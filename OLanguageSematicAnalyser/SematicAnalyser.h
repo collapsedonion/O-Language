@@ -21,6 +21,7 @@ namespace O {
         std::vector<Function> exportedFunctions;
         std::vector<Structure> definedStructures;
 		std::vector<Operator> operators;
+        std::map<std::wstring, std::vector<Analyser::TokenisedFile>> templates;
         std::map<std::wstring, Instruction> enumerations;
 
 	private:
@@ -39,6 +40,8 @@ namespace O {
         Instruction processEnumeration(Analyser::TokenisedFile tokenFile);
 
 		Instruction proccessPointerGet(Analyser::Token token);
+
+        Instruction processTemplate(Analyser::TokenisedFile tokenisedFile);
 
 		Instruction getVariableAsInstruction(std::wstring name);
 

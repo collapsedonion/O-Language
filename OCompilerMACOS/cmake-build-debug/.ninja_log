@@ -50,3 +50,16 @@
 731	834	1679567920609727969	OCompilerMAC	5de1dcb57fd881a7
 5	700	1679568483254147314	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
 700	768	1679568483316487306	OCompilerMAC	5de1dcb57fd881a7
+5	756	1679635966570085767	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+4	844	1679635966658928716	CMakeFiles/OLanguageSematicAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/SematicAnalyser.cpp.o	e4992e60d5640522
+844	872	1679635966692359000	libOLanguageSematicAnalyser.a	d09d2e70b46cdd4c
+872	946	1679635966754687350	OCompilerMAC	5de1dcb57fd881a7
+4	505	1679636058805187835	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/Analyser.cpp.o	3771a3b45a95f38c
+505	524	1679636058827444000	libOLexicalAnalyser.a	36dff39ae2096dd1
+524	584	1679636058878703258	OCompilerMAC	5de1dcb57fd881a7
+4	531	1679636293463644011	CMakeFiles/OLexicalAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLexicalAnalyser/Analyser.cpp.o	3771a3b45a95f38c
+531	554	1679636293491167000	libOLexicalAnalyser.a	36dff39ae2096dd1
+5	667	1679636293600749240	CMakeFiles/OCompilerMAC.dir/main.cpp.o	bda706cce9eda576
+5	760	1679636293693971864	CMakeFiles/OLanguageSematicAnalyser.dir/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OLanguageSematicAnalyser/SematicAnalyser.cpp.o	e4992e60d5640522
+761	782	1679636293719211000	libOLanguageSematicAnalyser.a	d09d2e70b46cdd4c
+782	846	1679636293772209647	OCompilerMAC	5de1dcb57fd881a7
