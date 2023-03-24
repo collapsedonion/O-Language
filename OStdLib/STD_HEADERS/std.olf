@@ -46,7 +46,7 @@ func operator "%=" (int~ a, int b){
 template:For{
     init;
 
-    while(cond){
+    while(condition){
         body;
         iterationEnd;
     }
