@@ -41,3 +41,13 @@ func operator "/=" (int~ a, int b){
 func operator "%=" (int~ a, int b){
     ~a = ~a % b;
 }
+
+
+template:For{
+    init;
+
+    while(cond){
+        body;
+        iterationEnd;
+    }
+}

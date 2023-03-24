@@ -587,11 +587,17 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
         tf.name = t;
     }
     else {
-        tf.name = StringToTree(sf.name);
+        auto stt = StringToTree(sf.name);
+        if(stt.token != L"") {
+            tf.name = stt;
+        }
     }
 
     for (auto elem : sf.subFile) {
-        tf.subToken.push_back(TokeniseFile(elem));
+        auto newF = TokeniseFile(elem);
+        if(newF.name.token != L"") {
+            tf.subToken.push_back(newF);
+        }
     }
 
     return tf;

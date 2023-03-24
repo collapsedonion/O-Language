@@ -22,11 +22,13 @@ namespace O {
         std::vector<Structure> definedStructures;
 		std::vector<Operator> operators;
         std::map<std::wstring, std::vector<Analyser::TokenisedFile>> templates;
+        std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>> definedLabels;
         std::map<std::wstring, Instruction> enumerations;
 
 	private:
 		// returns ERROR if not found
 		DataTypes containsFunction(std::wstring name, std::vector<DataTypes> dt);
+        std::pair<bool, std::vector<Analyser::TokenisedFile>> containsLabel(std::wstring label);
 		bool containsVariable(std::wstring name);
 		bool containsOperator(std::wstring op, DataTypes left, DataTypes right);
         bool dataTypeIsStructure(DataTypes dt);
@@ -53,6 +55,8 @@ namespace O {
 
         Instruction processElementCall(Analyser::Token token);
 
+        Instruction processFetchTemplate(Analyser::TokenisedFile token);
+
 		Instruction proccessString(Analyser::Token token);
         Instruction proccessStructureCreation(Analyser::TokenisedFile token);
 		Instruction proccessWhileCycleInstruction(Analyser::TokenisedFile token);
@@ -67,7 +71,12 @@ namespace O {
 
 		Instruction ProcessToken(Analyser::TokenisedFile token, bool add = true);
 
+        void merge(const SematicAnalyser* const sa);
+
 	public:
+        SematicAnalyser() = default;
+        SematicAnalyser(const SematicAnalyser* const origin);
+
 		void ProccessTokenisedFile(Analyser::TokenisedFile tf);
 		File getFileRepresantation();
 	};

@@ -259,14 +259,8 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 	toRet.Parameters.push_back(inst);
 
 	if(token.subToken.size() != 0) {
-		SematicAnalyser sa;
-		sa.adt = adt;
-		sa.operators = std::vector<Operator>(operators);
-		sa.functions = std::vector<Function>(functions);
-		sa.variables = std::vector<Variable>(variables);
-        sa.returnType = returnType;
-        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
-        sa.definedStructures = std::vector<Structure>(definedStructures);
+		SematicAnalyser sa(this);
+
 
 		for(auto elem : token.subToken){
 			sa.ProcessToken(elem);
@@ -424,14 +418,7 @@ Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile to
 	toRet.Parameters.push_back(inst);
 
     if(token.subToken.size() != 0) {
-        SematicAnalyser sa;
-        sa.adt = adt;
-        sa.operators = std::vector<Operator>(operators);
-        sa.functions = std::vector<Function>(functions);
-        sa.variables = std::vector<Variable>(variables);
-        sa.returnType = returnType;
-        sa.definedStructures = std::vector<Structure>(definedStructures);
-        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
+        SematicAnalyser sa(this);
 
         for(auto elem : token.subToken){
             sa.ProcessToken(elem);
@@ -470,14 +457,7 @@ Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFil
 	toRet.Parameters.push_back(inst);
 
     if(token.subToken.size() != 0) {
-        SematicAnalyser sa;
-        sa.adt = adt;
-        sa.operators = std::vector<Operator>(operators);
-        sa.functions = std::vector<Function>(functions);
-        sa.variables = std::vector<Variable>(variables);
-        sa.returnType = returnType;
-        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
-        sa.definedStructures = std::vector<Structure>(definedStructures);
+        SematicAnalyser sa(this);
 
         for(auto elem : token.subToken){
             sa.ProcessToken(elem);
@@ -504,14 +484,7 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
 	toRet.type = DataTypes::Void;
 
     if(token.subToken.size() != 0) {
-        SematicAnalyser sa;
-        sa.adt = adt;
-        sa.operators = std::vector<Operator>(operators);
-        sa.functions = std::vector<Function>(functions);
-        sa.variables = std::vector<Variable>(variables);
-        sa.returnType = returnType;
-        sa.enumerations = std::map<std::wstring, Instruction>(enumerations);
-        sa.definedStructures = std::vector<Structure>(definedStructures);
+        SematicAnalyser sa(this);
 
         for(auto elem : token.subToken){
             sa.ProcessToken(elem);
@@ -752,6 +725,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 {
 	Instruction inst;
 
+    auto containsLabel = this->containsLabel(token.name.token);
+
     if(token.name.token == VAR_CREATION_NAME){
         inst = proccessVarInstruction(token.name);
     }
@@ -792,6 +767,17 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
     }
     else if(token.name.token == SQUARE_OPERATOR && token.name.childToken.size() == 1 && token.name.childToken[0].token == FUNCTION_CALL){
         inst = processElementCall(token.name);
+    }else if(templates.find(token.name.token) != templates.end()){
+        processFetchTemplate(token);
+    }else if(containsLabel.first){
+        SematicAnalyser sa(this);
+        sa.definedLabels = std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>>(this->definedLabels);
+        Analyser::TokenisedFile tf;
+        tf.subToken = containsLabel.second;
+        tf.name = {};
+        tf.name.token = MAIN_FLOW_NAME;
+        sa.ProccessTokenisedFile(tf);
+        merge(&sa);
     }
     else {
         inst = proccessInstCall(token.name);
@@ -1029,10 +1015,21 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         res.type = getTypeOfNumber(token.token);
     }
     else if (token.type == Analyser::Type::Name) {
+        auto containsLabel = this->containsLabel(token.token);
+
         if (containsVariable(token.token)) {
             return getVariableAsInstruction(token.token);
-        }else if(enumerations.find(token.token) != enumerations.end()){
+        }else if(enumerations.find(token.token) != enumerations.end()) {
             return enumerations[token.token];
+        }else if(containsLabel.first){
+            SematicAnalyser sa(this);
+            sa.definedLabels = std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>>(this->definedLabels);
+            Analyser::TokenisedFile tf;
+            tf.subToken = containsLabel.second;
+            tf.name = {};
+            tf.name.token = MAIN_FLOW_NAME;
+            sa.ProccessTokenisedFile(tf);
+            res = sa.instructions[0];
         }
         else {
             std::wstring message = L"Undefined variable with name \"" + token.token + L"\"";
@@ -1136,4 +1133,63 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
 Instruction O::SematicAnalyser::processTemplate(O::Analyser::TokenisedFile tokenisedFile) {
     templates.insert({tokenisedFile.name.childToken[0].token, tokenisedFile.subToken});
     return {};
+}
+
+Instruction O::SematicAnalyser::processFetchTemplate(O::Analyser::TokenisedFile token) {
+    std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>> definedLabels =
+            std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>>(this->definedLabels);
+
+    for(auto elem : token.subToken){
+        definedLabels.push_back({elem.name.token, elem.subToken});
+    }
+
+    auto original = templates[token.name.token];
+
+    SematicAnalyser sa(this);
+    sa.definedLabels = definedLabels;
+
+    Analyser::TokenisedFile tf;
+    tf.subToken = original;
+    tf.name = {};
+    tf.name.token = MAIN_FLOW_NAME;
+
+    sa.ProccessTokenisedFile(tf);
+
+    merge(&sa);
+
+    return {};
+}
+
+O::SematicAnalyser::SematicAnalyser(const O::SematicAnalyser* const origin) {
+    this->adt = origin->adt;
+    this->operators = std::vector<Operator>(origin->operators);
+    this->functions = std::vector<Function>(origin->functions);
+    this->variables = std::vector<Variable>(origin->variables);
+    this->variables.insert(this->variables.end(), origin->variablesCreatedAtThatField.begin(), origin->variablesCreatedAtThatField.end());
+    this->returnType = origin->returnType;
+    this->enumerations = std::map<std::wstring, Instruction>(origin->enumerations);
+    this->definedStructures = std::vector<Structure>(origin->definedStructures);
+    this->templates = std::map<std::wstring, std::vector<Analyser::TokenisedFile>>(origin->templates);
+    this->definedLabels = std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>>(origin->definedLabels);
+}
+
+std::pair<bool, std::vector<O::Analyser::TokenisedFile>> O::SematicAnalyser::containsLabel(std::wstring label) {
+    for(int i = definedLabels.size() - 1; i >= 0; i--){
+        if(definedLabels[i].first == label){
+            return  {true,definedLabels[i].second};
+        }
+    }
+
+    return {false, {}};
+}
+
+void O::SematicAnalyser::merge(const O::SematicAnalyser *const sa) {
+    this->adt = sa->adt;
+    this->variablesCreatedAtThatField.insert(this->variablesCreatedAtThatField.end(), sa->variablesCreatedAtThatField.begin(), sa->variablesCreatedAtThatField.end());
+    this->variables.insert(this->variables.end(), sa->variablesCreatedAtThatField.begin(), sa->variablesCreatedAtThatField.end());
+    this->definedStructures = sa->definedStructures;
+    this->enumerations = sa->enumerations;
+    this->functions = sa->functions;
+    this->operators = sa->operators;
+    this->instructions.insert(this->instructions.end(), sa->instructions.begin(), sa->instructions.end());
 }
