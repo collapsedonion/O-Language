@@ -175,8 +175,12 @@ namespace O {
 
     void Memory::free(long value) {
         auto name = std::to_string(value >> 32) + "ALLOC";
+
+        int toErase = int(value >> 32);
+
         _heap.erase(int(value >> 32));
         _sectors.erase(name);
+        heapFree.push(toErase);
     }
 
     void Memory::free(Memory::Registers reg) {
