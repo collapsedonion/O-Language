@@ -184,6 +184,20 @@ struct File {
 
 typedef std::wstring(__stdcall *TranslateFunction)(File);
 
+inline bool isStringEndsWith(std::wstring wStr, std::wstring ending){
+    if(wStr.size() < ending.size()){
+        return false;
+    }
+
+    for(int i = ending.size() - 1; i >= 0; i--){
+        if(wStr[i+wStr.size() - ending.size()] != ending[i]){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 template <typename T>
 inline bool operator == (std::vector<T> v1, std::vector<T> v2) {
 

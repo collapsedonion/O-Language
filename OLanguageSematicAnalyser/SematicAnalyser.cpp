@@ -1011,8 +1011,26 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         return res;
     }
     else if (token.type == Analyser::Type::Number) {
-        res.name = token.token;
-        res.type = getTypeOfNumber(token.token);
+        if(isStringEndsWith(token.token, L"f") || isStringEndsWith(token.token, L"F")){
+            res.name = token.token.substr(0, token.token.size() - 1);
+            res.type = DataTypes::FloatingPoint;
+        }
+        else if(isStringEndsWith(token.token, L"c") || isStringEndsWith(token.token, L"C")){
+            if(token.token.find('.') != -1){
+                throw std::exception();
+            }
+
+            res.name = (char)(std::stoi(token.token));
+            res.type = DataTypes::Character;
+        }
+        else {
+            if(token.token.find('.') != -1){
+                throw std::exception();
+            }
+
+            res.name = token.token;
+            res.type = getTypeOfNumber(token.token);
+        }
     }
     else if (token.type == Analyser::Type::Name) {
         auto containsLabel = this->containsLabel(token.token);

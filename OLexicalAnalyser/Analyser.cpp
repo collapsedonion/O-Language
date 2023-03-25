@@ -1,6 +1,12 @@
 #include "Analyser.h"
 #include "pch.h"
 
+std::wstring O::Analyser::numericPostfix[] = {
+        L"f",
+        L"i",
+        L"c",
+};
+
 O::Analyser::Operator O::Analyser::mathOperatorMaxPriority[] = {
         {L",", L"math_comma", OperatorType::Binary},
         {L"+=", L"math_assign_add", OperatorType::Binary},
@@ -193,6 +199,18 @@ bool O::Analyser::isDefaultServiceName(std::wstring str)
 
 bool O::Analyser::isNumber(std::wstring str)
 {
+    if(str == L""){
+        return false;
+    }
+
+    for(auto postfix: numericPostfix){
+        if(isStringEndsWith(str, postfix)){
+            if(isNumber(str.substr(0, str.size() - postfix.size()))) {
+                return true;
+            }
+        }
+    }
+
     for (auto elem : str) {
         if (!std::isdigit(elem) && elem != '.') {
             return false;
@@ -653,4 +671,14 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
     }
 
     return {false, {}};
+}
+
+bool O::Analyser::isNumericPostfix(std::wstring str) {
+    for (auto elem : numericPostfix){
+        if(elem == str){
+            return true;
+        }
+    }
+
+    return false;
 }

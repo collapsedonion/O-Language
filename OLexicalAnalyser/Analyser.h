@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <BaseTypes.h>
 
 namespace O {
 	static bool operator & (std::wstring str1, std::wstring str2);
@@ -56,6 +57,7 @@ namespace O {
         static Operator mathOperatorMiddlePriority[];
         static Operator mathOperatorLowPriority[];
         static Operator mathOperatorUnary[];
+        static std::wstring numericPostfix[];
 		static std::wstring defaultServiceNames[];
 
 	private:
@@ -67,6 +69,7 @@ namespace O {
 		static bool isDefaultServiceName(std::wstring str);
 		static bool isNumber(std::wstring str);
 		static bool isString(std::wstring str);
+        static bool isNumericPostfix(std::wstring str);
 		static std::wstring removeBrackes(std::wstring str);
 		static std::pair<std::wstring, std::wstring> sliceString(std::wstring str, int slicePoint);
         static std::pair<bool, Token> getOperator(const std::wstring& str, const Operator& anOperator);
