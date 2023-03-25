@@ -16,6 +16,7 @@
 #define COMMA_OPERATOR L","
 #define FUNCTION_CALL L"()"
 #define SQUARE_OPERATOR L"[]"
+#define MATH_UNARY_MINUS L"-"
 #define MATH_SET L"="
 #define ENUM_NAME L"enum"
 
@@ -992,8 +993,14 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
             else if (token.token == POINTER_ACCESS_INSTRUCTION_TOKEN){
                 res = proccessPointerAccess(token);
             }
+            else if(token.token == MATH_UNARY_MINUS){
+                auto ppToken = token.childToken[0];
+                ppToken.token = L"-" + ppToken.token;
+                res = proccessInstCall(ppToken);
+            }
         }
-    } else if (token.type == Analyser::Type::StringLiteral) {
+    }
+    else if (token.type == Analyser::Type::StringLiteral) {
         return proccessString(token);
     }
     else if (token.type == Analyser::Type::ServiceName){
@@ -1023,11 +1030,15 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
             res.name = (char)(std::stoi(token.token));
             res.type = DataTypes::Character;
         }
-        else {
+        else if(isStringEndsWith(token.token, L"i") || isStringEndsWith(token.token, L"I")){
             if(token.token.find('.') != -1){
                 throw std::exception();
             }
 
+            res.name = std::stoi(token.token);
+            res.type = DataTypes::Integer;
+        }
+        else {
             res.name = token.token;
             res.type = getTypeOfNumber(token.token);
         }

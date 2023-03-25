@@ -40,6 +40,7 @@ O::Analyser::Operator O::Analyser::mathOperatorUnary[] = {
         {L"@", L"math_get_pointer", OperatorType::Unary},
         {L"~", L"math_get_content", OperatorType::Unary},
         {L"!", L"math_not", OperatorType::Unary},
+        {L"-", L"math_unary_minus", OperatorType::Unary},
 };
 
 std::wstring O::Analyser::defaultServiceNames[] = {
@@ -632,12 +633,14 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
                 auto right = splitOperator.second.substr(anOperator.name.size(),
                                                          splitOperator.second.size() -
                                                          anOperator.name.size() + 1);
-                return {true, {Type::MathematicalOperator,
-                               anOperator.name,
-                               true,
-                               false,
-                               {StringToTree(left), StringToTree(right)}
-                }};
+                if(left != L""){
+                    return {true, {Type::MathematicalOperator,
+                                   anOperator.name,
+                                   true,
+                                   false,
+                                   {StringToTree(left), StringToTree(right)}
+                    }};
+                }
             }
             break;
         }
