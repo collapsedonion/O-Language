@@ -103,6 +103,12 @@ void Reallocate(MEM_POINTER mem){
     page->resize(newSize);
 }
 
+void GetAlLocatedSize(MEM_POINTER mem){
+    int pageIndex =((*mem._mem)[mem.ebp]) >> 32;
+    std::vector<long>* page = &(*mem._heap)[pageIndex];
+    *mem.eax = page->size();
+}
+
 void Sin(MEM_POINTER mem){
     float x = *(float*)(getObjectReferenceByAddress(mem, mem.ebp));
     float result = sin(x);
@@ -178,6 +184,7 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("realloc", Reallocate);
     lu.AddNewInterrupt("cos", Cos);
     lu.AddNewInterrupt("sin", Sin);
+    lu.AddNewInterrupt("mSize", GetAlLocatedSize);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
