@@ -1,0 +1,4 @@
+
+
+extern:func:float cos(float a);
+extern:func:float sin(float a);

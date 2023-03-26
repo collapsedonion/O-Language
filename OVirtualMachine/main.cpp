@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <OVM_SDK.h>
+#include <math.h>
 #include <mach-o/dyld.h>
 
 void GetHighFloat(MEM_POINTER mem){
@@ -102,6 +103,18 @@ void Reallocate(MEM_POINTER mem){
     page->resize(newSize);
 }
 
+void Sin(MEM_POINTER mem){
+    float x = *(float*)(getObjectReferenceByAddress(mem, mem.ebp));
+    float result = sin(x);
+    *mem.eax = *(long*)&(result);
+}
+
+void Cos(MEM_POINTER mem){
+    float x = *(float*)(getObjectReferenceByAddress(mem, mem.ebp));
+    float result = cos(x);
+    *mem.eax = *(long*)&(result);
+}
+
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
 
@@ -163,6 +176,8 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("packSend", LoadPackage);
     lu.AddNewInterrupt("packExtract", ExtractPackage);
     lu.AddNewInterrupt("realloc", Reallocate);
+    lu.AddNewInterrupt("cos", Cos);
+    lu.AddNewInterrupt("sin", Sin);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
