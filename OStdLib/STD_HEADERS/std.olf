@@ -43,6 +43,13 @@ func operator "%=" (int~ a, int b){
     ~a = ~a % b;
 }
 
+func operator "&=" (bool~ a, bool b){
+    ~a = ~a & b;
+}
+
+func operator "|=" (bool~ a, bool b){
+    ~a = ~a | b;
+}
 
 template:For{
     init;

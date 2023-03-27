@@ -9,6 +9,8 @@ std::wstring O::Analyser::numericPostfix[] = {
 
 O::Analyser::Operator O::Analyser::mathOperatorMaxPriority[] = {
         {L",", L"math_comma", OperatorType::Binary},
+        {L"&=", L"math_assign_and", OperatorType::Binary},
+        {L"|=", L"math_assign_or", OperatorType::Binary},
         {L"+=", L"math_assign_add", OperatorType::Binary},
         {L"-=", L"math_assign_sub", OperatorType::Binary},
         {L"*=", L"math_assign_multiply", OperatorType::Binary},
