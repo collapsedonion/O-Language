@@ -7,6 +7,7 @@
 #include <OVM_SDK.h>
 #include <math.h>
 #include <mach-o/dyld.h>
+#include <time.h>
 
 void GetHighFloat(MEM_POINTER mem){
     long* origin = &(*mem._mem)[mem.ebp];
@@ -121,6 +122,18 @@ void Cos(MEM_POINTER mem){
     *mem.eax = *(long*)&(result);
 }
 
+void GetClockTime(MEM_POINTER mem){
+    clock_t time = clock();
+
+    *mem.eax = time;
+}
+
+void GetRunTime(MEM_POINTER mem){
+    clock_t time = clock();
+    float timeF = (float)time / CLOCKS_PER_SEC;
+    *mem.eax = *(int*)&timeF;
+}
+
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
 
@@ -185,6 +198,8 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("cos", Cos);
     lu.AddNewInterrupt("sin", Sin);
     lu.AddNewInterrupt("mSize", GetAlLocatedSize);
+    lu.AddNewInterrupt("clock", GetClockTime);
+    lu.AddNewInterrupt("getTime", GetRunTime);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 

@@ -51,6 +51,10 @@ func operator "|=" (bool~ a, bool b){
     ~a = ~a | b;
 }
 
+extern:func:int clock();
+
+extern:func:float getTime();
+
 template:For{
     init;
 
