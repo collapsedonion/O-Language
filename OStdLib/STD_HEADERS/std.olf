@@ -75,6 +75,14 @@ extern:func:int clock();
 
 extern:func:float getTime();
 
+struct:RPointer{
+
+};
+
+extern:func:RPointer getRPointer(void~ pointer);
+extern:func setRPointerData(RPointer rp, int size, int data);
+extern:func:int getRPointerContent(RPointer rp, int size);
+
 template:For{
     init;
 

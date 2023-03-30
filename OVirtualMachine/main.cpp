@@ -134,6 +134,61 @@ void GetRunTime(MEM_POINTER mem){
     *mem.eax = *(int*)&timeF;
 }
 
+void GetRealPointer(MEM_POINTER mem){
+    long* address = getObjectReferenceByAddress(mem, *getObjectReferenceByAddress(mem, mem.ebp));
+
+    *mem.eax = (long)address;
+}
+
+void SetRealPointer(MEM_POINTER mem){
+    long* pointer = (long*)(*getObjectReferenceByAddress(mem, mem.ebp));
+    long sizeInBytes = (long)(*getObjectReferenceByAddress(mem, mem.ebp - 1));
+    long data = (*getObjectReferenceByAddress(mem, mem.ebp - 2));
+
+    switch (sizeInBytes) {
+        case 1: {
+            *(char *) pointer = (char) data;
+            break;
+        }
+        case 2: {
+            *(short *) pointer = (short) data;
+            break;
+        }
+        case 4: {
+            *(int *) pointer = (int) data;
+            break;
+        }
+        case 8: {
+            *(long *) pointer = (long) data;
+            break;
+        }
+    }
+}
+
+void GetRealPointerContent(MEM_POINTER mem){
+    long* pointer = (long*)(*getObjectReferenceByAddress(mem, mem.ebp));
+    long sizeInBytes = (long)(*getObjectReferenceByAddress(mem, mem.ebp - 1));
+
+    switch (sizeInBytes) {
+        case 1: {
+            *mem.eax = *(char*)pointer;
+            break;
+        }
+        case 2: {
+            *mem.eax = *(short *)pointer;
+            break;
+        }
+        case 4: {
+            *mem.eax = *(int *)pointer;
+            break;
+        }
+        case 8: {
+            *mem.eax = *(long * )pointer;
+            break;
+        }
+    }
+}
+
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
 
@@ -200,6 +255,9 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("mSize", GetAlLocatedSize);
     lu.AddNewInterrupt("clock", GetClockTime);
     lu.AddNewInterrupt("getTime", GetRunTime);
+    lu.AddNewInterrupt("getRPointer", GetRealPointer);
+    lu.AddNewInterrupt("setRPointerData", SetRealPointer);
+    lu.AddNewInterrupt("getRPointerContent", GetRealPointerContent);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
