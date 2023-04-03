@@ -1,1 +1,55 @@
 extern:func:int getHighFloat(float a);
+
+struct:RPChar{
+    func set(char data){
+        setRPointerData(RPointer(me), 1, int(data));
+    }
+
+    func:char get(){
+        return(char(getRPointerContent(RPointer(me), 1)));
+    }
+
+    func:RPChar initRPChar(char~ pC){
+        return(RPChar(getRPointer(void~(pC))));
+    }
+}
+
+func:RPChar operator "+" (RPChar rpC, int a){
+    return(RPChar(int(rpC) + a));
+}
+
+struct:RPInt{
+    func set(int data){
+        setRPointerData(RPointer(me), 4, int(data));
+    }
+
+    func:int get(){
+        return(int(getRPointerContent(RPointer(me), 4)));
+    }
+
+    func:RPInt initRPChar(int~ pI){
+        return(RPInt(getRPointer(void~(pI))));
+    }
+}
+
+func:RPInt operator "+" (RPInt rpI, int a){
+    return(RPInt(int(rpI) + a));
+}
+
+struct:RPFloat{
+    func set(float data){
+        setRPointerData(RPointer(me), 4, int(data));
+    }
+
+    func:float get(){
+        return(float(getRPointerContent(RPointer(me), 4)));
+    }
+
+    func:RPFloat initRPChar(float~ pI){
+        return(RPFloat(getRPointer(void~(pI))));
+    }
+}
+
+func:RPFloat operator "+" (RPFloat rpF, int a){
+    return(RPFloat(int(rpF) + a));
+}
