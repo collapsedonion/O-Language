@@ -517,10 +517,11 @@ O::Analyser::Token O::Analyser::StringToTree(std::wstring str) {
     return result;
 }
 
-O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std::wstring name)
+O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std::wstring name, int prevLine)
 {
     StructurisedFile main;
     main.name = name;
+    main.line_id = prevLine;
 
     StructurisedFile newL;
     std::wstring last;
@@ -528,6 +529,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
 
     int level = -1;
     int levelCurly = -1;
+    int line = prevLine;
     bool inQouets = false;
 
     for (int i = 0; i < str.size(); i++) {
@@ -544,6 +546,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
         }
 
         if (str[i] == '{' && level == -1 && !inQouets) {
+
             levelCurly++;
             if (levelCurly == 0) {
                 continue;
@@ -552,7 +555,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
         if (str[i] == '}' && level == -1 && !inQouets) {
             levelCurly--;
             if (levelCurly == -1) {
-                main.subFile.push_back(StructuriseFile(newBody, last));
+                main.subFile.push_back(StructuriseFile(newBody, last, line));
                 last = L"";
                 newBody = L"";
                 continue;
@@ -573,10 +576,16 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
         }
         else {
             if (str[i] == ';') {
-                newL.name = last;
-                main.subFile.push_back(newL);
-                newL = StructurisedFile();
-                last = L"";
+                if(removeSpaceBars(last) & L"#LINE_ID"){
+                    line  = std::stoi(removeSpaceBars(last).substr(8, last.size() - 8));
+                    last = L"";
+                }else {
+                    newL.name = last;
+                    newL.line_id = line;
+                    main.subFile.push_back(newL);
+                    newL = StructurisedFile();
+                    last = L"";
+                }
             }
             else {
                 last += str[i];
@@ -584,14 +593,15 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
         }
     }
 
-    if (newBody != L"") {
-        main.subFile.push_back(StructuriseFile(newBody, last));
+    if (newBody != L"" && removeSpaceBars(last)[0] != '#') {
+        main.subFile.push_back(StructuriseFile(newBody, last, line));
         last = L"";
         newBody = L"";
     }
 
-    if (last != L"") {
+    if (last != L"" && removeSpaceBars(last)[0] != '#') {
         newL.name = last;
+        newL.line_id = line;
         main.subFile.push_back(newL);
     }
 

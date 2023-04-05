@@ -43,6 +43,7 @@ namespace O {
 
 		struct StructurisedFile {
 			std::wstring name;
+            int line_id;
 			std::vector<StructurisedFile> subFile;
 		};
 
@@ -81,7 +82,7 @@ namespace O {
 
 	public:
 		static Token StringToTree(std::wstring str);
-		static StructurisedFile StructuriseFile(std::wstring str, std::wstring name = L"___MAIN___");
+		static StructurisedFile StructuriseFile(std::wstring str, std::wstring name = L"___MAIN___", int line = 1);
 		static TokenisedFile TokeniseFile(StructurisedFile sf);
 	};
 }

@@ -12,13 +12,16 @@ namespace O {
 
         std::wstring buffer;
 
+        int strId = 1;
+
         bool bufferLoad = false;
 
         for(auto i : str){
 
+
+
             if(i == '\n' && bufferLoad){
                 bufferLoad = false;
-
                 result += getInst(buffer);
 
                 buffer = L"";
@@ -31,6 +34,14 @@ namespace O {
 
             if(bufferLoad){
                 buffer += i;
+            }
+
+            if(i == '\n') {
+                result += L"\n";
+                result += L"#LINE_ID";
+                result += std::to_wstring(strId + 1);
+                result += L";";
+                strId++;
             }
 
             if(!bufferLoad && i != '\t') {
