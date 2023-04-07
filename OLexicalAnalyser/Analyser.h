@@ -23,6 +23,7 @@ namespace O {
 		public:
 			Type type;
 			std::wstring token;
+            int line_id;
 			bool twoSided = false;
 			bool forward = false;
 			std::vector<Token> childToken;
@@ -73,15 +74,15 @@ namespace O {
         static bool isNumericPostfix(std::wstring str);
 		static std::wstring removeBrackes(std::wstring str);
 		static std::pair<std::wstring, std::wstring> sliceString(std::wstring str, int slicePoint);
-        static std::pair<bool, Token> getOperator(const std::wstring& str, const Operator& anOperator);
+        static std::pair<bool, Token> getOperator(const std::wstring& str, const Operator& anOperator, int line_id);
 		static std::wstring removeSpaceBars(std::wstring str);
 
-		static Token getMathematicExpression(std::wstring str);
+		static Token getMathematicExpression(std::wstring str, int line_id);
 
-		static Token ProccessNameOrCreation(std::wstring str);
+		static Token ProccessNameOrCreation(std::wstring str, int line_id);
 
 	public:
-		static Token StringToTree(std::wstring str);
+		static Token StringToTree(std::wstring str, int line_id);
 		static StructurisedFile StructuriseFile(std::wstring str, std::wstring name = L"___MAIN___", int line = 1);
 		static TokenisedFile TokeniseFile(StructurisedFile sf);
 	};

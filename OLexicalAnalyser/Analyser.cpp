@@ -309,35 +309,35 @@ bool O::operator&(std::wstring str1, std::wstring str2)
     return true;
 }
 
-O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str)
+O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str, int line_id)
 {
     Token t;
 
     std::pair<bool, Token> processedOperator;
 
     for(const auto& highOperator : mathOperatorMaxPriority){
-        processedOperator = getOperator(str, highOperator);
+        processedOperator = getOperator(str, highOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
         }
     }
 
     for(const auto& midOperator : mathOperatorMiddlePriority){
-        processedOperator = getOperator(str, midOperator);
+        processedOperator = getOperator(str, midOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
         }
     }
 
     for(const auto& lowOperator : mathOperatorLowPriority){
-        processedOperator = getOperator(str, lowOperator);
+        processedOperator = getOperator(str, lowOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
         }
     }
 
     for(const auto& unaryOperator : mathOperatorUnary){
-        processedOperator = getOperator(str, unaryOperator);
+        processedOperator = getOperator(str, unaryOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
         }
@@ -346,7 +346,7 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str)
     return t;
 }
 
-O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
+O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int line_id)
 {
     int idOfVar = stringNotInFunction(str, L"var");
     int idOfFunc = stringNotInFunction(str, L"func");
@@ -356,8 +356,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
     if (*(str.end()-1) == '~') {
         res.token = '~';
         res.type = Type::ServiceName;
-        res.childToken = { StringToTree(str.substr(0, str.size() - 1)) };
-
+        res.childToken = { StringToTree(str.substr(0, str.size() - 1), line_id)};
+        res.line_id = line_id;
         return res;
     }
     if (str & L"extern:"){
@@ -365,7 +365,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         res.type = Type::ServiceName;
         int idOfSpace = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSpace);
-        res.childToken.push_back(StringToTree(splited.second));
+        res.childToken.push_back(StringToTree(splited.second, line_id));
+        res.line_id = line_id;
         return res;
     }
 
@@ -374,7 +375,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
-        res.childToken.push_back(StringToTree(splited.second));
+        res.childToken.push_back(StringToTree(splited.second, line_id));
+        res.line_id = line_id;
         return res;
     }
 
@@ -383,7 +385,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
-        res.childToken.push_back(StringToTree(splited.second));
+        res.childToken.push_back(StringToTree(splited.second, line_id));
+        res.line_id = line_id;
         return res;
     }
     
@@ -395,7 +398,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
             r.type = Type::ServiceName;
             r.twoSided = true;
             r.token = L"var";
-            r.childToken = { StringToTree(splited.second)};
+            r.childToken = { StringToTree(splited.second, line_id)};
+            r.line_id = line_id;
             return r;
         }
     }
@@ -409,11 +413,11 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
             auto sliced = sliceString(str, idOfDoubleDot);
             leftFunctionPart = sliced.second;
             sliced = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' '));
-            Func.childToken.push_back(StringToTree(sliced.first));
+            Func.childToken.push_back(StringToTree(sliced.first, line_id));
             leftFunctionPart = sliced.second;
         }
         else {
-            Func.childToken.push_back(StringToTree(L"void"));
+            Func.childToken.push_back(StringToTree(L"void", line_id));
             leftFunctionPart = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' ')).second;
         }
         if(leftFunctionPart & L"operator"){
@@ -435,6 +439,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         }
 
         //Func.childToken.push_back();
+        Func.line_id = line_id;
         return Func;
     }
     else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
@@ -442,7 +447,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         res.type = Type::MathematicalOperator;
         res.forward = true;
         std::wstring leftPart = str.substr(1, str.size() - 2);
-        res.childToken = {StringToTree(leftPart)};
+        res.childToken = {StringToTree(leftPart, line_id)};
     }
     else {
         if (isDefaultServiceName(str)) {
@@ -473,12 +478,12 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
                     while (true) {
                         int idOfNext = charNotInFunction(last, ',');
                         if (idOfNext == -1) {
-                            res.childToken.push_back(StringToTree(last));
+                            res.childToken.push_back(StringToTree(last, line_id));
                             break;
                         }
                         else {
                             auto slice = sliceString(last, idOfNext);
-                            res.childToken.push_back(StringToTree(slice.first));
+                            res.childToken.push_back(StringToTree(slice.first, line_id));
                             last = slice.second;
                         }
                     }
@@ -489,7 +494,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
                 if(idOfSeparator != -1){
                     res.token = L"__init__";
                     auto splited = sliceString(str, idOfSeparator);
-                    res.childToken = {StringToTree(splited.first), StringToTree(splited.second)};
+                    res.childToken = {StringToTree(splited.first, line_id), StringToTree(splited.second, line_id)};
                 }else {
                     res.token = str;
                     res.type = Type::Name;
@@ -498,21 +503,20 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str)
         }
         
     }
-
+    res.line_id = line_id;
     return res;
 }
 
-O::Analyser::Token O::Analyser::StringToTree(std::wstring str) {
+O::Analyser::Token O::Analyser::StringToTree(std::wstring str, int line_id) {
     std::wstring withOutSpaces = removeSpaceBars(str);
     withOutSpaces = removeBrackes(withOutSpaces);
 
     Token result;
-    auto t = getMathematicExpression(withOutSpaces);
+    auto t = getMathematicExpression(withOutSpaces, line_id);
     if (t.token != L"") {
         return t;
     }
-    return ProccessNameOrCreation(withOutSpaces);
-
+    return ProccessNameOrCreation(withOutSpaces, line_id);
 
     return result;
 }
@@ -618,7 +622,7 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
         tf.name = t;
     }
     else {
-        auto stt = StringToTree(sf.name);
+        auto stt = StringToTree(sf.name, sf.line_id);
         if(stt.token != L"") {
             tf.name = stt;
         }
@@ -634,10 +638,10 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
     return tf;
 }
 
-std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring& str, const Operator& anOperator) {
+std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring& str, const Operator& anOperator, int line_id) {
 
     switch (anOperator.operatorType) {
-        case OperatorType::Binary:{
+        case OperatorType::Binary: {
             auto position = stringNotInFunction(str, anOperator.name);
             if (position != -1) {
                 auto splitOperator = sliceString(str, position);
@@ -645,40 +649,42 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
                 auto right = splitOperator.second.substr(anOperator.name.size(),
                                                          splitOperator.second.size() -
                                                          anOperator.name.size() + 1);
-                if(left != L""){
+                if (left != L"") {
                     return {true, {Type::MathematicalOperator,
                                    anOperator.name,
+                                   line_id,
                                    true,
                                    false,
-                                   {StringToTree(left), StringToTree(right)}
+                                   {StringToTree(left, line_id), StringToTree(right, line_id)}
                     }};
                 }
             }
             break;
         }
         case OperatorType::Unary: {
-            if(str & anOperator.name){
+            if (str & anOperator.name) {
                 return {true, {
-                    Type::MathematicalOperator,
-                    anOperator.name,
-                    false,
-                    true,
-                    {StringToTree(str.substr(anOperator.name.size(), str.size() - anOperator.name.size()))}
+                        Type::MathematicalOperator,
+                        anOperator.name,
+                        line_id,
+                        false,
+                        true,
+                        {StringToTree(str.substr(anOperator.name.size(), str.size() - anOperator.name.size()), line_id)}
                 }};
             }
             break;
         }
-        case OperatorType::Scope:
-        {
+        case OperatorType::Scope: {
             auto bracketOperator = doubleBracketOperator(str, anOperator.name[0], anOperator.name[1]);
 
-            if(bracketOperator.first){
+            if (bracketOperator.first) {
                 return {true, {
-                    Type::MathematicalOperator,
-                    anOperator.name,
-                    false,
-                    true,
-                    {StringToTree(bracketOperator.second.first), StringToTree(bracketOperator.second.second)}
+                        Type::MathematicalOperator,
+                        anOperator.name,
+                        line_id,
+                        false,
+                        true,
+                        {StringToTree(bracketOperator.second.first, line_id), StringToTree(bracketOperator.second.second, line_id)}
                 }};
             }
             break;
