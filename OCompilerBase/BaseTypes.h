@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <exception>
 
 enum class DataTypes {
 	ServiceInstruction = 0,
@@ -171,6 +172,23 @@ struct Function {
 		}
 		return dt;
 	}
+};
+
+class CompilationException : std::exception{
+public:
+    int line;
+    std::wstring description;
+
+public:
+    CompilationException(int line, std::wstring description){
+        this->line = line;
+        this->description = std::move(description);
+    }
+
+public:
+    std::wstring getText(){
+        return L"Critical error on line: " + std::to_wstring(this->line) + L"\n\t--" + description + L"\n";
+    }
 };
 
 struct File {

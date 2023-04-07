@@ -65,7 +65,13 @@ int main(int argC, char* args[]) {
     auto AnalisedFile = O::Analyser::StructuriseFile(filesource);
     auto TokenisedFile = O::Analyser::TokeniseFile(AnalisedFile);
     O::SematicAnalyser sematiser;
-    sematiser.ProccessTokenisedFile(TokenisedFile);
+
+    try {
+        sematiser.ProccessTokenisedFile(TokenisedFile);
+    }catch (CompilationException& exception){
+        std::wcout << exception.getText();
+        return -1;
+    }
 
     O::OtoOTranslator translator;
     translator.Build(sematiser.getFileRepresantation());

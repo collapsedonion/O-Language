@@ -12,18 +12,16 @@ namespace O {
 
         std::wstring buffer;
 
-        int strId = 1;
+        int strId = 0;
 
         bool bufferLoad = false;
 
         for(auto i : str){
 
-
-
             if(i == '\n' && bufferLoad){
                 bufferLoad = false;
                 result += getInst(buffer);
-
+                strId++;
                 buffer = L"";
                 continue;
             }
