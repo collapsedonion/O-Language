@@ -189,14 +189,27 @@ namespace O {
     void OtoOTranslator::WriteResulToFile(std::wstring filepath) {
         std::ofstream f(filepath);
 
-        int size = mainFlow.size();
+        int sectorCount = this->addSectors.size() + 1;
 
-        f.write((char*)&size, 4);
-        f.write((char*)&bodyStart, 4);
+        f.write((char *)&sectorCount, sizeof(int) / sizeof(char));
 
-        for(int i = 0; i < mainFlow.size(); i++){
-            f.write((char*)&((*Instructions)[i]), 4);
+        for(auto sector : addSectors){
+            int name_size = sector.first.size();
+            f.write((char*)&name_size, sizeof(int) / sizeof(char));
+            f.write((char*)sector.first.c_str(), name_size * sizeof(wchar_t) / sizeof(char));
+
+            int sector_size = sector.second.size();
+            f.write((char *)&sector_size, sizeof(int) / sizeof(char));
+            f.write((char *)sector.second.data(), sector.second.size() * sizeof(int) / sizeof(char));
         }
+
+        int name_size = sectorName.size();
+        f.write((char*)&name_size, sizeof(int) / sizeof(char));
+        f.write((char *)sectorName.c_str(), name_size * sizeof(wchar_t) / sizeof(char));
+
+        int sector_size = Instructions->size();
+        f.write((char *)&sector_size, sizeof(int) / sizeof(char));
+        f.write((char *)Instructions->data(), Instructions->size() * sizeof(int) / sizeof(char));
 
         f.close();
     }
@@ -204,39 +217,56 @@ namespace O {
     void OtoOTranslator::LoadFunctions(std::vector<Function> functions) {
 
         for(auto fun : functions) {
+            std::wstring fName = fun.name;
+
+            for(auto var : fun.arguments){
+                fName += dataTypeToString(var.type, adtTable);
+            }
+
             FunctionStored newF;
-            newF.sector = L"main";
-            newF.fromZeroOffset = Instructions->size();
-            LoadVariables(fun.arguments, true);
-            addOffset += 1;
-            LoadVariables(fun.variables, true);
+            newF.sector = fName;
+            newF.fromZeroOffset = 0;
+            OtoOTranslator newFT;
 
-            int countOfLocalVariable = addOffset - fun.arguments.size() - 1;
+            newFT.sectorName = fName;
+            newFT.addOffset = addOffset;
+            newFT.variables = std::vector<VariableStored>(this->variables);
+            newFT.structs = std::vector<Structure>(this->structs);
+            newFT.storedFunctions = std::vector<FunctionStored>(this->storedFunctions);
+            newFT.adtTable = this->adtTable;
+            newFT.LoadVariables(fun.arguments, true);
+            newFT.addOffset += 1;
+            newFT.LoadVariables(fun.variables, true);
+            newFT.Instructions = &newFT.mainFlow;
 
-            localSize = countOfLocalVariable;
+            int countOfLocalVariable = newFT.addOffset - fun.arguments.size() - 1;
+
+            newFT.localSize = countOfLocalVariable;
 
             auto sub0 = G::sub(GR::esp, countOfLocalVariable);
-            ADDVTV(Instructions, sub0);
+            ADDVTV(newFT.Instructions, sub0);
 
             for(auto argument : fun.arguments){
                 newF.parameters.push_back(argument.type);
             }
 
             for(auto inst : fun.body){
-                ProccessInstruction(inst);
+                newFT.ProccessInstruction(inst);
             }
 
             if(fun.returnType == DataTypes::Void){
                 if(countOfLocalVariable != 0) {
                     auto add0 = G::add(GR::esp, countOfLocalVariable);
-                    ADDVTV(Instructions, add0);
+                    ADDVTV(newFT.Instructions, add0);
                 }
                 auto retCommand = Geneerator::ret();
-                Instructions->insert(Instructions->end(), retCommand.begin(), retCommand.end());
+                newFT.Instructions->insert(newFT.Instructions->end(), retCommand.begin(), retCommand.end());
             }
             newF.name = fun.name;
             newF.stackSize = addOffset;
             storedFunctions.push_back(newF);
+
+            addSectors.insert({fName, std::vector<int>(*newFT.Instructions)});
 
             addOffset = 0;
             additionalVariables.clear();
@@ -579,7 +609,7 @@ namespace O {
         (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
         LoadInstToReg(inst.Parameters[0], GR::mc3);
         auto cm = G::cmp(GR::mc3, 1);
-        auto je = G::jme(L"main", jumpOffsetId + 3, GR::NULLREG);
+        auto je = G::jme(sectorName, jumpOffsetId + 3, GR::NULLREG);
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
         (*Instructions)[offsetOfExit] = Instructions->size() - exitSize;
@@ -634,7 +664,7 @@ namespace O {
         (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
         LoadInstToReg(inst.Parameters[0], GR::mc3);
         auto cm = G::cmp(GR::mc3, 1);
-        auto je = G::jme(L"main", jumpOffsetId + 3, GR::NULLREG);
+        auto je = G::jme(sectorName, jumpOffsetId + 3, GR::NULLREG);
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
     }

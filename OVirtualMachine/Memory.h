@@ -53,6 +53,7 @@ namespace O {
 
     public:
         Memory(int stackSize);
+        SectorDescription getSectorDescription(std::string name);
         int getFreeHeap();
         int LoadProgram(std::string sectorName, std::vector<long> content);
         long* GetRegisterAccess(Registers reg);

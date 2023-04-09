@@ -215,5 +215,9 @@ namespace O {
 
     }
 
+    SectorDescription Memory::getSectorDescription(std::string name) {
+        return _sectors[name];
+    }
+
 
 } // O

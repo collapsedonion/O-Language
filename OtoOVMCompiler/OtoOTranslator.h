@@ -8,6 +8,7 @@
 #include <BaseTypes.h>
 #include <Geneerator.h>
 #include <fstream>
+#include <map>
 
 namespace O {
 
@@ -37,6 +38,7 @@ namespace O {
         std::vector<VariableStored> additionalVariables;
         std::vector<Structure> structs;
         AdditionalDataType adtTable;
+        std::wstring sectorName = L"main";
         int addOffset = 0;
         int localSize = 0;
         int popSystemCOunt = 0;
@@ -45,6 +47,7 @@ namespace O {
         std::vector<int>* Instructions;
         std::vector<int> mainFlow;
         std::vector<FunctionStored> storedFunctions;
+        std::map<std::wstring, std::vector<int>> addSectors;
 
     private:
         void LoadVariables(std::vector<Variable> variables, bool add = false);

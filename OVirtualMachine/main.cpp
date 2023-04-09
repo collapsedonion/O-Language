@@ -228,21 +228,6 @@ int main(int argc, char* args[]) {
 
     std::ifstream f(loadFile);
 
-    std::vector<long> fileRep;
-
-    int size;
-    f.read((char*)&size, 4);
-    int bodyStart;
-    f.read((char*)&bodyStart, 4);
-
-    for(int i = 0; i < size; i++){
-        long newE = 0;
-        f.read((char*)&newE, 4);
-        fileRep.push_back(newE);
-    }
-
-    f.close();
-
     O::Memory mem(20000);
     O::LogicUnit lu(&mem);
 
@@ -261,15 +246,46 @@ int main(int argc, char* args[]) {
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
+    int sectorCount;
+    f.read((char*)&sectorCount, sizeof(int));
+
+    for(int i = 0; i < sectorCount; i++){
+        int nameSize;
+        f.read((char*)&nameSize, sizeof(int));
+        char* sectorName = (char*)malloc((nameSize + 1) * sizeof(char));
+
+        for(int j = 0; j < nameSize; j++){
+            wchar_t newC;
+            f.read((char*)&newC, sizeof(wchar_t ) / sizeof(char ));
+            sectorName[j] = (char)newC;
+        }
+
+        int size;
+        f.read((char*)&size, sizeof(int));
+
+        std::vector<int> data;
+        data.resize(size);
+
+        f.read((char*)data.data(), size * sizeof(wchar_t));
+
+        std::vector<long> lData(data.begin(), data.end());
+
+        mem.LoadProgram(std::string(sectorName), lData);
+
+        free(sectorName);
+    }
+
+    f.close();
+
     if(argc == 3){
         LoadDL(args[2], &lu);
     }
 
-    int start = mem.LoadProgram("main", fileRep);
-    lu.mov(O::Memory::Registers::eip, start + bodyStart);
+    SectorDescription mainSector = mem.getSectorDescription("main");
 
+    lu.mov(O::Memory::Registers::eip, mainSector.start);
 
-    while (*(mem.GetRegisterAccess(O::Memory::Registers::eip)) < start + fileRep.size()){
+    while (*(mem.GetRegisterAccess(O::Memory::Registers::eip)) < mainSector.start + mainSector.size){
         auto scenary = O::Scenary::generateScript(mem.getMem(), *(mem.GetRegisterAccess(O::Memory::Registers::eip)));
         *(mem.GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
         O::Scenary::EvaluateWord(scenary.second, &lu, &mem);

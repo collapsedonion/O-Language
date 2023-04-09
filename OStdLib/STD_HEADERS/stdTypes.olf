@@ -27,7 +27,7 @@ struct:RPInt{
         return(int(getRPointerContent(RPointer(me), 4)));
     }
 
-    func:RPInt initRPChar(int~ pI){
+    func:RPInt initRPInt(int~ pI){
         return(RPInt(getRPointer(void~(pI))));
     }
 }
@@ -45,7 +45,7 @@ struct:RPFloat{
         return(float(getRPointerContent(RPointer(me), 4)));
     }
 
-    func:RPFloat initRPChar(float~ pI){
+    func:RPFloat initRPFloat(float~ pI){
         return(RPFloat(getRPointer(void~(pI))));
     }
 }
