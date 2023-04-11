@@ -52,23 +52,19 @@ func operator "|=" (bool~ a, bool b){
 }
 
 func operator "+=" (float~ a, float b){
-~a = ~a + b;
+    ~a = ~a + b;
 }
 
 func operator "-=" (float~ a, float b){
-~a = ~a - b;
+    ~a = ~a - b;
 }
 
 func operator "*=" (float~ a, float b){
-~a = ~a * b;
+    ~a = ~a * b;
 }
 
 func operator "/=" (float~ a, float b){
-~a = ~a / b;
-}
-
-func operator "%=" (float~ a, float b){
-~a = ~a % b;
+    ~a = ~a / b;
 }
 
 extern:func:int clock();
