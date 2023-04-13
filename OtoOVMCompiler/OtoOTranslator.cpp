@@ -14,7 +14,6 @@
 #define ELIF_NAME L"else if"
 #define ARRAY_CREATION_NAME L"ARRAY_INIT"
 #define FREE_INSTRUCTION_NAME L"_FREE"
-#define ARRAY_ELEMENT_ACCESS_NAME L"ARRAY_ACCESS_INTEGER"
 #define STRUCTURE_ELEMENT_ACCESS_NAME L"STRUCTURE_ACCESS"
 #define WHILE_CYCLE_NAME L"WHILE_CYCLE"
 #define MALLOC_INSTRUCTION_NAME L"_MALLOC"
@@ -154,13 +153,6 @@ namespace O {
             LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
             auto mov = G::mov(L"", 0, GR::mc3, GR::aa0);
             ADDVTV(Instructions, mov)
-        }else if(inst.Parameters[0].name == ARRAY_ELEMENT_ACCESS_NAME) {
-            LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
-            LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
-            auto add = G::add(GR::edi, GR::mc3);
-            ADDVTV(Instructions, add);
-            auto mov = G::mov(L"", 0, GR::edi, GR::aa0);
-            ADDVTV(Instructions, mov);
         }else if(inst.Parameters[0].name == STRUCTURE_ELEMENT_ACCESS_NAME){
             LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
             auto elementName = inst.Parameters[0].Parameters[0].name;
@@ -439,13 +431,6 @@ namespace O {
                     auto mov = G::mov(L"", i - 1, reg, GR::aa1);
                     ADDVTV(Instructions, mov);
                 }
-            }else if(inst.name == ARRAY_ELEMENT_ACCESS_NAME){
-                LoadInstToReg(inst.Parameters[0], GR::mc1);
-                LoadInstToReg(inst.Parameters[1], GR::edi);
-                auto add = G::add(GR::edi, GR::mc1);
-                ADDVTV(Instructions, add);
-                auto mov = G::mov(reg, L"", 0, GR::edi);
-                ADDVTV(Instructions, mov);
             }else if(inst.name == STRUCTURE_ELEMENT_ACCESS_NAME){
                 LoadInstToReg(inst.Parameters[1], GR::edi);
                 Structure structure;
