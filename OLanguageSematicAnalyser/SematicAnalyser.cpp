@@ -308,6 +308,7 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
         toRet.Parameters.push_back(dataSource);
         return toRet;
     }
+    DataTypes originalType = dataSource.type;
 
 	Instruction index = proccessInstCall(token.childToken[1]);
 
@@ -316,13 +317,21 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
 		throw CompilationException(token.line_id, L"Array-element-access operator works only with pointer data-type but got " + reprasentation);
 	}
 
+    dataSource.type = DataTypes::Integer;
+
 	reprasentation = reprasentation.substr(1, reprasentation.size() - 1);
+
+    Instruction plus;
+    plus.Parameters.push_back(dataSource);
+    plus.Parameters.push_back(index);
+    plus.type = originalType;
+    plus.ArithmeticProccess = true;
+    plus.name = L"+";
 
     Instruction toRet;
     toRet.type = stringToDataType(reprasentation, adt);
-    toRet.name = ARRAY_ELEMENT_ACCESS_NAME;
-    toRet.Parameters.push_back(index);
-    toRet.Parameters.push_back(dataSource);
+    toRet.name = POINTER_ACCESS_INSTRUCTION_NAME;
+    toRet.Parameters.push_back(plus);
 
 	return toRet;
 }

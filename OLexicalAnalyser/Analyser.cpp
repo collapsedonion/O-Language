@@ -316,6 +316,14 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str, int li
     std::pair<bool, Token> processedOperator;
 
     for(const auto& highOperator : mathOperatorMaxPriority){
+        if(highOperator.operatorType == OperatorType::Scope){
+            for(const auto& unaryOperator : mathOperatorUnary){
+                processedOperator = getOperator(str, unaryOperator, line_id);
+                if(processedOperator.first){
+                    return processedOperator.second;
+                }
+            }
+        }
         processedOperator = getOperator(str, highOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
@@ -323,6 +331,14 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str, int li
     }
 
     for(const auto& midOperator : mathOperatorMiddlePriority){
+        if(midOperator.operatorType == OperatorType::Scope){
+            for(const auto& unaryOperator : mathOperatorUnary){
+                processedOperator = getOperator(str, unaryOperator, line_id);
+                if(processedOperator.first){
+                    return processedOperator.second;
+                }
+            }
+        }
         processedOperator = getOperator(str, midOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
@@ -330,6 +346,14 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str, int li
     }
 
     for(const auto& lowOperator : mathOperatorLowPriority){
+        if(lowOperator.operatorType == OperatorType::Scope){
+            for(const auto& unaryOperator : mathOperatorUnary){
+                processedOperator = getOperator(str, unaryOperator, line_id);
+                if(processedOperator.first){
+                    return processedOperator.second;
+                }
+            }
+        }
         processedOperator = getOperator(str, lowOperator, line_id);
         if(processedOperator.first){
             return processedOperator.second;
