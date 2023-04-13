@@ -143,15 +143,9 @@ Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
 		throw CompilationException(token.line_id, L"Pointer-get operator require at least one argument");
 	}
 	else {
-        Instruction inst;
-        if(token.childToken[0].token == POINTER_ACCESS_INSTRUCTION_TOKEN){
-            if(token.childToken[0].childToken.size() != 1){
-                throw CompilationException(token.line_id, L"Pointer-get operator require at least one argument");
-            }
-            inst = proccessInstCall(token.childToken[0].childToken[0]);
-            return inst;
-        }else {
-            inst = proccessInstCall(token.childToken[0]);
+        Instruction inst = proccessInstCall(token.childToken[0]);
+        if(inst.name == POINTER_ACCESS_INSTRUCTION_NAME){
+            return inst.Parameters[0];
         }
 		Analyser::Token typeToken;
 		typeToken.token = L"~";
