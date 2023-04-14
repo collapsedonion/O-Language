@@ -415,11 +415,31 @@ namespace O {
                 auto movRes = G::mov(reg, GR::eax);
                 ADDVTV(Instructions, movRes)
             }else if(inst.name == POINTER_GET_INSTRUCTION_NAME) {
-                auto v = getVar(inst.Parameters[0].name);
-                auto moveEbp = G::mov(reg, GR::ebp);
-                auto subTarget = G::add(reg, v.fromEbpOffset);
-                ADDVTV(Instructions, moveEbp);
-                ADDVTV(Instructions, subTarget)
+                if(inst.Parameters[0].name == STRUCTURE_ELEMENT_ACCESS_NAME){
+                    LoadInstToReg(inst.Parameters[0].Parameters[1], reg);
+                    Structure structure;
+                    for(auto elem : structs){
+                        if(elem.myDt == inst.Parameters[0].Parameters[1].type){
+                            structure = elem;
+                            break;
+                        }
+                    }
+                    int offset = 0;
+                    for(int i = 0; i < structure.variables.size(); i++){
+                        if(structure.variables[i].name == inst.Parameters[0].Parameters[0].name){
+                            offset = i;
+                            break;
+                        }
+                    }
+                    auto add = G::add(reg, offset);
+                    ADDVTV(Instructions, add)
+                }else {
+                    auto v = getVar(inst.Parameters[0].name);
+                    auto moveEbp = G::mov(reg, GR::ebp);
+                    auto subTarget = G::add(reg, v.fromEbpOffset);
+                    ADDVTV(Instructions, moveEbp);
+                    ADDVTV(Instructions, subTarget)
+                }
 
             }else if(inst.name == ARRAY_CREATION_NAME){
                 auto malloc = G::malloc((int)inst.Parameters[0].name[0]);
