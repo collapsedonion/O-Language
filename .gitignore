@@ -837,3 +837,4 @@ OVirtualMachine/build/CMakeFiles/OVirtualMachine.dir/compiler_depend.internal
 .vscode/settings.json
 .vscode/launch.json
 .vscode/c_cpp_properties.json
+OCompilerMACOS/.vscode/c_cpp_properties.json
