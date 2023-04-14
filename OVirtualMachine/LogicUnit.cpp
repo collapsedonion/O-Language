@@ -3,6 +3,7 @@
 //
 
 #include "LogicUnit.h"
+#include <dlfcn.h>
 
 #define GETREG(varname) *_mem->GetRegisterAccess(varname)
 #define GETMAD(varname) *_mem->GetAccessByMemoryDescriptor(varname)
