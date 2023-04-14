@@ -3,6 +3,7 @@ include(../OCompilerBase/CMakeLists.txt)
 include(../OLanguageSematicAnalyser/CMakeLists.txt)
 include(../OPreProccessor/CMakeLists.txt)
 include(../OtoOVMCompiler/CMakeLists.txt)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(OCompilerMACOS)
 
