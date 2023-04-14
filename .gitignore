@@ -834,3 +834,6 @@ OVirtualMachine/build/stdbin/libOStd_file_IO.dylib
 OVirtualMachine/build/stdbin/libOVM_Console_out.dylib
 OVirtualMachine/build/stdbin/libs.conf
 OVirtualMachine/build/CMakeFiles/OVirtualMachine.dir/compiler_depend.internal
+.vscode/settings.json
+.vscode/launch.json
+.vscode/c_cpp_properties.json
