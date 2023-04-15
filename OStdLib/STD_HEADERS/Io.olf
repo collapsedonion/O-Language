@@ -9,19 +9,19 @@ func readStr(char~ out, int countToRead){
 
     while(canRead){
         if(index + 2 ? countToRead){
-            canRead = false;
+            @canRead = false;
         }else{   
-            c = tookChar();
+            @c = tookChar();
             if(c ? '\n'){
-                canRead = false;
+                @canRead = false;
             }else{
-                out[index] = c;
+                @out[index] = c;
             }
         }
-        index = index + 1;
+        @index = index + 1;
     }
 
-    out[countToRead - 1] = '\0';
+    @out[countToRead - 1] = '\0';
 }
 
 func printStr(char~ str){
@@ -32,10 +32,10 @@ func printStr(char~ str){
 
     while(notComplete){
         if(str[index] ? '\0'){
-            notComplete = false;
+            @notComplete = false;
         }else{
             putChar(str[index]);
         }
-        index = index + 1;
+        @index = index + 1;
     }
 }

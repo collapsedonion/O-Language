@@ -2,29 +2,29 @@
 #include packedString.olf
 
 enum {
-    EventTypeLeftMouseDown = 1,
-    EventTypeLeftMouseUp = 2,
-    EventTypeRightMouseDown = 3,
-    EventTypeRightMouseUp = 4,
-    EventTypeMouseMoved = 5,
-    EventTypeLeftMouseDragged = 6,
-    EventTypeRightMouseDragged = 7,
-    EventTypeMouseEntered = 8,
-    EventTypeMouseExited = 9,
-    EventTypeKeyDown = 10,
-    EventTypeKeyUp = 11,
-    EventTypeFlagsChanged = 12,
-    EventTypeAppKitDefined = 13,
-    EventTypeSystemDefined = 14,
-    EventTypeApplicationDefined = 15,
-    EventTypePeriodic = 16,
-    EventTypeCursorUpdate = 17,
-    EventTypeScrollWheel = 22,
-    EventTypeTabletPoint = 23,
-    EventTypeTabletProximity = 24,
-    EventTypeOtherMouseDown = 25,
-    EventTypeOtherMouseUp = 26,
-    EventTypeOtherMouseDragged = 27
+    EventTypeLeftMouseDown = 1;
+    EventTypeLeftMouseUp = 2;
+    EventTypeRightMouseDown = 3;
+    EventTypeRightMouseUp = 4;
+    EventTypeMouseMoved = 5;
+    EventTypeLeftMouseDragged = 6;
+    EventTypeRightMouseDragged = 7;
+    EventTypeMouseEntered = 8;
+    EventTypeMouseExited = 9;
+    EventTypeKeyDown = 10;
+    EventTypeKeyUp = 11;
+    EventTypeFlagsChanged = 12;
+    EventTypeAppKitDefined = 13;
+    EventTypeSystemDefined = 14;
+    EventTypeApplicationDefined = 15;
+    EventTypePeriodic = 16;
+    EventTypeCursorUpdate = 17;
+    EventTypeScrollWheel = 22;
+    EventTypeTabletPoint = 23;
+    EventTypeTabletProximity = 24;
+    EventTypeOtherMouseDown = 25;
+    EventTypeOtherMouseUp = 26;
+    EventTypeOtherMouseDragged = 27;
 }
 
 extern:func:int getEventType(Event event);

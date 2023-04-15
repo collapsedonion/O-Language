@@ -205,6 +205,7 @@ PublishScripts/
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
+*.json
 
 # Microsoft Azure Build Output
 csx/
@@ -878,3 +879,38 @@ OtoOVMCompiler/build/CMakeFiles/progress.marks
 OtoOVMCompiler/build/CMakeFiles/TargetDirectories.txt
 OtoOVMCompiler/build/Makefile
 OtoOVMCompiler/CMakeLists.txt
+OCompilerMACOS/.vscode/settings.json
+OCompilerMACOS/build/.cmake/api/v1/query/client-vscode/query.json
+OCompilerMACOS/build/.cmake/api/v1/reply/cache-v2-c236ef4ad17a12426105.json
+OCompilerMACOS/build/.cmake/api/v1/reply/cmakeFiles-v1-51cbd9a7a7a0c017f4b5.json
+OCompilerMACOS/build/.cmake/api/v1/reply/codemodel-v2-c29bf6430d5d06429dfb.json
+OCompilerMACOS/build/.cmake/api/v1/reply/directory-.-Debug-f5ebdc15457944623624.json
+OCompilerMACOS/build/.cmake/api/v1/reply/index-2023-04-15T07-58-03-0696.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-O_ByteCode_generator-Debug-d7b2ef7490d8e4329284.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-OCompilerMAC-Debug-4184d1dd6b3449e40be6.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-OLanguageSematicAnalyser-Debug-a009471ba13f539cf686.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-OLexicalAnalyser-Debug-97e103a664151e4d90c1.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-OPreProccessor-Debug-9a3c5cd3ea45265666a6.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-OtoOVMCompiler-Debug-e568af879e6dca691a8c.json
+OCompilerMACOS/build/.cmake/api/v1/reply/toolchains-v1-4fe27b011d06b146b859.json
+OCompilerMACOS/build/CMakeFiles/3.26.3/CompilerIdC/a.out
+OCompilerMACOS/build/CMakeFiles/3.26.3/CompilerIdCXX/a.out
+OCompilerMACOS/build/.cmake/api/v1/reply/index-2023-04-15T08-00-00-0397.json
+OCompilerMACOS/build/.cmake/api/v1/reply/cache-v2-a3df40460f0fb47e1d79.json
+OCompilerMACOS/build/.cmake/api/v1/reply/cmakeFiles-v1-f7b27c420d0ef61af591.json
+OCompilerMACOS/build/.cmake/api/v1/reply/codemodel-v2-df290b5e0535c5e9b58a.json
+OCompilerMACOS/build/.cmake/api/v1/reply/index-2023-04-15T08-01-20-0965.json
+OCompilerMACOS/build/.cmake/api/v1/reply/target-OCompilerMAC-Debug-1ab58caca74092927e35.json
+OCompilerMACOS/build/.cmake/api/v1/reply/index-2023-04-15T08-04-43-0907.json
+OCompilerMACOS/build/.cmake/api/v1/reply/index-2023-04-15T08-12-40-0596.json
+OVirtualMachine/.vscode/c_cpp_properties.json
+OVirtualMachine/build/.cmake/api/v1/query/client-vscode/query.json
+OVirtualMachine/build/.cmake/api/v1/reply/cache-v2-b69737a4dfa79163ba80.json
+OVirtualMachine/build/.cmake/api/v1/reply/cmakeFiles-v1-fbcf32f6d42a1c7909cb.json
+OVirtualMachine/build/.cmake/api/v1/reply/codemodel-v2-32065093f767edbc1bdf.json
+OVirtualMachine/build/.cmake/api/v1/reply/directory-.-f5ebdc15457944623624.json
+OVirtualMachine/build/.cmake/api/v1/reply/index-2023-04-15T08-29-05-0349.json
+OVirtualMachine/build/.cmake/api/v1/reply/target-OVirtualMachine-f395dbbc5a23ef6555b9.json
+OVirtualMachine/build/.cmake/api/v1/reply/toolchains-v1-4fe27b011d06b146b859.json
+OVirtualMachine/build/CMakeFiles/3.26.3/CompilerIdC/a.out
+OVirtualMachine/build/CMakeFiles/3.26.3/CompilerIdCXX/a.out

@@ -8,10 +8,10 @@ func:int stringSize(char~ str){
     while(active){
         
         if(str[index] ? '\0'){
-            active = false;
+            @active = false;
         }else{
-            index = index + 1;
-            size = size + 1;
+            @index = index + 1;
+            @size = size + 1;
         }
     }
 
@@ -33,14 +33,14 @@ func:int strToInteger(char~ str){
         var:int newElem = int(str[start - 1] - '0');
         
         if(index ? 0){
-            result = newElem;
+            @result = newElem;
         }else{
-            result = result + newElem * multiplier;
-            multiplier = multiplier * 10;
+            @result = result + newElem * multiplier;
+            @multiplier = multiplier * 10;
         }       
 
-        index = index + 1;
-        start = start - 1;
+        @index = index + 1;
+        @start = start - 1;
     }
 
     return(result);
@@ -54,11 +54,11 @@ func reverseString(char~ str){
         var:char buf1 = str[first];
         var:char buf2 = str[last];
 
-        str[last] = buf1;
-        str[first] = buf2;
+        @str[last] = buf1;
+        @str[first] = buf2;
 
-        first = first + 1;
-        last = last - 1;
+        @first = first + 1;
+        @last = last - 1;
     }
 }
 
@@ -71,13 +71,13 @@ func integerToString(int source, char~ str, int maxSize){
     while(index < maxSize - 1 & remind > 0){
         var:int newElement = remind % 10;
 
-        str[index] = char(newElement) + '0';
+        @str[index] = char(newElement) + '0';
 
-        index = index + 1;
-        remind = remind / 10;
+        @index = index + 1;
+        @remind = remind / 10;
     }
 
-    str[index] = '\0';
+    @str[index] = '\0';
 
     reverseString(str);
 }
@@ -97,7 +97,7 @@ func:bool compareString(char~ str1, char~ str2){
                 return(false);
             }
 
-            index = index +  1;
+            @index = index +  1;
         }
 
     }else{

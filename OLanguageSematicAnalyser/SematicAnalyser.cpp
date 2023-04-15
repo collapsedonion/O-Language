@@ -717,11 +717,17 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
                     destination.token = v.name;
                     destination.type = Analyser::Type::Name;
 
+                    Analyser::Token destination_pointer;
+                    destination_pointer.token = L"@";
+                    destination_pointer.type = Analyser::Type::MathematicalOperator;
+                    destination_pointer.forward = true;
+                    destination_pointer.childToken = {destination};
+
                     Analyser::Token structureMallocToken;
                     structureMallocToken.token = MATH_SET;
                     structureMallocToken.type = Analyser::Type::MathematicalOperator;
                     structureMallocToken.twoSided = true;
-                    structureMallocToken.childToken = {destination, malloc};
+                    structureMallocToken.childToken = {destination_pointer, malloc};
 
                     instructions.push_back(proccessInstCall(structureMallocToken));
                 }
@@ -732,7 +738,16 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
 		throw CompilationException(token.line_id, L"Unexpected data at variable definition");
 	}
 
-	return toRet;
+    Instruction pointer;
+    pointer.Parameters = {toRet};
+    pointer.name = POINTER_GET_INSTRUCTION_NAME;
+    Analyser::Token dt_token;
+    dt_token.token = L"~";
+    dt_token.childToken = {Analyser::Token()};
+    dt_token.childToken[0].token = dataTypeToString(toRet.type, adt);
+    pointer.type = getDataType(dt_token);
+
+	return pointer;
 }
 
 Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool add)
@@ -933,7 +948,8 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
             }
             else {
                 if (token.token == MATH_SET) {
-                    if (t1.type == t2.type) {
+                    std::wstring firstDt = dataTypeToString(t1.type, adt);
+                    if (firstDt[0] == '~' && stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt) == t2.type) {
                         res.name = L"SET_VALUE";
                         res.ArithmeticProccess = true;
                         res.type = DataTypes::ServiceInstruction;
@@ -1131,15 +1147,9 @@ bool O::SematicAnalyser::isExternFunction(std::wstring name, std::vector<DataTyp
 }
 
 Instruction O::SematicAnalyser::processEnumeration(O::Analyser::TokenisedFile tokenFile) {
-    if(tokenFile.subToken.size() != 1){
-        throw CompilationException(tokenFile.name.line_id, L"Unexpected data at enumeration construction");
-    }
-
-    std::vector<Analyser::Token> tokens = getComma(tokenFile.subToken[0].name);
-
-    for(auto elem : tokens){
-        auto replaceInst = proccessInstCall(elem.childToken[1]);
-        auto name = elem.childToken[0].token;
+    for(auto elem : tokenFile.subToken){
+        auto replaceInst = proccessInstCall(elem.name.childToken[1]);
+        auto name = elem.name.childToken[0].token;
 
         enumerations.insert({name, replaceInst});
     }

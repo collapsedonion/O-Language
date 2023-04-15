@@ -144,8 +144,12 @@ namespace O {
 
     void OtoOTranslator::SetInstruction(Instruction inst) {
         LoadInstToReg(inst.Parameters[1], GR::aa0);
+        LoadInstToReg(inst.Parameters[0], GR::aa1);
 
-        if(inst.Parameters[0].IsVariable){
+        auto mov = G::mov(L"", 0, GR::aa1, GR::aa0);
+        ADDVTV(Instructions, mov)
+
+        /*if(inst.Parameters[0].IsVariable){
             auto var = getVar(inst.Parameters[0].name);
             auto mov = G::mov(FILLVAR(var), GR::aa0);
             ADDVTV(Instructions, mov)
@@ -175,7 +179,7 @@ namespace O {
             ADDVTV(Instructions, add)
             auto mov = G::mov(L"", 0, GR::edi, GR::aa0);
             ADDVTV(Instructions, mov);
-        }
+        }*/
     }
 
     void OtoOTranslator::WriteResulToFile(std::wstring filepath) {

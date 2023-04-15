@@ -24,47 +24,47 @@ extern:func realloc(void~ pMemory, int size);
 extern:func:int mSize(void~ pMemory);
 
 func operator "+=" (int~ a, int b){
-    ~a = ~a + b;
+    a = ~a + b;
 }
 
 func operator "-=" (int~ a, int b){
-    ~a = ~a - b;
+    a = ~a - b;
 }
 
 func operator "*=" (int~ a, int b){
-    ~a = ~a * b;
+    a = ~a * b;
 }
 
 func operator "/=" (int~ a, int b){
-    ~a = ~a / b;
+    a = ~a / b;
 }
 
 func operator "%=" (int~ a, int b){
-    ~a = ~a % b;
+    a = ~a % b;
 }
 
 func operator "&=" (bool~ a, bool b){
-    ~a = ~a & b;
+    a = ~a & b;
 }
 
 func operator "|=" (bool~ a, bool b){
-    ~a = ~a | b;
+    a = ~a | b;
 }
 
 func operator "+=" (float~ a, float b){
-    ~a = ~a + b;
+    a = ~a + b;
 }
 
 func operator "-=" (float~ a, float b){
-    ~a = ~a - b;
+    a = ~a - b;
 }
 
 func operator "*=" (float~ a, float b){
-    ~a = ~a * b;
+    a = ~a * b;
 }
 
 func operator "/=" (float~ a, float b){
-    ~a = ~a / b;
+    a = ~a / b;
 }
 
 extern:func:int clock();

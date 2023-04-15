@@ -23,11 +23,11 @@ struct:Window{
 }
 
 enum {
-    WindowStyleMaskBorderLess = 0,
-    WindowStyleMaskTitled = 1,
-    WindowStyleMaskClosable = 2,
-    WindowStyleMaskMiniaturizable = 4,
-    WindowStyleMaskResizable = 8
+    WindowStyleMaskBorderLess = 0;
+    WindowStyleMaskTitled = 1;
+    WindowStyleMaskClosable = 2;
+    WindowStyleMaskMiniaturizable = 4;
+    WindowStyleMaskResizable = 8;
 }
 
 extern:func:App initApplication();

@@ -17,14 +17,14 @@ func fReadToString(File file, char~ str, int stringSize){
     while(fGood(file) & endOfFile(file) ? false & lineEnd ? false & index + 2 < stringSize){
         var:char newChar = fReadChar(file);
         if(newChar ? '\n'){
-            lineEnd = true;
+            @lineEnd = true;
         }else{
-            str[index] = newChar;
+            @str[index] = newChar;
         }
-        index = index + 1;
+        @index = index + 1;
     }
 
-    str[index] = '\0';
+    @str[index] = '\0';
 }
 
 func fWriteString(File file, char~ str){
@@ -38,10 +38,10 @@ func fWriteString(File file, char~ str){
 
     while(notComplete){
         if(str[index] ? '\0'){
-            notComplete = false;
+            @notComplete = false;
         }else{
             fPutChar(file, str[index]);
         }
-        index = index + 1;
+        @index = index + 1;
     }
 }

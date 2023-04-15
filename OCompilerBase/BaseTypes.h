@@ -200,8 +200,6 @@ struct File {
     std::vector<Structure> structures;
 };
 
-typedef std::wstring(__stdcall *TranslateFunction)(File);
-
 inline bool isStringEndsWith(std::wstring wStr, std::wstring ending){
     if(wStr.size() < ending.size()){
         return false;
