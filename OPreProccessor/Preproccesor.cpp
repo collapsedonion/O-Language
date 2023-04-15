@@ -35,10 +35,12 @@ namespace O {
             }
 
             if(i == '\n') {
-                result += L"\n";
-                result += L"#LINE_ID";
-                result += std::to_wstring(strId + 1);
-                result += L";";
+                if(*(result.end() - 1) == ';'){
+                    result += L"\n";
+                    result += L"#LINE_ID";
+                    result += std::to_wstring(strId + 1);
+                    result += L";";
+                }
                 strId++;
             }
 
