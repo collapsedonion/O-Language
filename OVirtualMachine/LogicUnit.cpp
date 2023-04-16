@@ -3,7 +3,10 @@
 //
 
 #include "LogicUnit.h"
+
+#ifdef __APPLE__
 #include <dlfcn.h>
+#endif
 
 #define GETREG(varname) *_mem->GetRegisterAccess(varname)
 #define GETMAD(varname) *_mem->GetAccessByMemoryDescriptor(varname)
@@ -322,13 +325,18 @@ namespace O {
     }
 
     void LogicUnit::LoadNewInterrupts(std::string path) {
+        OVM_MODULE_MAIN main;
+#ifdef __APPLE__
         void* hDl = dlopen(path.c_str(), RTLD_NOW);
 
         if(hDl == nullptr){
             throw std::exception();
         }
 
-        OVM_MODULE_MAIN main = (OVM_MODULE_MAIN)dlsym(hDl, "_Omain");
+	main = (OVM_MODULE_MAIN)dlsym(hDl, "_Omain");
+
+#endif
+
         if(main == nullptr){
             throw std::exception();
         }

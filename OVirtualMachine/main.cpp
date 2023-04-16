@@ -6,7 +6,9 @@
 #include <string>
 #include <OVM_SDK.h>
 #include <math.h>
-#include <mach-o/dyld.h>
+#ifdef __APPLE__
+	#include <mach-o/dyld.h>
+#endif
 #include <time.h>
 
 void GetHighFloat(MEM_POINTER mem){
@@ -213,11 +215,13 @@ int main(int argc, char* args[]) {
     uint32_t execPathBufSize;
     char* execPathBuf = (char*)malloc(execPathBufSize);
 
+#ifdef __APPLE__
     while(_NSGetExecutablePath(execPathBuf, &execPathBufSize) == -1){
         free(execPathBuf);
         execPathBufSize += 1024;
         execPathBuf = (char*)malloc(execPathBufSize);
     }
+#endif
 
     std::string execPath(execPathBuf);
     free(execPathBuf);

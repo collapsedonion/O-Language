@@ -7,7 +7,9 @@
 #include <sstream>
 #include <OtoOTranslator.h>
 #include <Preproccesor.h>
-#include <mach-o/dyld.h>
+#ifdef __APPLE__
+	#include <mach-o/dyld.h>
+#endif
 
 const std::wstring PreInclude =
         L"#include std.olf\n";
@@ -20,12 +22,13 @@ int main(int argC, char* args[]) {
     char* sourcePath = (char*)malloc(1024);
     uint32_t sourceSize = 1024;
 
+#ifdef __APPLE__
     while(_NSGetExecutablePath(sourcePath, &sourceSize) == -1){
         free(sourcePath);
         sourceSize = sourceSize + 1024;
         sourcePath = (char*) malloc(sourceSize);
     }
-
+#endif
     std::string execPath(sourcePath);
     free(sourcePath);
 
