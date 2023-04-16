@@ -148,38 +148,6 @@ namespace O {
 
         auto mov = G::mov(L"", 0, GR::aa1, GR::aa0);
         ADDVTV(Instructions, mov)
-
-        /*if(inst.Parameters[0].IsVariable){
-            auto var = getVar(inst.Parameters[0].name);
-            auto mov = G::mov(FILLVAR(var), GR::aa0);
-            ADDVTV(Instructions, mov)
-        }else if(inst.Parameters[0].name == POINTER_ACCESS_INSTRUCTION_NAME){
-            LoadInstToReg(inst.Parameters[0].Parameters[0], GR::mc3);
-            auto mov = G::mov(L"", 0, GR::mc3, GR::aa0);
-            ADDVTV(Instructions, mov)
-        }else if(inst.Parameters[0].name == STRUCTURE_ELEMENT_ACCESS_NAME){
-            LoadInstToReg(inst.Parameters[0].Parameters[1], GR::edi);
-            auto elementName = inst.Parameters[0].Parameters[0].name;
-            auto dt = inst.Parameters[0].Parameters[1].type;
-            Structure structure;
-            for(auto elem : structs){
-                if(elem.myDt == dt){
-                    structure = elem;
-                    break;
-                }
-            }
-            int offset = 0;
-            for(int i = 0; i < structure.variables.size(); i++){
-                if(structure.variables[i].name == elementName){
-                    offset = i;
-                    break;
-                }
-            }
-            auto add = G::add(GR::edi, offset);
-            ADDVTV(Instructions, add)
-            auto mov = G::mov(L"", 0, GR::edi, GR::aa0);
-            ADDVTV(Instructions, mov);
-        }*/
     }
 
     void OtoOTranslator::WriteResulToFile(std::wstring filepath) {
