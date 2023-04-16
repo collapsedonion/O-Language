@@ -22,6 +22,11 @@ extern:func:int operator "*" (int a, int b);
 extern:func:int operator "/" (int a, int b);
 extern:func realloc(void~ pMemory, int size);
 extern:func:int mSize(void~ pMemory);
+extern:func:int getSysId();
+
+enum{
+	MACOS_SYS_ID = 0;
+}
 
 func operator "+=" (int~ a, int b){
     a = ~a + b;

@@ -61,6 +61,12 @@ void LoadPackage(MEM_POINTER mem){
     }
 }
 
+void GetSystemID(MEM_POINTER mem){
+#ifdef __APPLE__
+	*mem.eax = 0;
+#endif
+}
+
 void ExtractPackage(MEM_POINTER mem){
     long sourceData = (*mem._mem)[mem.ebp];
     unsigned char elementIndex = (*mem._mem)[mem.ebp - 1];
@@ -247,6 +253,7 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("getRPointer", GetRealPointer);
     lu.AddNewInterrupt("setRPointerData", SetRealPointer);
     lu.AddNewInterrupt("getRPointerContent", GetRealPointerContent);
+    lu.AddNewInterrupt("getSysId", GetSystemID);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
