@@ -3,14 +3,15 @@
 //
 
 #include "Preproccesor.h"
+#include <codecvt>
 
 namespace O {
 
 
-    std::wstring Preproccesor::proccess(std::wstring str) {
-        std::wstring result;
+    std::u32string Preproccesor::proccess(std::u32string str) {
+        std::u32string result;
 
-        std::wstring buffer;
+        std::u32string buffer;
 
         int strId = 0;
 
@@ -22,7 +23,7 @@ namespace O {
                 bufferLoad = false;
                 result += getInst(buffer);
                 strId++;
-                buffer = L"";
+                buffer = U"";
                 continue;
             }
 
@@ -36,10 +37,12 @@ namespace O {
 
             if(i == '\n') {
                 if(*(result.end() - 1) == ';'){
-                    result += L"\n";
-                    result += L"#LINE_ID";
-                    result += std::to_wstring(strId + 1);
-                    result += L";";
+                    result += U"\n";
+                    result += U"#LINE_ID";
+		            std::string line_id_str = std::to_string(strId);
+		            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+                    result += converter.from_bytes(line_id_str);
+                    result += U";";
                 }
                 strId++;
             }
@@ -52,7 +55,7 @@ namespace O {
         return result;
     }
 
-    bool Preproccesor::isAlredyIncluded(std::wstring name) {
+    bool Preproccesor::isAlredyIncluded(std::u32string name) {
 
         for(auto e : included){
             if(e == name){
@@ -63,66 +66,66 @@ namespace O {
         return false;
     }
 
-    std::wstring Preproccesor::Include(std::wstring str) {
+    std::u32string Preproccesor::Include(std::u32string str) {
         auto params = getParameters(str);
 
         if(!isAlredyIncluded(params[1])){
             included.push_back(params[1]);
-            std::wifstream f(filePath + params[1]);
+            std::ifstream f(filePath + params[1]);
             if(!f.good()){
-                f = std::wifstream(execPath + L"/stdLib/" + params[1]);
+                f = std::ifstream(execPath + U"/stdLib/" + params[1]);
             }
-            std::wstringstream buf;
-            buf << f.rdbuf();
-            std::wstring content = buf.str();
+	        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
+            std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+            std::u32string content = convertor.from_bytes(s);
             f.close();
             return proccess(content);
         }
 
-        return L"";
+        return U"";
     }
 
-    std::vector<std::wstring> Preproccesor::getParameters(std::wstring promt) {
+    std::vector<std::u32string> Preproccesor::getParameters(std::u32string promt) {
 
-        std::vector<std::wstring> toRet;
+        std::vector<std::u32string> toRet;
 
         if(promt[0] != '#'){
             return {};
         }
 
-        std::wstring last;
+        std::u32string last;
 
         for(auto c : promt){
             if(c == ' '){
                 toRet.push_back(last);
-                last = L"";
+                last = U"";
             }else if(c != '\t'){
                 last += c;
             }
         }
 
-        if(last != L""){
+        if(last != U""){
             toRet.push_back(last);
         }
 
         return toRet;
     }
 
-    std::wstring Preproccesor::getInst(std::wstring promt) {
+    std::u32string Preproccesor::getInst(std::u32string promt) {
         auto p = getParameters(promt);
 
-        if(p[0] == L"#include"){
+        if(p[0] == U"#include"){
             return Include(promt);
         }
 
-        return L"";
+        return U"";
     }
 
-    Preproccesor::Preproccesor(std::wstring filePath, std::wstring execPath) {
+    Preproccesor::Preproccesor(std::u32string filePath, std::u32string execPath) {
         auto indexOfLast = filePath.rfind('/');
         if(indexOfLast != std::string::npos)
         {
-           this->filePath = filePath.substr(0, indexOfLast) + L"/";
+           this->filePath = filePath.substr(0, indexOfLast) + U"/";
         }
 
         this->execPath = execPath;

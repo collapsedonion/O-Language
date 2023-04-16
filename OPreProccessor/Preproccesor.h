@@ -14,24 +14,24 @@ namespace O {
 
     class Preproccesor {
     private:
-        std::vector<std::wstring> included;
-        std::wstring filePath;
+        std::vector<std::u32string> included;
+        std::u32string filePath;
 
     private:
-        bool isAlredyIncluded(std::wstring name);
+        bool isAlredyIncluded(std::u32string name);
 
-        std::vector<std::wstring> getParameters(std::wstring promt);
+        std::vector<std::u32string> getParameters(std::u32string promt);
 
-        std::wstring getInst(std::wstring promt);
+        std::u32string getInst(std::u32string promt);
 
-        std::wstring Include(std::wstring str);
+        std::u32string Include(std::u32string str);
 
-        std::wstring execPath;
+        std::u32string execPath;
 
     public:
-        Preproccesor(std::wstring filePath, std::wstring execPath = L"");
+        Preproccesor(std::u32string filePath, std::u32string execPath = U"");
 
-        std::wstring proccess(std::wstring str);
+        std::u32string proccess(std::u32string str);
     };
 
 } // O

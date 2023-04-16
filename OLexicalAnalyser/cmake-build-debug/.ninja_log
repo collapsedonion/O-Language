@@ -1,6 +1,0 @@
-# ninja log v5
-3	493	1677243920496545826	CMakeFiles/OLexicalAnalyser.dir/pch.cpp.o	b88921b3c8f2b170
-10	32	1677244277452729000	libOLexicalAnalyser.a	797da01086f9fca1
-3	298	1677223910479140926	CMakeFiles/OLexicalAnalyser.dir/Analyser.cpp.o	188a707e6099348d
-9	36	1677244488832806000	libOLexicalAnalyser.a	797da01086f9fca1
-12	33	1677244955977228000	libOLexicalAnalyser.a	797da01086f9fca1

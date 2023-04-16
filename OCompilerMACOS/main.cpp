@@ -7,12 +7,13 @@
 #include <sstream>
 #include <OtoOTranslator.h>
 #include <Preproccesor.h>
+#include <codecvt>
 #ifdef __APPLE__
 	#include <mach-o/dyld.h>
 #endif
 
-const std::wstring PreInclude =
-        L"#include std.olf\n";
+const std::u32string PreInclude =
+        U"#include std.olf\n";
 
 int main(int argC, char* args[]) {
 
@@ -46,19 +47,18 @@ int main(int argC, char* args[]) {
         outfilepath = args[2];
     }
 
-    std::wstring realFilePath(filepath.begin(), filepath.end());
-    std::wstring realOutFilePath(outfilepath.begin(), outfilepath.end());
-    std::wstring realExecPath(execPath.begin(), execPath.end());
+    std::u32string realFilePath(filepath.begin(), filepath.end());
+    std::u32string realOutFilePath(outfilepath.begin(), outfilepath.end());
+    std::u32string realExecPath(execPath.begin(), execPath.end());
 
-    std::wstring filesource;
+    std::u32string filesource;
 
-    std::wifstream f(realFilePath);
-    std::wstringstream inBuffer;
-    inBuffer << f.rdbuf();
+    std::ifstream f(realFilePath);    
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConvertor;
+    std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+    filesource = utfConvertor.from_bytes(s);
     f.close();
-    filesource = inBuffer.str();
-    inBuffer.clear();
-
+    
     filesource = PreInclude + filesource;
 
     O::Preproccesor pp(realFilePath, realExecPath);
@@ -72,7 +72,9 @@ int main(int argC, char* args[]) {
     try {
         sematiser.ProccessTokenisedFile(TokenisedFile);
     }catch (CompilationException& exception){
-        std::wcout << exception.getText();
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+        std::string res = converter.to_bytes(exception.getText());
+        std::cout << res;
         return -1;
     }
 

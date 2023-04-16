@@ -15,14 +15,14 @@ namespace O {
     class OtoOTranslator {
     private:
         struct VariableStored{
-            std::wstring name;
-            std::wstring sector;
+            std::u32string name;
+            std::u32string sector;
             int fromEbpOffset = 0;
         };
 
         struct FunctionStored{
-            std::wstring name;
-            std::wstring sector;
+            std::u32string name;
+            std::u32string sector;
             std::vector<DataTypes> parameters;
             int stackSize = 0;
             int fromZeroOffset = 0;
@@ -38,7 +38,7 @@ namespace O {
         std::vector<VariableStored> additionalVariables;
         std::vector<Structure> structs;
         AdditionalDataType adtTable;
-        std::wstring sectorName = L"main";
+        std::u32string sectorName = U"main";
         int addOffset = 0;
         int localSize = 0;
         int popSystemCOunt = 0;
@@ -47,13 +47,13 @@ namespace O {
         std::vector<int>* Instructions;
         std::vector<int> mainFlow;
         std::vector<FunctionStored> storedFunctions;
-        std::map<std::wstring, std::vector<int>> addSectors;
+        std::map<std::u32string, std::vector<int>> addSectors;
 
     private:
         void LoadVariables(std::vector<Variable> variables, bool add = false);
         void LoadFunctions(std::vector<Function> functions);
         void ProccessInstruction(Instruction inst);
-        void MovVariableToRegister(std::wstring name, Geneerator::Registers dest);
+        void MovVariableToRegister(std::u32string name, Geneerator::Registers dest);
         void MovConstantToRegister(int constant, Geneerator::Registers dest);
         void SetInstruction(Instruction inst);
         void CallFunction(Instruction inst);
@@ -64,12 +64,12 @@ namespace O {
         void ElseInstruction(Instruction inst);
         void ElifInstruction(Instruction inst);
         void WhileInstruction(Instruction inst);
-        VariableStored getVar(std::wstring name);
-        FunctionStored getFun(std::wstring name, std::vector<DataTypes> dt);
+        VariableStored getVar(std::u32string name);
+        FunctionStored getFun(std::u32string name, std::vector<DataTypes> dt);
         int GetValueToInt(Instruction inst);
         bool isStdLogic(Instruction instOP1, Instruction instOP2);
         StdLogicType getLogicType(Instruction instOP1, Instruction instOP2);
-        void ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::wstring type);
+        void ProccessStdLogic(Instruction instOP1, Instruction instOP2, std::u32string type);
 
         void MathematicalProccess(Instruction inst);
 
@@ -77,7 +77,7 @@ namespace O {
 
     public:
         void Build(File f);
-        void WriteResulToFile(std::wstring filepath);
+        void WriteResulToFile(std::u32string filepath);
     };
 
 } // O

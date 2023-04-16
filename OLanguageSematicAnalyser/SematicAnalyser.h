@@ -21,21 +21,21 @@ namespace O {
         std::vector<Function> exportedFunctions;
         std::vector<Structure> definedStructures;
 		std::vector<Operator> operators;
-        std::map<std::wstring, std::vector<Analyser::TokenisedFile>> templates;
-        std::vector<std::pair<std::wstring, std::vector<Analyser::TokenisedFile>>> definedLabels;
-        std::map<std::wstring, Instruction> enumerations;
+        std::map<std::u32string, std::vector<Analyser::TokenisedFile>> templates;
+        std::vector<std::pair<std::u32string, std::vector<Analyser::TokenisedFile>>> definedLabels;
+        std::map<std::u32string, Instruction> enumerations;
 
 	private:
 		// returns ERROR if not found
-		DataTypes containsFunction(std::wstring name, std::vector<DataTypes> dt);
-        std::pair<bool, std::vector<Analyser::TokenisedFile>> containsLabel(std::wstring label);
-		bool containsVariable(std::wstring name);
-		bool containsOperator(std::wstring op, DataTypes left, DataTypes right);
+		DataTypes containsFunction(std::u32string name, std::vector<DataTypes> dt);
+        std::pair<bool, std::vector<Analyser::TokenisedFile>> containsLabel(std::u32string label);
+		bool containsVariable(std::u32string name);
+		bool containsOperator(std::u32string op, DataTypes left, DataTypes right);
         bool dataTypeIsStructure(DataTypes dt);
-        bool isExternFunction(std::wstring name, std::vector<DataTypes> dt);
+        bool isExternFunction(std::u32string name, std::vector<DataTypes> dt);
         std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
         std::vector<Analyser::Token> getComma(Analyser::Token token);
-		DataTypes getReturnDataTypeOfOperator(std::wstring op, DataTypes left, DataTypes right);
+		DataTypes getReturnDataTypeOfOperator(std::u32string op, DataTypes left, DataTypes right);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
 
@@ -45,7 +45,7 @@ namespace O {
 
         Instruction processTemplate(Analyser::TokenisedFile tokenisedFile);
 
-		Instruction getVariableAsInstruction(std::wstring name);
+		Instruction getVariableAsInstruction(std::u32string name);
 
 		Instruction proccessInstCall(Analyser::Token token);
 

@@ -1,65 +1,67 @@
 #include "Analyser.h"
 #include "pch.h"
+#include <codecvt>
+#include <locale>
 
-std::wstring O::Analyser::numericPostfix[] = {
-        L"f",
-        L"i",
-        L"c",
+std::u32string O::Analyser::numericPostfix[] = {
+        U"f",
+        U"i",
+        U"c",
 };
 
 O::Analyser::Operator O::Analyser::mathOperatorMaxPriority[] = {
-        {L",", L"math_comma", OperatorType::Binary},
-        {L"&=", L"math_assign_and", OperatorType::Binary},
-        {L"|=", L"math_assign_or", OperatorType::Binary},
-        {L"+=", L"math_assign_add", OperatorType::Binary},
-        {L"-=", L"math_assign_sub", OperatorType::Binary},
-        {L"*=", L"math_assign_multiply", OperatorType::Binary},
-        {L"/=", L"math_assign_divide", OperatorType::Binary},
-        {L"%=", L"math_assign_modulo", OperatorType::Binary},
-        {L"=", L"math_assign", OperatorType::Binary}
+        {U",", U"math_comma", OperatorType::Binary},
+        {U"&=", U"math_assign_and", OperatorType::Binary},
+        {U"|=", U"math_assign_or", OperatorType::Binary},
+        {U"+=", U"math_assign_add", OperatorType::Binary},
+        {U"-=", U"math_assign_sub", OperatorType::Binary},
+        {U"*=", U"math_assign_multiply", OperatorType::Binary},
+        {U"/=", U"math_assign_divide", OperatorType::Binary},
+        {U"%=", U"math_assign_modulo", OperatorType::Binary},
+        {U"=", U"math_assign", OperatorType::Binary}
 
 };
 
 O::Analyser::Operator O::Analyser::mathOperatorMiddlePriority[] = {
-        {L"|", L"math_or", OperatorType::Binary},
-        {L"&", L"math_and", OperatorType::Binary},
-        {L"?", L"math_equ", OperatorType::Binary},
-        {L"<", L"math_less", OperatorType::Binary},
-        {L">", L"math_greater", OperatorType::Binary}
+        {U"|", U"math_or", OperatorType::Binary},
+        {U"&", U"math_and", OperatorType::Binary},
+        {U"?", U"math_equ", OperatorType::Binary},
+        {U"<", U"math_less", OperatorType::Binary},
+        {U">", U"math_greater", OperatorType::Binary}
 };
 
 O::Analyser::Operator O::Analyser::mathOperatorLowPriority[] {
-        {L"-", L"math_subtract", OperatorType::Binary},
-        {L"+", L"math_add",OperatorType::Binary},
-        {L"*", L"math_multiply", OperatorType::Binary},
-        {L"/", L"math_divide", OperatorType::Binary},
-        {L"%", L"math_modulo", OperatorType::Binary},
-        {L"()", L"scope_default", OperatorType::Scope},
-        {L"[]", L"scope_square", OperatorType::Scope},
+        {U"-", U"math_subtract", OperatorType::Binary},
+        {U"+", U"math_add",OperatorType::Binary},
+        {U"*", U"math_multiply", OperatorType::Binary},
+        {U"/", U"math_divide", OperatorType::Binary},
+        {U"%", U"math_modulo", OperatorType::Binary},
+        {U"()", U"scope_default", OperatorType::Scope},
+        {U"[]", U"scope_square", OperatorType::Scope},
 };
 
 O::Analyser::Operator O::Analyser::mathOperatorUnary[] = {
-        {L"@", L"math_get_pointer", OperatorType::Unary},
-        {L"~", L"math_get_content", OperatorType::Unary},
-        {L"!", L"math_not", OperatorType::Unary},
-        {L"-", L"math_unary_minus", OperatorType::Unary},
+        {U"@", U"math_get_pointer", OperatorType::Unary},
+        {U"~", U"math_get_content", OperatorType::Unary},
+        {U"!", U"math_not", OperatorType::Unary},
+        {U"-", U"math_unary_minus", OperatorType::Unary},
 };
 
-std::wstring O::Analyser::defaultServiceNames[] = {
-    L"int",
-    L"bool",
-    L"float",
-    L"char",
-    L"void",
-    L"false",
-    L"true",
-    L"while",
-    L"malloc",
-    L"free",
-    L"return"
+std::u32string O::Analyser::defaultServiceNames[] = {
+    U"int",
+    U"bool",
+    U"float",
+    U"char",
+    U"void",
+    U"false",
+    U"true",
+    U"while",
+    U"malloc",
+    U"free",
+    U"return"
 };
 
-int O::Analyser::charNotInBrackets(std::wstring str, wchar_t c)
+int O::Analyser::charNotInBrackets(std::u32string str, wchar_t c)
 {
     int level = -1;
 
@@ -82,7 +84,7 @@ int O::Analyser::charNotInBrackets(std::wstring str, wchar_t c)
     return -1;
 }
 
-int O::Analyser::charNotInQuets(std::wstring str, wchar_t c)
+int O::Analyser::charNotInQuets(std::u32string str, wchar_t c)
 {
     bool inQuets = false;
 
@@ -99,7 +101,7 @@ int O::Analyser::charNotInQuets(std::wstring str, wchar_t c)
     return -1;
 }
 
-int O::Analyser::charNotInFunction(std::wstring str, wchar_t c)
+int O::Analyser::charNotInFunction(std::u32string str, wchar_t c)
 {
     int level = -1;
     int levelInCube = -1;
@@ -135,17 +137,17 @@ int O::Analyser::charNotInFunction(std::wstring str, wchar_t c)
     return -1;
 }
 
-std::pair<bool, std::pair<std::wstring, std::wstring>> O::Analyser::doubleBracketOperator(std::wstring str, wchar_t left, wchar_t right)
+std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBracketOperator(std::u32string str, wchar_t left, wchar_t right)
 {
     int level = -1;
     if ((*(str.end() - 1)) != right || str[0] == left) {
-        return { false, {L"", L""} };
+        return { false, {U"", U""} };
     }
 
-    std::wstring operatorContent = L"";
-    std::wstring leftPart;
+    std::u32string operatorContent = U"";
+    std::u32string leftPart;
 
-    std::wstring operatorContentRight = L"";
+    std::u32string operatorContentRight = U"";
 
     for (int i = str.size() - 1; i >= 0; i--) {
         if (str[i] == right) {
@@ -168,9 +170,9 @@ std::pair<bool, std::pair<std::wstring, std::wstring>> O::Analyser::doubleBracke
     return { true, {leftPart, operatorContentRight.substr(0, operatorContentRight.size() - 1)} };
 }
 
-int O::Analyser::stringNotInFunction(std::wstring str, std::wstring toFind)
+int O::Analyser::stringNotInFunction(std::u32string str, std::u32string toFind)
 {
-    std::wstring found = str;
+    std::u32string found = str;
     while (true)
     {
         int id = charNotInFunction(found, toFind[0]);
@@ -189,7 +191,7 @@ int O::Analyser::stringNotInFunction(std::wstring str, std::wstring toFind)
     }
 }
 
-bool O::Analyser::isDefaultServiceName(std::wstring str)
+bool O::Analyser::isDefaultServiceName(std::u32string str)
 {
     for (auto elem : defaultServiceNames){
         if (elem == str) {
@@ -200,9 +202,9 @@ bool O::Analyser::isDefaultServiceName(std::wstring str)
     return false;
 }
 
-bool O::Analyser::isNumber(std::wstring str)
+bool O::Analyser::isNumber(std::u32string str)
 {
-    if(str == L""){
+    if(str == U""){
         return false;
     }
 
@@ -223,12 +225,12 @@ bool O::Analyser::isNumber(std::wstring str)
     return true;
 }
 
-bool O::Analyser::isString(std::wstring str)
+bool O::Analyser::isString(std::u32string str)
 {
     return str[0] == '\"' && ((* (str.end() - 1)) == '\"');
 }
 
-std::wstring O::Analyser::removeBrackes(std::wstring str)
+std::u32string O::Analyser::removeBrackes(std::u32string str)
 {
     if (str.size() < 2) {
         return str;
@@ -257,14 +259,14 @@ std::wstring O::Analyser::removeBrackes(std::wstring str)
     return str;
 }
 
-std::pair<std::wstring, std::wstring> O::Analyser::sliceString(std::wstring str, int slicePoint)
+std::pair<std::u32string, std::u32string> O::Analyser::sliceString(std::u32string str, int slicePoint)
 {
     return {str.substr(0, slicePoint), str.substr(slicePoint + 1, str.size() - slicePoint)};
 }
 
-std::wstring O::Analyser::removeSpaceBars(std::wstring str)
+std::u32string O::Analyser::removeSpaceBars(std::u32string str)
 {
-    std::wstring res = L"";
+    std::u32string res = U"";
 
     bool inQuets = false;
 
@@ -294,7 +296,7 @@ std::wstring O::Analyser::removeSpaceBars(std::wstring str)
     return res;
 }
 
-bool O::operator&(std::wstring str1, std::wstring str2)
+bool O::operator&(std::u32string str1, std::u32string str2)
 {
     if (str1.size() < str2.size()) {
         return false;
@@ -309,7 +311,7 @@ bool O::operator&(std::wstring str1, std::wstring str2)
     return true;
 }
 
-O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str, int line_id)
+O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int line_id)
 {
     Token t;
 
@@ -370,10 +372,10 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::wstring str, int li
     return t;
 }
 
-O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int line_id)
+O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int line_id)
 {
-    int idOfVar = stringNotInFunction(str, L"var");
-    int idOfFunc = stringNotInFunction(str, L"func");
+    int idOfVar = stringNotInFunction(str, U"var");
+    int idOfFunc = stringNotInFunction(str, U"func");
 
     Token res;
 
@@ -384,8 +386,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
         res.line_id = line_id;
         return res;
     }
-    if (str & L"extern:"){
-        res.token = L"extern";
+    if (str & U"extern:"){
+        res.token = U"extern";
         res.type = Type::ServiceName;
         int idOfSpace = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSpace);
@@ -394,8 +396,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
         return res;
     }
 
-    if (str & L"struct:"){
-        res.token = L"structure";
+    if (str & U"struct:"){
+        res.token = U"structure";
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
@@ -404,8 +406,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
         return res;
     }
 
-    if(str & L"template:"){
-        res.token = L"template";
+    if(str & U"template:"){
+        res.token = U"template";
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
@@ -421,7 +423,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
             Token r;
             r.type = Type::ServiceName;
             r.twoSided = true;
-            r.token = L"var";
+            r.token = U"var";
             r.childToken = { StringToTree(splited.second, line_id)};
             r.line_id = line_id;
             return r;
@@ -431,8 +433,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
         int idOfDoubleDot = charNotInFunction(str, ':');
         Token Func;
         Func.type = Type::ServiceName;
-        Func.token = L"func";
-        std::wstring leftFunctionPart = str;
+        Func.token = U"func";
+        std::u32string leftFunctionPart = str;
         if (idOfDoubleDot != -1) {
             auto sliced = sliceString(str, idOfDoubleDot);
             leftFunctionPart = sliced.second;
@@ -441,12 +443,12 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
             leftFunctionPart = sliced.second;
         }
         else {
-            Func.childToken.push_back(StringToTree(L"void", line_id));
+            Func.childToken.push_back(StringToTree(U"void", line_id));
             leftFunctionPart = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' ')).second;
         }
-        if(leftFunctionPart & L"operator"){
+        if(leftFunctionPart & U"operator"){
             Token name;
-            name.token = L"operator";
+            name.token = U"operator";
             name.type = Type::ServiceName;
             int idOfSpace = charNotInFunction(leftFunctionPart, ' ');
             leftFunctionPart = sliceString(leftFunctionPart, idOfSpace).second;
@@ -467,10 +469,10 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
         return Func;
     }
     else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
-        res.token = L"[]";
+        res.token = U"[]";
         res.type = Type::MathematicalOperator;
         res.forward = true;
-        std::wstring leftPart = str.substr(1, str.size() - 2);
+        std::u32string leftPart = str.substr(1, str.size() - 2);
         res.childToken = {StringToTree(leftPart, line_id)};
     }
     else {
@@ -498,7 +500,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
                 res.forward = true;
                 res.type = Type::Name;
                 if (sliced.second.size() > 1) {
-                    std::wstring last = sliced.second.substr(0, sliced.second.size() - 1);
+                    std::u32string last = sliced.second.substr(0, sliced.second.size() - 1);
                     while (true) {
                         int idOfNext = charNotInFunction(last, ',');
                         if (idOfNext == -1) {
@@ -516,7 +518,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
             else {
                 auto idOfSeparator = charNotInFunction(str, ' ');
                 if(idOfSeparator != -1){
-                    res.token = L"__init__";
+                    res.token = U"__init__";
                     auto splited = sliceString(str, idOfSeparator);
                     res.childToken = {StringToTree(splited.first, line_id), StringToTree(splited.second, line_id)};
                 }else {
@@ -531,13 +533,13 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::wstring str, int lin
     return res;
 }
 
-O::Analyser::Token O::Analyser::StringToTree(std::wstring str, int line_id) {
-    std::wstring withOutSpaces = removeSpaceBars(str);
+O::Analyser::Token O::Analyser::StringToTree(std::u32string str, int line_id) {
+    std::u32string withOutSpaces = removeSpaceBars(str);
     withOutSpaces = removeBrackes(withOutSpaces);
 
     Token result;
     auto t = getMathematicExpression(withOutSpaces, line_id);
-    if (t.token != L"") {
+    if (t.token != U"") {
         return t;
     }
     return ProccessNameOrCreation(withOutSpaces, line_id);
@@ -545,15 +547,15 @@ O::Analyser::Token O::Analyser::StringToTree(std::wstring str, int line_id) {
     return result;
 }
 
-O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std::wstring name, int prevLine)
+O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, std::u32string name, int prevLine)
 {
     StructurisedFile main;
     main.name = name;
     main.line_id = prevLine;
 
     StructurisedFile newL;
-    std::wstring last;
-    std::wstring newBody;
+    std::u32string last;
+    std::u32string newBody;
 
     int level = -1;
     int levelCurly = -1;
@@ -584,8 +586,8 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
             levelCurly--;
             if (levelCurly == -1) {
                 main.subFile.push_back(StructuriseFile(newBody, last, line));
-                last = L"";
-                newBody = L"";
+                last = U"";
+                newBody = U"";
                 continue;
             }
         }
@@ -604,15 +606,18 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
         }
         else {
             if (str[i] == ';') {
-                if(removeSpaceBars(last) & L"#LINE_ID"){
-                    line  = std::stoi(removeSpaceBars(last).substr(8, last.size() - 8));
-                    last = L"";
+                if(removeSpaceBars(last) & U"#LINE_ID")
+		{
+		    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+		    std::string num = convert.to_bytes(removeSpaceBars(last).substr(8, last.size()-8));
+                    line  = std::stoi(num);
+                    last = U"";
                 }else {
                     newL.name = last;
                     newL.line_id = line;
                     main.subFile.push_back(newL);
                     newL = StructurisedFile();
-                    last = L"";
+                    last = U"";
                 }
             }
             else {
@@ -621,13 +626,13 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
         }
     }
 
-    if (newBody != L"" && removeSpaceBars(last)[0] != '#') {
+    if (newBody != U"" && removeSpaceBars(last)[0] != '#') {
         main.subFile.push_back(StructuriseFile(newBody, last, line));
-        last = L"";
-        newBody = L"";
+        last = U"";
+        newBody = U"";
     }
 
-    if (last != L"" && removeSpaceBars(last)[0] != '#') {
+    if (last != U"" && removeSpaceBars(last)[0] != '#') {
         newL.name = last;
         newL.line_id = line;
         main.subFile.push_back(newL);
@@ -639,22 +644,22 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::wstring str, std
 O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
 {
     TokenisedFile tf;
-    if (sf.name == L"___MAIN___") {
+    if (sf.name == U"___MAIN___") {
         Token t;
-        t.token = L"___MAIN___";
+        t.token = U"___MAIN___";
         t.type = Type::ServiceName;
         tf.name = t;
     }
     else {
         auto stt = StringToTree(sf.name, sf.line_id);
-        if(stt.token != L"") {
+        if(stt.token != U"") {
             tf.name = stt;
         }
     }
 
     for (auto elem : sf.subFile) {
         auto newF = TokeniseFile(elem);
-        if(newF.name.token != L"") {
+        if(newF.name.token != U"") {
             tf.subToken.push_back(newF);
         }
     }
@@ -662,7 +667,7 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
     return tf;
 }
 
-std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring& str, const Operator& anOperator, int line_id) {
+std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32string& str, const Operator& anOperator, int line_id) {
 
     switch (anOperator.operatorType) {
         case OperatorType::Binary: {
@@ -673,7 +678,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
                 auto right = splitOperator.second.substr(anOperator.name.size(),
                                                          splitOperator.second.size() -
                                                          anOperator.name.size() + 1);
-                if (left != L"") {
+                if (left != U"") {
                     return {true, {Type::MathematicalOperator,
                                    anOperator.name,
                                    line_id,
@@ -718,7 +723,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::wstring&
     return {false, {}};
 }
 
-bool O::Analyser::isNumericPostfix(std::wstring str) {
+bool O::Analyser::isNumericPostfix(std::u32string str) {
     for (auto elem : numericPostfix){
         if(elem == str){
             return true;

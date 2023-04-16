@@ -5,7 +5,7 @@
 #include <BaseTypes.h>
 
 namespace O {
-	static bool operator & (std::wstring str1, std::wstring str2);
+	static bool operator & (std::u32string str1, std::u32string str2);
 
 	class Analyser
 	{
@@ -22,7 +22,7 @@ namespace O {
 		struct Token {
 		public:
 			Type type;
-			std::wstring token;
+			std::u32string token;
             int line_id;
 			bool twoSided = false;
 			bool forward = false;
@@ -37,13 +37,13 @@ namespace O {
 
         struct Operator{
         public:
-            std::wstring name;
-            std::wstring postAnalyseName;
+            std::u32string name;
+            std::u32string postAnalyseName;
             OperatorType operatorType;
         };
 
 		struct StructurisedFile {
-			std::wstring name;
+			std::u32string name;
             int line_id;
 			std::vector<StructurisedFile> subFile;
 		};
@@ -59,31 +59,31 @@ namespace O {
         static Operator mathOperatorMiddlePriority[];
         static Operator mathOperatorLowPriority[];
         static Operator mathOperatorUnary[];
-        static std::wstring numericPostfix[];
-		static std::wstring defaultServiceNames[];
+        static std::u32string numericPostfix[];
+		static std::u32string defaultServiceNames[];
 
 	private:
-		static int charNotInBrackets(std::wstring str, wchar_t c);
-		static int charNotInQuets(std::wstring str, wchar_t c);
-		static int charNotInFunction(std::wstring str, wchar_t c);
-		static std::pair<bool, std::pair<std::wstring, std::wstring>> doubleBracketOperator(std::wstring str, wchar_t left, wchar_t right);
-		static int stringNotInFunction(std::wstring str, std::wstring toFind);
-		static bool isDefaultServiceName(std::wstring str);
-		static bool isNumber(std::wstring str);
-		static bool isString(std::wstring str);
-        static bool isNumericPostfix(std::wstring str);
-		static std::wstring removeBrackes(std::wstring str);
-		static std::pair<std::wstring, std::wstring> sliceString(std::wstring str, int slicePoint);
-        static std::pair<bool, Token> getOperator(const std::wstring& str, const Operator& anOperator, int line_id);
-		static std::wstring removeSpaceBars(std::wstring str);
+		static int charNotInBrackets(std::u32string str, wchar_t c);
+		static int charNotInQuets(std::u32string str, wchar_t c);
+		static int charNotInFunction(std::u32string str, wchar_t c);
+		static std::pair<bool, std::pair<std::u32string, std::u32string>> doubleBracketOperator(std::u32string str, wchar_t left, wchar_t right);
+		static int stringNotInFunction(std::u32string str, std::u32string toFind);
+		static bool isDefaultServiceName(std::u32string str);
+		static bool isNumber(std::u32string str);
+		static bool isString(std::u32string str);
+        static bool isNumericPostfix(std::u32string str);
+		static std::u32string removeBrackes(std::u32string str);
+		static std::pair<std::u32string, std::u32string> sliceString(std::u32string str, int slicePoint);
+        static std::pair<bool, Token> getOperator(const std::u32string& str, const Operator& anOperator, int line_id);
+		static std::u32string removeSpaceBars(std::u32string str);
 
-		static Token getMathematicExpression(std::wstring str, int line_id);
+		static Token getMathematicExpression(std::u32string str, int line_id);
 
-		static Token ProccessNameOrCreation(std::wstring str, int line_id);
+		static Token ProccessNameOrCreation(std::u32string str, int line_id);
 
 	public:
-		static Token StringToTree(std::wstring str, int line_id);
-		static StructurisedFile StructuriseFile(std::wstring str, std::wstring name = L"___MAIN___", int line = 1);
+		static Token StringToTree(std::u32string str, int line_id);
+		static StructurisedFile StructuriseFile(std::u32string str, std::u32string name = U"___MAIN___", int line = 1);
 		static TokenisedFile TokeniseFile(StructurisedFile sf);
 	};
 }

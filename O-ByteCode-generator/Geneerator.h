@@ -8,9 +8,9 @@
 #include <vector>
 #include <string>
 
-#define GENERATETWOPARAMETERSDEF(NAME) static std::vector<int> NAME(Registers op1, int op2); static std::vector<int> NAME(Registers op1, Registers op2); static std::vector<int> NAME(Registers op1, std::wstring sector, int offset, Registers anchor); static std::vector<int> NAME(std::wstring sectorDest, int offsetDest, Registers anchorDest, int op2); static std::vector<int> NAME(std::wstring sectorDest, int offsetDest, Registers anchorDest, Registers op2); static std::vector<int> NAME(std::wstring sectorD, int offsetD, Registers anchorD, std::wstring sector, int offset, Registers anchor);
+#define GENERATETWOPARAMETERSDEF(NAME) static std::vector<int> NAME(Registers op1, int op2); static std::vector<int> NAME(Registers op1, Registers op2); static std::vector<int> NAME(Registers op1, std::u32string sector, int offset, Registers anchor); static std::vector<int> NAME(std::u32string sectorDest, int offsetDest, Registers anchorDest, int op2); static std::vector<int> NAME(std::u32string sectorDest, int offsetDest, Registers anchorDest, Registers op2); static std::vector<int> NAME(std::u32string sectorD, int offsetD, Registers anchorD, std::u32string sector, int offset, Registers anchor);
 #define GENERATEZEROPARAMDEF(NAME) static std::vector<int> NAME();
-#define GENERATEONEPARAMDEF(NAME) static std::vector<int> NAME(int value); static std::vector<int> NAME(Registers op); static std::vector<int> NAME(std::wstring sector, int offset, Registers anchor);
+#define GENERATEONEPARAMDEF(NAME) static std::vector<int> NAME(int value); static std::vector<int> NAME(Registers op); static std::vector<int> NAME(std::u32string sector, int offset, Registers anchor);
 
 static class Geneerator {
 public:
@@ -35,7 +35,7 @@ public:
         flag = 16
     };
 
-    static std::vector<int> generateMad(std::wstring sectorName, Registers anchor, int offset);
+    static std::vector<int> generateMad(std::u32string sectorName, Registers anchor, int offset);
     static std::vector<int> generateRegister(Registers reg);
     static std::vector<int> generateValue(int value);
 

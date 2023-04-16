@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <locale>
+#include <codecvt>
 
 enum class DataTypes {
 	ServiceInstruction = 0,
@@ -17,25 +19,25 @@ enum class DataTypes {
 struct AdditionalDataType {
 	int lastId = 7;
 	std::vector<int> additionalNumber;
-	std::vector<std::wstring> additionalName;
+	std::vector<std::u32string> additionalName;
 };
 
-inline DataTypes stringToDataType(std::wstring str, AdditionalDataType adt) {
+inline DataTypes stringToDataType(std::u32string str, AdditionalDataType adt) {
 
-	if (str == L"int") {
+	if (str == U"int") {
 		return DataTypes::Integer;
 	}
-	else if (str == L"bool") {
+	else if (str == U"bool") {
 		return DataTypes::Boolean;
 	}
-	else if (str == L"void") {
+	else if (str == U"void") {
 		return DataTypes::Void;
 	}
-	else if (str == L"float")
+	else if (str == U"float")
 	{
 		return DataTypes::FloatingPoint;
 	}
-	else if (str == L"char") {
+	else if (str == U"char") {
 		return DataTypes::Character;
 	}
 	else {
@@ -60,7 +62,7 @@ inline bool contains(std::vector<T> vector, T value) {
 	return false;
 }
 
-inline bool containsChar(std::wstring str, wchar_t c) {
+inline bool containsChar(std::u32string str, wchar_t c) {
 	for (auto elem : str) {
 		if (elem == c) {
 			return true;
@@ -70,7 +72,7 @@ inline bool containsChar(std::wstring str, wchar_t c) {
 	return false;
 }
 
-inline DataTypes getTypeOfNumber(std::wstring str) {
+inline DataTypes getTypeOfNumber(std::u32string str) {
 	if (containsChar(str, '.')) {
 		return DataTypes::FloatingPoint;
 	}
@@ -78,36 +80,36 @@ inline DataTypes getTypeOfNumber(std::wstring str) {
 	return DataTypes::Integer;
 }
 
-inline std::wstring dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType()) {
+inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType()) {
 	switch (dt)
 	{
 	case DataTypes::ServiceInstruction:
-		return L"___SI___";
+		return U"___SI___";
 	case DataTypes::MathematicalOperator:
-		return L"___MO___";
+		return U"___MO___";
 	case DataTypes::Void:
-		return L"void";
+		return U"void";
 	case DataTypes::Integer:
-		return L"int";
+		return U"int";
 	case DataTypes::FloatingPoint:
-		return L"float";
+		return U"float";
 	case DataTypes::Boolean:
-		return L"bool";
+		return U"bool";
 	case DataTypes::Character:
-		return L"char";
+		return U"char";
 	case DataTypes::Error:
-		return L"ERROR";
+		return U"ERROR";
 	default:
 		for (int i = 0; i < adt.lastId - 7; i++) {
 			if (adt.additionalNumber[i] == (int)dt) {
 				return adt.additionalName[i];
 			}
 		}
-		return L"ERROR";
+		return U"ERROR";
 	}
 }
 
-inline bool adtContains(std::wstring str, AdditionalDataType adt) {
+inline bool adtContains(std::u32string str, AdditionalDataType adt) {
 	for (auto elem : adt.additionalName) {
 		if (elem == str) {
 			return true;
@@ -119,22 +121,22 @@ inline bool adtContains(std::wstring str, AdditionalDataType adt) {
 
 struct Variable {
 	DataTypes type;
-	std::wstring name;
+	std::u32string name;
 };
 
 struct Operator {
-	std::wstring op;
+	std::u32string op;
 	DataTypes left;
 	DataTypes right;
 	DataTypes resultType;
 
 	Operator() {
-		op = L"";
+		op = U"";
 		left = DataTypes::Error;
 		right = DataTypes::Error;
 	}
 
-	Operator(std::wstring op, DataTypes left, DataTypes right, DataTypes resultType) {
+	Operator(std::u32string op, DataTypes left, DataTypes right, DataTypes resultType) {
 		this->op = op;
 		this->left = left;
 		this->right = right;
@@ -143,13 +145,13 @@ struct Operator {
 };
 
 struct Structure{
-    std::wstring name;
+    std::u32string name;
     DataTypes myDt;
     std::vector<Variable> variables;
 };
 
 struct Instruction {
-	std::wstring name = L"UNSIGNED_TOKEN";
+	std::u32string name = U"UNSIGNED_TOKEN";
 	DataTypes type = DataTypes::Error;
 	bool ArithmeticProccess = false;
 	bool IsVariable = false;
@@ -158,7 +160,7 @@ struct Instruction {
 };
 
 struct Function {
-	std::wstring name;
+	std::u32string name;
 	DataTypes returnType;
 	std::vector<Variable> arguments;
 	std::vector<Variable> variables;
@@ -177,17 +179,20 @@ struct Function {
 class CompilationException : std::exception{
 public:
     int line;
-    std::wstring description;
+    std::u32string description;
 
 public:
-    CompilationException(int line, std::wstring description){
+    CompilationException(int line, std::u32string description){
         this->line = line;
         this->description = std::move(description);
     }
 
 public:
-    std::wstring getText(){
-        return L"Critical error on line: " + std::to_wstring(this->line) + L"\n\t--" + description + L"\n";
+    std::u32string getText(){
+		std::wstring lineId = std::to_wstring(line);
+		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+		std::u32string line32 = converter.from_bytes((char*)lineId.c_str());
+        return U"Critical error on line: " + line32 + U"\n\t--" + description + U"\n";
     }
 };
 
@@ -200,7 +205,7 @@ struct File {
     std::vector<Structure> structures;
 };
 
-inline bool isStringEndsWith(std::wstring wStr, std::wstring ending){
+inline bool isStringEndsWith(std::u32string wStr, std::u32string ending){
     if(wStr.size() < ending.size()){
         return false;
     }

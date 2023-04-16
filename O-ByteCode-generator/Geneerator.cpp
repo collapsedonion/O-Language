@@ -10,7 +10,7 @@
 #define ADDVECTORTOVECTOR(target, source) target.insert(target.end(), source.begin(), source.end());
 #define LOADREG(paramOut, paramIn) auto paramOut = generateRegister(paramIn);
 #define LOADVALUE(paramOut, paramIn) auto paramOut = generateValue(paramIn);
-#define MADINIT(name0, name1, name2) std::wstring name0, int name1, Registers name2
+#define MADINIT(name0, name1, name2) std::u32string name0, int name1, Registers name2
 #define LOADMAD(paramOut, sector, anchor, offset) auto paramOut = generateMad(sector, anchor, offset);
 #define REGREG(name) HEADER(name, Registers op1, Registers op2)
 #define REGVAL(name) HEADER(name, Registers op1, int value)
@@ -25,9 +25,9 @@
 
 #define CREATEZEROPARAM(name, index)std::vector<int> Geneerator::name(){return {index,0,0,0,0};}
 
-#define CREATEONEPARAM(name, index) std::vector<int> Geneerator::name(int value){return {index, 0, value,0,0};}std::vector<int> Geneerator::name(Geneerator::Registers value){TORET toRet.push_back(index);LOADREG(r0, value)ADDVECTORTOVECTOR(toRet, r0)toRet.push_back(0);toRet.push_back(0);return toRet;}std::vector<int> Geneerator::name(std::wstring sector, int offset, Registers anchor){TORET toRet.push_back(index);LOADMAD(m0, sector, anchor, offset)ADDVECTORTOVECTOR(toRet, m0)toRet.push_back(0);toRet.push_back(0);return toRet;}
+#define CREATEONEPARAM(name, index) std::vector<int> Geneerator::name(int value){return {index, 0, value,0,0};}std::vector<int> Geneerator::name(Geneerator::Registers value){TORET toRet.push_back(index);LOADREG(r0, value)ADDVECTORTOVECTOR(toRet, r0)toRet.push_back(0);toRet.push_back(0);return toRet;}std::vector<int> Geneerator::name(std::u32string sector, int offset, Registers anchor){TORET toRet.push_back(index);LOADMAD(m0, sector, anchor, offset)ADDVECTORTOVECTOR(toRet, m0)toRet.push_back(0);toRet.push_back(0);return toRet;}
 
-std::vector<int> Geneerator::generateMad(std::wstring sectorName, Geneerator::Registers anchor, int offset) {
+std::vector<int> Geneerator::generateMad(std::u32string sectorName, Geneerator::Registers anchor, int offset) {
     std::vector<int> toRet;
 
     toRet.push_back(2);

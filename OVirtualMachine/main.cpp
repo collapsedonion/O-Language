@@ -266,8 +266,8 @@ int main(int argc, char* args[]) {
         char* sectorName = (char*)malloc((nameSize + 1) * sizeof(char));
 
         for(int j = 0; j < nameSize; j++){
-            wchar_t newC;
-            f.read((char*)&newC, sizeof(wchar_t ) / sizeof(char ));
+            char32_t newC;
+            f.read((char*)&newC, sizeof(char32_t ) / sizeof(char ));
             sectorName[j] = (char)newC;
         }
 
@@ -277,7 +277,7 @@ int main(int argc, char* args[]) {
         std::vector<int> data;
         data.resize(size);
 
-        f.read((char*)data.data(), size * sizeof(wchar_t));
+        f.read((char*)data.data(), size * sizeof(char32_t));
 
         std::vector<long> lData(data.begin(), data.end());
 
