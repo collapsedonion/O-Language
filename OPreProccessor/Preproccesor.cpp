@@ -13,7 +13,7 @@ namespace O {
 
         std::u32string buffer;
 
-        int strId = 0;
+        int strId = 1;
 
         bool bufferLoad = false;
 
@@ -36,6 +36,7 @@ namespace O {
             }
 
             if(i == '\n') {
+                strId++;
                 if(*(result.end() - 1) == ';'){
                     result += U"\n";
                     result += U"#LINE_ID";
@@ -44,7 +45,6 @@ namespace O {
                     result += converter.from_bytes(line_id_str);
                     result += U";";
                 }
-                strId++;
             }
 
             if(!bufferLoad && i != '\t') {
