@@ -180,11 +180,13 @@ class CompilationException : std::exception{
 public:
     int line;
     std::u32string description;
+    std::u32string file_name;
 
 public:
-    CompilationException(int line, std::u32string description){
+    CompilationException(int line, std::u32string file_name, std::u32string description){
         this->line = line;
         this->description = std::move(description);
+	this->file_name = file_name;
     }
 
 public:
@@ -192,7 +194,7 @@ public:
 		std::string lineId = std::to_string(line);
 		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 		std::u32string line32 = converter.from_bytes((char*)lineId.c_str());
-        return U"Critical error on line: " + line32 + U"\n\t--" + description + U"\n";
+        return U"Critical error at file: " + file_name + U":" + line32 + U"\n\t--" + description + U"\n";
     }
 };
 

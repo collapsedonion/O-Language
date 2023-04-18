@@ -16,6 +16,7 @@ namespace O {
     private:
         std::vector<std::u32string> included;
         std::u32string filePath;
+	std::u32string file_name;
 
     private:
         bool isAlredyIncluded(std::u32string name);

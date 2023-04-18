@@ -36,7 +36,7 @@ namespace O {
             }
 
             if(i == '\n') {
-                strId++;
+                
                 if(*(result.end() - 1) == ';'){
                     result += U"\n";
                     result += U"#LINE_ID";
@@ -44,7 +44,10 @@ namespace O {
 		            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
                     result += converter.from_bytes(line_id_str);
                     result += U";";
+		    result += U"\n#FILE_NAME" + this->file_name + U";";
                 }
+		strId++;
+		continue;
             }
 
             if(!bufferLoad && i != '\t') {
@@ -79,7 +82,11 @@ namespace O {
             std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
             std::u32string content = convertor.from_bytes(s);
             f.close();
-            return proccess(content);
+	    std::u32string pred_name = this->file_name;
+	    this->file_name = params[1];
+	    std::u32string new_content = proccess(content);
+	    this->file_name = pred_name;
+            return new_content;
         }
 
         return U"";
@@ -126,7 +133,12 @@ namespace O {
         if(indexOfLast != std::string::npos)
         {
            this->filePath = filePath.substr(0, indexOfLast) + U"/";
+	   this->file_name = filePath.substr(indexOfLast + 1, filePath.size() - (indexOfLast+1));
         }
+	else{
+	   this->filePath = filePath;
+	   this->file_name = filePath;
+	}
 
         this->execPath = execPath;
     }

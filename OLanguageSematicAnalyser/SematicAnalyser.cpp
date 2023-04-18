@@ -130,7 +130,7 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
 
         std::u32string message = U"Unable to find function with name \"" + retInst.name + U"\"";
 
-        throw CompilationException(token.line_id, message);
+        throw CompilationException(token.line_id, token.file_name, message);
     }
 
     retInst.type = f;
@@ -141,7 +141,7 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
 Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
 {
 	if (token.childToken.size() != 1) {
-		throw CompilationException(token.line_id, U"Pointer-get operator require at least one argument");
+		throw CompilationException(token.line_id, token.file_name, U"Pointer-get operator require at least one argument");
 	}
 	else {
         Instruction inst = proccessInstCall(token.childToken[0]);
@@ -203,14 +203,14 @@ DataTypes O::SematicAnalyser::getDataType(Analyser::Token token)
 Instruction O::SematicAnalyser::proccessPointerAccess(Analyser::Token token)
 {
 	if (token.childToken.size() != 1) {
-		throw CompilationException(token.line_id, U"Pointer-data-access operator require one argument");
+		throw CompilationException(token.line_id, token.file_name, U"Pointer-data-access operator require one argument");
 	}
 
 	Instruction inst = proccessInstCall(token.childToken[0]);
 
 	std::u32string dtStrReprasentation = dataTypeToString(inst.type, adt);
 	if (dtStrReprasentation[0] != '~') {
-		throw CompilationException(token.line_id, U"Excepted pointer data-type but got " + dtStrReprasentation);
+		throw CompilationException(token.line_id, token.file_name, U"Excepted pointer data-type but got " + dtStrReprasentation);
 	}
 
 	Instruction retInst;
@@ -249,13 +249,13 @@ Instruction O::SematicAnalyser::proccessString(Analyser::Token token)
 Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::TokenisedFile token)
 {
 	if (token.name.childToken[0].token == COMMA_OPERATOR) {
-		throw CompilationException(token.name.childToken[0].line_id, U"While cycle requires exactly one argument");
+		throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"While cycle requires exactly one argument");
 	}
 
 	Instruction inst = proccessInstCall(token.name.childToken[1]);
 
 	if (inst.type != DataTypes::Boolean) {
-		throw CompilationException(token.name.childToken[1].line_id, U"While cycle works only with Boolean data-type");
+		throw CompilationException(token.name.childToken[1].line_id, token.name.childToken[1].file_name, U"While cycle works only with Boolean data-type");
 	}
 
 	Instruction toRet;
@@ -284,7 +284,7 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token token)
 {
 	if (token.childToken.size() != 2) {
-		throw CompilationException(token.line_id, U"Unexpected data at array-element-access operator");
+		throw CompilationException(token.line_id, token.file_name, U"Unexpected data at array-element-access operator");
 	}
 
     Instruction dataSource = proccessInstCall(token.childToken[0]);
@@ -315,7 +315,7 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
 
 	std::u32string reprasentation = dataTypeToString(dataSource.type, adt);
 	if (reprasentation[0] != '~') {
-		throw CompilationException(token.line_id, U"Array-element-access operator works only with pointer data-type but got " + reprasentation);
+		throw CompilationException(token.line_id, token.file_name, U"Array-element-access operator works only with pointer data-type but got " + reprasentation);
 	}
 
     dataSource.type = DataTypes::Integer;
@@ -341,7 +341,7 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 {
 	if (token.forward) {
 		if (token.childToken.size() == 0) {
-			throw CompilationException(token.line_id, U"Array-creation construction requires at least one argument");
+			throw CompilationException(token.line_id, token.file_name, U"Array-creation construction requires at least one argument");
 		}
 
         std::vector<Analyser::Token> tokens;
@@ -363,7 +363,7 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 			toRet.Parameters.push_back(proccessInstCall(tokens[i]));
 			if (i != 0 && i != 1) {
 				if (toRet.Parameters[i - 1].type != toRet.Parameters[i].type) {
-					throw CompilationException(token.line_id, U"All elements of array must have one data-type");
+					throw CompilationException(token.line_id, token.file_name, U"All elements of array must have one data-type");
 				}
 			}
 		}
@@ -377,7 +377,7 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 		return toRet;
 	}
 	else {
-		throw CompilationException(token.line_id, U"Not an array-creation construction");
+		throw CompilationException(token.line_id, token.file_name, U"Not an array-creation construction");
 	}
 }
 
@@ -386,13 +386,13 @@ Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
     auto arguments = getComma(token.childToken[1]);
 
 	if (returnType != DataTypes::Void && arguments.size() != 1) {
-		throw CompilationException(token.line_id, U"Function with non void return data-type requires one argument");
+		throw CompilationException(token.line_id, token.file_name, U"Function with non void return data-type requires one argument");
 	}
 
     if(arguments.size() != 0) {
         Instruction toRet = proccessInstCall(arguments[0]);
         if (toRet.type != returnType) {
-            throw CompilationException(token.line_id, U"Expected " + dataTypeToString(returnType, adt) + U" but got " +
+            throw CompilationException(token.line_id, token.file_name, U"Expected " + dataTypeToString(returnType, adt) + U" but got " +
                     dataTypeToString(toRet.type, adt));
         }
 
@@ -417,13 +417,13 @@ Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
 Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile token)
 {
 	if (token.name.childToken[0].token == COMMA_OPERATOR) {
-		throw CompilationException(token.name.childToken[0].line_id, U"If construction works only with one argument");
+		throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"If construction works only with one argument");
 	}
 
 	Instruction inst = proccessInstCall(token.name.childToken[1]);
 
 	if (inst.type != DataTypes::Boolean) {
-		throw CompilationException(token.name.childToken[1].line_id, U"Boolean type expected but got " +
+		throw CompilationException(token.name.childToken[1].line_id, token.name.childToken[0].file_name, U"Boolean type expected but got " +
                 dataTypeToString(inst.type, adt));
 	}
 
@@ -453,17 +453,17 @@ Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile to
 Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFile token)
 {
 	if (instructions.size() == 0 || ((*(instructions.end() - 1)).name != IF_NAME && (*(instructions.end() - 1)).name != ELIF_NAME)) {
-		throw CompilationException(token.name.childToken[0].line_id, U"\"if\" or \"else if\" must be used before \"else if\" construction");
+		throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"\"if\" or \"else if\" must be used before \"else if\" construction");
 	}
 
 	if (token.name.childToken[0].token == COMMA_OPERATOR) {
-		throw CompilationException(token.name.childToken[0].line_id, U"\"else if\" construction works only with one argument");
+		throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"\"else if\" construction works only with one argument");
 	}
 
 	Instruction inst = proccessInstCall(token.name.childToken[1]);
 
 	if (inst.type != DataTypes::Boolean) {
-		throw CompilationException(token.name.childToken[1].line_id, U"Expected Boolean data-type but got " +
+		throw CompilationException(token.name.childToken[1].line_id, token.name.childToken[1].file_name, U"Expected Boolean data-type but got " +
                 dataTypeToString(inst.type, adt));
 	}
 
@@ -493,7 +493,7 @@ Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFil
 Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile token)
 {
 	if (instructions.size() == 0 || ((*(instructions.end() - 1)).name != IF_NAME && (*(instructions.end() - 1)).name != ELIF_NAME)) {
-        throw CompilationException(token.name.line_id, U"\"if\" or \"else if\" must be used before \"else\" construction");
+        throw CompilationException(token.name.line_id, token.name.file_name, U"\"if\" or \"else if\" must be used before \"else\" construction");
     }
 
 	Instruction toRet;
@@ -530,7 +530,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
     }
 
     if (token.name.childToken.size() != 2) {
-        throw CompilationException(token.name.childToken[0].line_id, U"Unexpected data at function definition field");
+        throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"Unexpected data at function definition field");
     }
 
     auto type = getDataType(funcFirstDescriptor.childToken[0]);
@@ -544,7 +544,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
     if (type == DataTypes::Error) {
         std::u32string exceptionMessage =
                 U"Unexpected return data-type at function definition \"" + funcFirstDescriptor.token + U"\"";
-        throw CompilationException(funcFirstDescriptor.line_id, exceptionMessage);
+        throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, exceptionMessage);
     }
 
     func.returnType = type;
@@ -570,21 +570,21 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 
             if(newArg.token != UNIT_DEFINITION_TOKEN){
                 std::u32string message = U"Initialisation definition expected";
-                throw CompilationException(newArg.line_id, message);
+                throw CompilationException(newArg.line_id, newArg.file_name, message);
             }
 
             auto funcArgType = getDataType(newArg.childToken[0]);
             if (funcArgType == DataTypes::Error) {
                 std::u32string message =
                         U"Unrecognised data type at function argument \"" + newArg.childToken[0].token + U"\"";
-                throw CompilationException(newArg.line_id, message);
+                throw CompilationException(newArg.line_id, newArg.file_name, message);
             }
             Variable v;
             v.name = newArg.childToken[1].token;
             v.type = funcArgType;
 
             if (contains(func.arguments, v)) {
-                throw CompilationException(newArg.line_id, U"Argument already defined");
+                throw CompilationException(newArg.line_id, newArg.file_name, U"Argument already defined");
             }
             dt.push_back(v.type);
             func.arguments.push_back(v);
@@ -623,7 +623,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
 
             if (func.returnType != DataTypes::Void && subSematicAnalyser.returnCalls == 0) {
                 std::u32string message = U"Require at least one return call at \"" + func.name + U"\" function";
-                throw CompilationException(funcFirstDescriptor.line_id, message);
+                throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, message);
             }
 
             func.variables = subSematicAnalyser.variablesCreatedAtThatField;
@@ -631,12 +631,12 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
         }
         if (containsFunction(func.name, dt) != DataTypes::Error) {
             std::u32string message = U"Function redefinition \"" + func.name + U"\"";
-            throw CompilationException(funcFirstDescriptor.line_id, message);
+            throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, message);
         }
         if (!isExtern) {
             if (isOperator) {
                 if (func.arguments.size() != 2) {
-                    throw CompilationException(funcFirstDescriptor.line_id, U"Operator definition works only with two arguments");
+                    throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, U"Operator definition works only with two arguments");
                 }
                 auto newOp = Operator(func.name, func.arguments[0].type, func.arguments[1].type, func.returnType);
                 operators.push_back(newOp);
@@ -648,7 +648,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
         }
         functionsCreatedAtThatField.push_back(func);
     } else {
-        throw CompilationException(funcFirstDescriptor.line_id, U"Unexpected data at function definition field");
+        throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, U"Unexpected data at function definition field");
     }
     toRet.name = func.name;
     toRet.type = func.returnType;
@@ -665,19 +665,19 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
 	if (token.childToken.size() == 1) {
         if(token.childToken[0].token != UNIT_DEFINITION_TOKEN){
             std::u32string noDefinitionUnit = U"No unit definition at variable definition";
-            throw CompilationException(token.line_id, noDefinitionUnit);
+            throw CompilationException(token.line_id, token.file_name, noDefinitionUnit);
         }
 		toRet.name = token.childToken[0].childToken[1].token;
 		if (containsVariable(toRet.name)) {
 			std::u32string message = (U"Variable with name " + toRet.name + U" already exists");
-			throw CompilationException(token.line_id, message);
+			throw CompilationException(token.line_id, token.file_name, message);
 		}
 		std::u32string invalidDatatype = U"Invalid data type name " + token.childToken[0].childToken[0].token;
 
 		auto getType = getDataType(token.childToken[0].childToken[0]);
 
 		if (getType == DataTypes::Error) {
-			throw CompilationException(token.line_id, invalidDatatype);
+			throw CompilationException(token.line_id, token.file_name, invalidDatatype);
 		}
 
 		toRet.type = getType;
@@ -740,7 +740,7 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
         }
 	}
 	else {
-		throw CompilationException(token.line_id, U"Unexpected data at variable definition");
+		throw CompilationException(token.line_id, token.file_name, U"Unexpected data at variable definition");
 	}
 
     Instruction pointer;
@@ -833,7 +833,7 @@ void O::SematicAnalyser::ProccessTokenisedFile(Analyser::TokenisedFile tf)
 		return;
 	}
 
-	throw CompilationException(-1, U"No main-flow field");
+	throw CompilationException(-1, U"system_info", U"No main-flow field");
 }
 
 std::pair<bool, Structure> O::SematicAnalyser::containsStructureByDataType(DataTypes dt) {
@@ -867,14 +867,14 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     std::vector<Analyser::TokenisedFile> methods;
 
     if(stringToDataType(newStruct.name, adt) != DataTypes::Error){
-        throw CompilationException(token.name.childToken[0].line_id, U"Data-type already defined");
+        throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"Data-type already defined");
     }
 
     for(auto elem : token.subToken){
         if(elem.name.token == UNIT_DEFINITION_TOKEN){
             Variable v;
             if(elem.name.childToken.size() != 2){
-                throw CompilationException(elem.name.line_id, U"Unexpected data at structure element field");
+                throw CompilationException(elem.name.line_id, elem.name.file_name, U"Unexpected data at structure element field");
             }
             v.type = getDataType(elem.name.childToken[0]);
             v.name = elem.name.childToken[1].token;
@@ -918,7 +918,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
 
             proccessFuncInstrucion(tf, tf.name.childToken[0].token == U"extern");
         }else{
-            throw CompilationException(newMethod.name.line_id, U"Expected function definition");
+            throw CompilationException(newMethod.name.line_id, newMethod.name.file_name, U"Expected function definition");
         }
     }
 
@@ -961,7 +961,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                         res.Parameters = {t1, t2};
                         return res;
                     }else{
-                        throw CompilationException(token.line_id, U"Excepted " + dataTypeToString(t1.type, adt) + U" data-type but got " +
+                        throw CompilationException(token.line_id, token.file_name, U"Excepted " + dataTypeToString(t1.type, adt) + U" data-type but got " +
                                 dataTypeToString(t2.type, adt));
                     }
                 }
@@ -1062,7 +1062,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         }
         else if(isStringEndsWith(token.token, U"c") || isStringEndsWith(token.token, U"C")){
             if(token.token.find('.') != -1){
-                throw CompilationException(token.line_id, U"Floating-Point do not allowed with \"C\" numeric postfix");
+                throw CompilationException(token.line_id, token.file_name, U"Floating-Point do not allowed with \"C\" numeric postfix");
             }
 	        std::string num = converter.to_bytes(token.token);
             res.name = (char)(std::stoi(num));
@@ -1070,7 +1070,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         }
         else if(isStringEndsWith(token.token, U"i") || isStringEndsWith(token.token, U"I")){
             if(token.token.find('.') != -1){
-                throw CompilationException(token.line_id, U"Floating-Point do not allowed with \"I\" numeric postfix");
+                throw CompilationException(token.line_id, token.file_name, U"Floating-Point do not allowed with \"I\" numeric postfix");
             }
 	        std::string num = converter.to_bytes(token.token);
             res.name = std::stoi(num);
@@ -1100,7 +1100,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         }
         else {
             std::u32string message = U"Undefined name \"" + token.token + U"\"";
-            throw CompilationException(token.line_id, message);
+            throw CompilationException(token.line_id, token.file_name, message);
         }
 
     }
@@ -1170,7 +1170,7 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
     converted.forward = true;
 
     if(token.childToken[0].childToken[0].token != U"__init__"){
-        throw CompilationException(token.line_id, U"Unexpected data at function-call");
+        throw CompilationException(token.line_id, token.file_name, U"Unexpected data at function-call");
     }
 
     O::Analyser::Token me = token.childToken[0].childToken[0].childToken[0];

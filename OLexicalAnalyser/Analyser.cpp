@@ -61,7 +61,7 @@ std::u32string O::Analyser::defaultServiceNames[] = {
     U"return"
 };
 
-int O::Analyser::charNotInBrackets(std::u32string str, wchar_t c)
+int O::Analyser::charNotInBrackets(std::u32string str, char32_t c)
 {
     int level = -1;
 
@@ -84,7 +84,7 @@ int O::Analyser::charNotInBrackets(std::u32string str, wchar_t c)
     return -1;
 }
 
-int O::Analyser::charNotInQuets(std::u32string str, wchar_t c)
+int O::Analyser::charNotInQuets(std::u32string str, char32_t c)
 {
     bool inQuets = false;
 
@@ -101,7 +101,7 @@ int O::Analyser::charNotInQuets(std::u32string str, wchar_t c)
     return -1;
 }
 
-int O::Analyser::charNotInFunction(std::u32string str, wchar_t c)
+int O::Analyser::charNotInFunction(std::u32string str, char32_t c)
 {
     int level = -1;
     int levelInCube = -1;
@@ -137,7 +137,7 @@ int O::Analyser::charNotInFunction(std::u32string str, wchar_t c)
     return -1;
 }
 
-std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBracketOperator(std::u32string str, wchar_t left, wchar_t right)
+std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBracketOperator(std::u32string str, char32_t left, char32_t right)
 {
     int level = -1;
     if ((*(str.end() - 1)) != right || str[0] == left) {
@@ -311,7 +311,7 @@ bool O::operator&(std::u32string str1, std::u32string str2)
     return true;
 }
 
-O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int line_id)
+O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int line_id, std::u32string file_name)
 {
     Token t;
 
@@ -320,13 +320,13 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int 
     for(const auto& highOperator : mathOperatorMaxPriority){
         if(highOperator.operatorType == OperatorType::Scope){
             for(const auto& unaryOperator : mathOperatorUnary){
-                processedOperator = getOperator(str, unaryOperator, line_id);
+                processedOperator = getOperator(str, unaryOperator, line_id, file_name);
                 if(processedOperator.first){
                     return processedOperator.second;
                 }
             }
         }
-        processedOperator = getOperator(str, highOperator, line_id);
+        processedOperator = getOperator(str, highOperator, line_id, file_name);
         if(processedOperator.first){
             return processedOperator.second;
         }
@@ -335,13 +335,13 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int 
     for(const auto& midOperator : mathOperatorMiddlePriority){
         if(midOperator.operatorType == OperatorType::Scope){
             for(const auto& unaryOperator : mathOperatorUnary){
-                processedOperator = getOperator(str, unaryOperator, line_id);
+                processedOperator = getOperator(str, unaryOperator, line_id, file_name);
                 if(processedOperator.first){
                     return processedOperator.second;
                 }
             }
         }
-        processedOperator = getOperator(str, midOperator, line_id);
+        processedOperator = getOperator(str, midOperator, line_id, file_name);
         if(processedOperator.first){
             return processedOperator.second;
         }
@@ -350,20 +350,20 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int 
     for(const auto& lowOperator : mathOperatorLowPriority){
         if(lowOperator.operatorType == OperatorType::Scope){
             for(const auto& unaryOperator : mathOperatorUnary){
-                processedOperator = getOperator(str, unaryOperator, line_id);
+                processedOperator = getOperator(str, unaryOperator, line_id, file_name);
                 if(processedOperator.first){
                     return processedOperator.second;
                 }
             }
         }
-        processedOperator = getOperator(str, lowOperator, line_id);
+        processedOperator = getOperator(str, lowOperator, line_id, file_name);
         if(processedOperator.first){
             return processedOperator.second;
         }
     }
 
     for(const auto& unaryOperator : mathOperatorUnary){
-        processedOperator = getOperator(str, unaryOperator, line_id);
+        processedOperator = getOperator(str, unaryOperator, line_id, file_name);
         if(processedOperator.first){
             return processedOperator.second;
         }
@@ -372,7 +372,7 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int 
     return t;
 }
 
-O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int line_id)
+O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int line_id, std::u32string file_name)
 {
     int idOfVar = stringNotInFunction(str, U"var");
     int idOfFunc = stringNotInFunction(str, U"func");
@@ -382,8 +382,9 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
     if (*(str.end()-1) == '~') {
         res.token = '~';
         res.type = Type::ServiceName;
-        res.childToken = { StringToTree(str.substr(0, str.size() - 1), line_id)};
+        res.childToken = { StringToTree(str.substr(0, str.size() - 1), line_id, file_name)};
         res.line_id = line_id;
+	res.file_name = file_name;
         return res;
     }
     if (str & U"extern:"){
@@ -391,8 +392,9 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         res.type = Type::ServiceName;
         int idOfSpace = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSpace);
-        res.childToken.push_back(StringToTree(splited.second, line_id));
+        res.childToken.push_back(StringToTree(splited.second, line_id, file_name));
         res.line_id = line_id;
+        res.file_name = file_name;
         return res;
     }
 
@@ -401,8 +403,9 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
-        res.childToken.push_back(StringToTree(splited.second, line_id));
+        res.childToken.push_back(StringToTree(splited.second, line_id, file_name));
         res.line_id = line_id;
+	res.file_name = file_name;
         return res;
     }
 
@@ -411,8 +414,9 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         res.type = Type::ServiceName;
         int idOfSeparator = charNotInFunction(str, ':');
         auto splited = sliceString(str, idOfSeparator);
-        res.childToken.push_back(StringToTree(splited.second, line_id));
+        res.childToken.push_back(StringToTree(splited.second, line_id, file_name));
         res.line_id = line_id;
+	res.file_name = file_name;
         return res;
     }
     
@@ -424,8 +428,9 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
             r.type = Type::ServiceName;
             r.twoSided = true;
             r.token = U"var";
-            r.childToken = { StringToTree(splited.second, line_id)};
+            r.childToken = { StringToTree(splited.second, line_id, file_name)};
             r.line_id = line_id;
+	    r.file_name = file_name;
             return r;
         }
     }
@@ -439,11 +444,11 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
             auto sliced = sliceString(str, idOfDoubleDot);
             leftFunctionPart = sliced.second;
             sliced = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' '));
-            Func.childToken.push_back(StringToTree(sliced.first, line_id));
+            Func.childToken.push_back(StringToTree(sliced.first, line_id, file_name));
             leftFunctionPart = sliced.second;
         }
         else {
-            Func.childToken.push_back(StringToTree(U"void", line_id));
+            Func.childToken.push_back(StringToTree(U"void", line_id, file_name));
             leftFunctionPart = sliceString(leftFunctionPart, charNotInFunction(leftFunctionPart, ' ')).second;
         }
         if(leftFunctionPart & U"operator"){
@@ -466,6 +471,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
 
         //Func.childToken.push_back();
         Func.line_id = line_id;
+	Func.file_name = file_name;
         return Func;
     }
     else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
@@ -473,7 +479,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         res.type = Type::MathematicalOperator;
         res.forward = true;
         std::u32string leftPart = str.substr(1, str.size() - 2);
-        res.childToken = {StringToTree(leftPart, line_id)};
+        res.childToken = {StringToTree(leftPart, line_id, file_name)};
     }
     else {
         if (isDefaultServiceName(str)) {
@@ -504,12 +510,12 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
                     while (true) {
                         int idOfNext = charNotInFunction(last, ',');
                         if (idOfNext == -1) {
-                            res.childToken.push_back(StringToTree(last, line_id));
+                            res.childToken.push_back(StringToTree(last, line_id, file_name));
                             break;
                         }
                         else {
                             auto slice = sliceString(last, idOfNext);
-                            res.childToken.push_back(StringToTree(slice.first, line_id));
+                            res.childToken.push_back(StringToTree(slice.first, line_id, file_name));
                             last = slice.second;
                         }
                     }
@@ -520,7 +526,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
                 if(idOfSeparator != -1){
                     res.token = U"__init__";
                     auto splited = sliceString(str, idOfSeparator);
-                    res.childToken = {StringToTree(splited.first, line_id), StringToTree(splited.second, line_id)};
+                    res.childToken = {StringToTree(splited.first, line_id, file_name), StringToTree(splited.second, line_id, file_name)};
                 }else {
                     res.token = str;
                     res.type = Type::Name;
@@ -530,28 +536,30 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         
     }
     res.line_id = line_id;
+    res.file_name = file_name;
     return res;
 }
 
-O::Analyser::Token O::Analyser::StringToTree(std::u32string str, int line_id) {
+O::Analyser::Token O::Analyser::StringToTree(std::u32string str, int line_id, std::u32string file_name) {
     std::u32string withOutSpaces = removeSpaceBars(str);
     withOutSpaces = removeBrackes(withOutSpaces);
 
     Token result;
-    auto t = getMathematicExpression(withOutSpaces, line_id);
+    auto t = getMathematicExpression(withOutSpaces, line_id, file_name);
     if (t.token != U"") {
         return t;
     }
-    return ProccessNameOrCreation(withOutSpaces, line_id);
+    return ProccessNameOrCreation(withOutSpaces, line_id, file_name);
 
     return result;
 }
 
-O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, std::u32string name, int prevLine)
+O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, std::u32string name, int prevLine, std::u32string file_name)
 {
     StructurisedFile main;
     main.name = name;
     main.line_id = prevLine;
+    main.file_name = file_name;
 
     StructurisedFile newL;
     std::u32string last;
@@ -560,6 +568,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
     int level = -1;
     int levelCurly = -1;
     int line = prevLine;
+    std::u32string current_file_name = file_name;
     bool inQouets = false;
 
     for (int i = 0; i < str.size(); i++) {
@@ -585,7 +594,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
         if (str[i] == '}' && level == -1 && !inQouets) {
             levelCurly--;
             if (levelCurly == -1) {
-                main.subFile.push_back(StructuriseFile(newBody, last, line));
+                main.subFile.push_back(StructuriseFile(newBody, last, line, current_file_name));
                 last = U"";
                 newBody = U"";
                 continue;
@@ -612,9 +621,13 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
 		    std::string num = convert.to_bytes(removeSpaceBars(last).substr(8, last.size()-8));
                     line  = std::stoi(num);
                     last = U"";
-                }else {
+		}else if(removeSpaceBars(last) & U"#FILE_NAME"){
+	            current_file_name = removeSpaceBars(last).substr(10, last.size() - 10);
+		    last = U"";
+		}else {
                     newL.name = last;
                     newL.line_id = line;
+		    newL.file_name = current_file_name;
                     main.subFile.push_back(newL);
                     newL = StructurisedFile();
                     last = U"";
@@ -627,7 +640,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
     }
 
     if (newBody != U"" && removeSpaceBars(last)[0] != '#') {
-        main.subFile.push_back(StructuriseFile(newBody, last, line));
+        main.subFile.push_back(StructuriseFile(newBody, last, line, current_file_name));
         last = U"";
         newBody = U"";
     }
@@ -635,6 +648,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
     if (last != U"" && removeSpaceBars(last)[0] != '#') {
         newL.name = last;
         newL.line_id = line;
+	newL.file_name = current_file_name;
         main.subFile.push_back(newL);
     }
 
@@ -651,7 +665,7 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
         tf.name = t;
     }
     else {
-        auto stt = StringToTree(sf.name, sf.line_id);
+        auto stt = StringToTree(sf.name, sf.line_id, sf.file_name);
         if(stt.token != U"") {
             tf.name = stt;
         }
@@ -667,7 +681,7 @@ O::Analyser::TokenisedFile O::Analyser::TokeniseFile(StructurisedFile sf)
     return tf;
 }
 
-std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32string& str, const Operator& anOperator, int line_id) {
+std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32string& str, const Operator& anOperator, int line_id, std::u32string file_name) {
 
     switch (anOperator.operatorType) {
         case OperatorType::Binary: {
@@ -681,10 +695,11 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32strin
                 if (left != U"") {
                     return {true, {Type::MathematicalOperator,
                                    anOperator.name,
+				   file_name,
                                    line_id,
                                    true,
                                    false,
-                                   {StringToTree(left, line_id), StringToTree(right, line_id)}
+                                   {StringToTree(left, line_id, file_name), StringToTree(right, line_id, file_name)}
                     }};
                 }
             }
@@ -695,10 +710,11 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32strin
                 return {true, {
                         Type::MathematicalOperator,
                         anOperator.name,
+			file_name,
                         line_id,
                         false,
                         true,
-                        {StringToTree(str.substr(anOperator.name.size(), str.size() - anOperator.name.size()), line_id)}
+                        {StringToTree(str.substr(anOperator.name.size(), str.size() - anOperator.name.size()), line_id, file_name)}
                 }};
             }
             break;
@@ -710,10 +726,11 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32strin
                 return {true, {
                         Type::MathematicalOperator,
                         anOperator.name,
+			file_name,
                         line_id,
                         false,
                         true,
-                        {StringToTree(bracketOperator.second.first, line_id), StringToTree(bracketOperator.second.second, line_id)}
+                        {StringToTree(bracketOperator.second.first, line_id, file_name), StringToTree(bracketOperator.second.second, line_id, file_name)}
                 }};
             }
             break;

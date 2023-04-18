@@ -23,6 +23,7 @@ namespace O {
 		public:
 			Type type;
 			std::u32string token;
+			std::u32string file_name;
             int line_id;
 			bool twoSided = false;
 			bool forward = false;
@@ -44,6 +45,7 @@ namespace O {
 
 		struct StructurisedFile {
 			std::u32string name;
+			std::u32string file_name;
             int line_id;
 			std::vector<StructurisedFile> subFile;
 		};
@@ -63,10 +65,10 @@ namespace O {
 		static std::u32string defaultServiceNames[];
 
 	private:
-		static int charNotInBrackets(std::u32string str, wchar_t c);
-		static int charNotInQuets(std::u32string str, wchar_t c);
-		static int charNotInFunction(std::u32string str, wchar_t c);
-		static std::pair<bool, std::pair<std::u32string, std::u32string>> doubleBracketOperator(std::u32string str, wchar_t left, wchar_t right);
+		static int charNotInBrackets(std::u32string str, char32_t c);
+		static int charNotInQuets(std::u32string str, char32_t c);
+		static int charNotInFunction(std::u32string str, char32_t c);
+		static std::pair<bool, std::pair<std::u32string, std::u32string>> doubleBracketOperator(std::u32string str, char32_t left, char32_t right);
 		static int stringNotInFunction(std::u32string str, std::u32string toFind);
 		static bool isDefaultServiceName(std::u32string str);
 		static bool isNumber(std::u32string str);
@@ -74,16 +76,16 @@ namespace O {
         static bool isNumericPostfix(std::u32string str);
 		static std::u32string removeBrackes(std::u32string str);
 		static std::pair<std::u32string, std::u32string> sliceString(std::u32string str, int slicePoint);
-        static std::pair<bool, Token> getOperator(const std::u32string& str, const Operator& anOperator, int line_id);
+        static std::pair<bool, Token> getOperator(const std::u32string& str, const Operator& anOperator, int line_id, std::u32string file_name);
 		static std::u32string removeSpaceBars(std::u32string str);
 
-		static Token getMathematicExpression(std::u32string str, int line_id);
+		static Token getMathematicExpression(std::u32string str, int line_id, std::u32string file_name);
 
-		static Token ProccessNameOrCreation(std::u32string str, int line_id);
+		static Token ProccessNameOrCreation(std::u32string str, int line_id, std::u32string file_name);
 
 	public:
-		static Token StringToTree(std::u32string str, int line_id);
-		static StructurisedFile StructuriseFile(std::u32string str, std::u32string name = U"___MAIN___", int line = 1);
+		static Token StringToTree(std::u32string str, int line_id, std::u32string file_name);
+		static StructurisedFile StructuriseFile(std::u32string str, std::u32string name = U"___MAIN___", int line = 1, std::u32string file_name = U"NONE_FILE");
 		static TokenisedFile TokeniseFile(StructurisedFile sf);
 	};
 }
