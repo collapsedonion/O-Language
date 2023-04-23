@@ -41,6 +41,11 @@ bld/
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
+.DS_Store
+build/
+*.swp
+.idea/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
@@ -1016,3 +1021,5 @@ OLanguageSematicAnalyser/build/CMakeFiles/3.26.3/CMakeCXXCompiler.cmake
 OLanguageSematicAnalyser/build/CMakeFiles/3.26.3/CMakeCCompiler.cmake
 OLanguageSematicAnalyser/build/CMakeCache.txt
 OLanguageSematicAnalyser/build/cmake_install.cmake
+.DS_Store
+.DS_Store

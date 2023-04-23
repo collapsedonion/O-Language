@@ -1,41 +1,73 @@
-#include "CompilerSources.h"
-#include "Analyser.h"
-#include "SematicAnalyser.h"
 #include <iostream>
+#include <BaseTypes.h>
+#include <Analyser.h>
+#include <SematicAnalyser.h>
+#include <string>
 #include <fstream>
 #include <sstream>
+#include <OtoOTranslator.h>
+#include <Preproccesor.h>
+#include <codecvt>
+#include <cdc.h>
 
-int main() {
-	
-	std::string filepath = "";
-	std::string outfilepath = "";
+const std::u32string PreInclude =
+        U"#include std.olf\n";
 
-	std::cout << "Enter in and out filepaths:\n";
+int main(int argC, char* args[]) {
 
-	std::cin >> filepath;
-	std::cin >> outfilepath;
+    std::string filepath;
+    std::string outfilepath;
 
-	std::string filesource;
+    char* sourcePath = cdc_get_executable_directory();
+    std::string execPath(sourcePath);
+    free(sourcePath);
 
-	std::ifstream f(filepath);
-	std::stringstream inBuffer;
-	inBuffer << f.rdbuf();
-	f.close();
-	filesource = inBuffer.str();
-	inBuffer.clear();
+    if (argC == 1) {
+        return -1;
+    }
+    else if (argC == 2) {
+        filepath = args[1];
 
-	auto AnalisedFile = O::Analyser::StructuriseFile(filesource);
-	auto TokenisedFile = O::Analyser::TokeniseFile(AnalisedFile);
-	O::SematicAnalyser sematiser;
-	sematiser.ProccessTokenisedFile(TokenisedFile);
+        outfilepath = "a.ovm";
+    } else if (argC == 3) {
+        filepath = args[1];
+        outfilepath = args[2];
+    }
 
-	auto translator = getTranslator(L"OtoPythonTranslator.dll");
+    std::u32string realFilePath(filepath.begin(), filepath.end());
+    std::u32string realOutFilePath(outfilepath.begin(), outfilepath.end());
+    std::u32string realExecPath(execPath.begin(), execPath.end());
 
-	std::string outFile = translator(sematiser.getFileRepresantation());
+    std::u32string filesource;
 
-	std::ofstream of(outfilepath);
-	of << outFile;
-	of.close();
+    std::ifstream f(realFilePath);    
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConvertor;
+    std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+    filesource = utfConvertor.from_bytes(s);
+    f.close();
+    
+    filesource = PreInclude + filesource;
 
-	return 0;
+    O::Preproccesor pp(realFilePath, realExecPath);
+
+    filesource = pp.proccess(filesource);
+
+    auto AnalisedFile = O::Analyser::StructuriseFile(filesource);
+    auto TokenisedFile = O::Analyser::TokeniseFile(AnalisedFile);
+    O::SematicAnalyser sematiser;
+
+    try {
+        sematiser.ProccessTokenisedFile(TokenisedFile);
+    }catch (CompilationException& exception){
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+        std::string res = converter.to_bytes(exception.getText());
+        std::cout << res;
+        return -1;
+    }
+
+    O::OtoOTranslator translator;
+    translator.Build(sematiser.getFileRepresantation());
+    translator.WriteResulToFile(realOutFilePath);
+
+    return 0;
 }

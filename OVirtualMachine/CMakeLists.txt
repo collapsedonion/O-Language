@@ -4,8 +4,13 @@ project(OVirtualMachine)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
+set(PROJECT_BINARY_DIR ${PROJECT_SOURCE_DIR}/build)
+add_subdirectory(${PROJECT_SOURCE_DIR}/../CDC ${PROJECT_BINARY_DIR}/cdc)
 
-add_executable(OVirtualMachine main.cpp Memory.cpp Memory.h LogicUnit.cpp LogicUnit.h Scenary.cpp Scenary.h)
+add_executable(OVirtualMachine ${PROJECT_SOURCE_DIR}/main.cpp ${PROJECT_SOURCE_DIR}/Memory.cpp ${PROJECT_SOURCE_DIR}/Memory.h ${PROJECT_SOURCE_DIR}/LogicUnit.cpp ${PROJECT_SOURCE_DIR}/LogicUnit.h ${PROJECT_SOURCE_DIR}/Scenary.cpp ${PROJECT_SOURCE_DIR}/Scenary.h)
+
+target_link_libraries(OVirtualMachine LINK_PRIVATE CDC)
+target_include_directories(OVirtualMachine PRIVATE ${PROJECT_SOURCE_DIR}/../CDC/)
 
 add_custom_command(TARGET OVirtualMachine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

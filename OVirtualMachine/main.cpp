@@ -6,9 +6,7 @@
 #include <string>
 #include <OVM_SDK.h>
 #include <math.h>
-#ifdef __APPLE__
-	#include <mach-o/dyld.h>
-#endif
+#include <cdc.h>
 #include <time.h>
 
 void GetHighFloat(MEM_POINTER mem){
@@ -206,9 +204,11 @@ void LoadDL(std::string path, O::LogicUnit* lu){
         while (!f.eof()){
             std::string newF;
             f >> newF;
-            newF = orgPath + "/" + newF;
-            lu->LoadNewInterrupts(newF);
-        }
+	    if(newF!=""){
+            	newF = orgPath + "/" + newF;
+            	lu->LoadNewInterrupts(newF);
+	    }
+	}
     }
 }
 
@@ -219,21 +219,10 @@ int main(int argc, char* args[]) {
     }
 
     uint32_t execPathBufSize;
-    char* execPathBuf = (char*)malloc(execPathBufSize);
-
-#ifdef __APPLE__
-    while(_NSGetExecutablePath(execPathBuf, &execPathBufSize) == -1){
-        free(execPathBuf);
-        execPathBufSize += 1024;
-        execPathBuf = (char*)malloc(execPathBufSize);
-    }
-#endif
-
+    char* execPathBuf = cdc_get_executable_directory();
     std::string execPath(execPathBuf);
     free(execPathBuf);
-
-    execPath = execPath.substr(0, execPath.rfind("/"));
-
+ 
     std::string loadFile = args[1];
 
     std::ifstream f(loadFile);

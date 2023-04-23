@@ -4,10 +4,8 @@
 
 #include "LogicUnit.h"
 
-#ifdef __APPLE__
-#include <dlfcn.h>
-#endif
-
+#include <iostream>
+#include <cdc.h>
 #define GETREG(varname) *_mem->GetRegisterAccess(varname)
 #define GETMAD(varname) *_mem->GetAccessByMemoryDescriptor(varname)
 
@@ -326,18 +324,13 @@ namespace O {
 
     void LogicUnit::LoadNewInterrupts(std::string path) {
         OVM_MODULE_MAIN main;
-#ifdef __APPLE__
-        void* hDl = dlopen(path.c_str(), RTLD_NOW);
 
-        if(hDl == nullptr){
-            throw std::exception();
-        }
-
-	main = (OVM_MODULE_MAIN)dlsym(hDl, "_Omain");
-
-#endif
+        cdc_dynamic_lib_handle hDl = cdc_open_dynamic_lib((char*)path.c_str());
+	std::string main_name = "_Omain";	
+	main = (OVM_MODULE_MAIN)cdc_get_dynamic_lib_member(hDl, (char*)main_name.c_str());
 
         if(main == nullptr){
+	    std::cout << path << "\n";
             throw std::exception();
         }
 
