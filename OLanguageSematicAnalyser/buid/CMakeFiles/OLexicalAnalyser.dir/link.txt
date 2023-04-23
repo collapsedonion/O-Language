@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libOLexicalAnalyser.a CMakeFiles/OLexicalAnalyser.dir/pch.cpp.o CMakeFiles/OLexicalAnalyser.dir/Analyser.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libOLexicalAnalyser.a
