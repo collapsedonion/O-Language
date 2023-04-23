@@ -1,3 +1,0 @@
-/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/cmake-build-debug/CMakeFiles/OtoPythonTranslator.dir
-/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/romantimofeev/Documents/CodingProjects/O-Compiler-Source-Files-CMAKE/OtoPythonTranslator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
