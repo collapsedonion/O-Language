@@ -43,6 +43,7 @@ Generated\ Files/
 
 .DS_Store
 build/
+buid/
 *.swp
 .idea/
 
