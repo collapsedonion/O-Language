@@ -39,12 +39,14 @@ namespace O {
 
         Instructions = &mainFlow;
 
+
+        LoadVariables(f.variables);
+
         LoadFunctions(f.functions);
 
         bodyStart = this->Instructions->size();
 
         Instructions->insert(Instructions->end(), mov.begin(), mov.end());
-        LoadVariables(f.variables);
 
         for(auto inst : f.instructions){
             ProccessInstruction(inst);
@@ -55,19 +57,35 @@ namespace O {
         int offset = addOffset;
 
         for(auto elem : variables){
-            offset+= GetDataSize(elem.type);
-            VariableStored vs;
-            vs.sector = U"";
-            vs.fromEbpOffset = (offset * -1);
-            if(add){
-                vs.fromEbpOffset += 1;
-            }
-            vs.name = elem.name;
-            if(!add) {
-                this->variables.push_back(vs);
-            }else{
-                this->additionalVariables.push_back(vs);
-            }
+	if(elem.isGlobal){
+		VariableStored vs;
+		vs.name = elem.name;
+		vs.sector = elem.name;
+		vs.fromEbpOffset = 0;
+		vs.useEbp = false;
+	        if(!add) {
+                	this->variables.push_back(vs);
+            	}else{
+                	this->additionalVariables.push_back(vs);
+            	}
+		addSectors.insert({elem.name, {0}});
+	}
+	else{
+            	offset+= GetDataSize(elem.type);
+            	VariableStored vs;
+           	 vs.sector = U"";
+		 vs.useEbp = true;
+           	 vs.fromEbpOffset = (offset * -1);
+           	 if(add){
+                	vs.fromEbpOffset += 1;
+           	 }
+           	 vs.name = elem.name;
+           	 if(!add) {
+               			 this->variables.push_back(vs);
+            		}else{
+                		this->additionalVariables.push_back(vs);
+            		}
+	}
         }
 
         if(add){
@@ -411,10 +429,17 @@ namespace O {
                     ADDVTV(Instructions, add)
                 }else {
                     auto v = getVar(inst.Parameters[0].name);
-                    auto moveEbp = G::mov(reg, GR::ebp);
-                    auto subTarget = G::add(reg, v.fromEbpOffset);
-                    ADDVTV(Instructions, moveEbp);
-                    ADDVTV(Instructions, subTarget)
+		   if(v.useEbp){ 
+                   	 auto moveEbp = G::mov(reg, GR::ebp);
+                   	 auto subTarget = G::add(reg, v.fromEbpOffset);
+                   	 ADDVTV(Instructions, moveEbp);
+                   	 ADDVTV(Instructions, subTarget)
+		   }else{
+			auto ga = G::ga(v.sector, 0, GR::NULLREG);
+			auto mv = G::mov(reg, GR::mc3);
+			ADDVTV(Instructions, ga);
+			ADDVTV(Instructions, mv);
+		   }   
                 }
 
             }else if(inst.name == ARRAY_CREATION_NAME){
@@ -455,8 +480,13 @@ namespace O {
             }
         }else if(inst.IsVariable){
             auto op1 = getVar(inst.name);
-            auto mm1 = G::mov(reg,FILLVAR(op1));
-            ADDVTV(Instructions, mm1);
+	    if(op1.useEbp == false){
+	    	auto mm1 = G::mov(reg, op1.sector, 0, GR::NULLREG);	
+		ADDVTV(Instructions, mm1);		
+	    }else{
+                auto mm1 = G::mov(reg,FILLVAR(op1));
+                ADDVTV(Instructions, mm1);
+	    }
         }else if(inst.IsFunction){
             CallFunction(inst);
             auto mm1 = G::mov(reg, GR::eax);

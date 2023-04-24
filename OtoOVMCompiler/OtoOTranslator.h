@@ -18,6 +18,7 @@ namespace O {
             std::u32string name;
             std::u32string sector;
             int fromEbpOffset = 0;
+	    bool useEbp;
         };
 
         struct FunctionStored{

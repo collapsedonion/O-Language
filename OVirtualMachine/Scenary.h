@@ -46,6 +46,7 @@ namespace O {
             mulf = 25,
             divf = 26,
             cmpf = 27,
+	    ga = 28,
         };
 
         struct Operand{

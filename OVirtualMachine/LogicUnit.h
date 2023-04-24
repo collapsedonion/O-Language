@@ -10,7 +10,7 @@
 #include <dlfcn.h>
 
 #define DOUBLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg, long value);void instName(O::Memory::Registers destReg, O::Memory::Registers sourceReg);void instName(O::Memory::MemoryAddressDescriptor dest, long value);void instName(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source);void instName(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source);void instName(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source);
-#define SINGLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg); void instName(O::Memory::MemoryAddressDescriptor mad); void instName(int value);
+#define SINGLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg); void instName(O::Memory::MemoryAddressDescriptor mad); void instName(long value);
 #define ZEROOPINSTRUCTIONDESCRTIPTION(instName) void instName();
 
 namespace O {
@@ -69,6 +69,8 @@ namespace O {
         DOUBLEOPINSTRUCTIONDESCRIPTION(divf);
 
         DOUBLEOPINSTRUCTIONDESCRIPTION(cmpf);
+
+	SINGLEOPINSTRUCTIONDESCRIPTION(ga);
     };
 }
 

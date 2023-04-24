@@ -15,6 +15,18 @@ namespace O {
          this->_mem = memoryUnit;
     }
 
+    void LogicUnit::ga(O::Memory::MemoryAddressDescriptor desc){
+    	GETREG(Memory::Registers::mc3) = _mem->getSectorDescription(desc.sectorName).start;
+    }
+
+    void LogicUnit::ga(O::Memory::Registers desc){
+	throw(std::exception());
+    }
+
+    void LogicUnit::ga(long desc){
+    	throw(std::exception());
+    }
+
     void LogicUnit::mov(O::Memory::Registers destReg, long value) {
         long* destination = _mem->GetRegisterAccess(destReg);
         *destination = value;
@@ -98,7 +110,7 @@ namespace O {
         _mem->pop(O::Memory::Registers::eip);
     }
 
-    void LogicUnit::call(int value) {
+    void LogicUnit::call(long value) {
         throw std::exception();
     }
 
@@ -282,7 +294,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::jmp(int value) {
+    void LogicUnit::jmp(long value) {
         throw std::exception();
     }
 
@@ -294,7 +306,7 @@ namespace O {
         GETREG(O::Memory::Registers::eip) = _mem->GetIdByMAD(mad);
     }
 
-    void LogicUnit::jme(int value) {
+    void LogicUnit::jme(long value) {
         throw std::exception();
     }
 
@@ -309,7 +321,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::interrupt(int value) {
+    void LogicUnit::interrupt(long value) {
         Interrupt inter = registeredInterrupts[value];
         inter.hInt(_mem->getMemPointer());
     }

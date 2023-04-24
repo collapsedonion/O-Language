@@ -120,8 +120,9 @@ inline bool adtContains(std::u32string str, AdditionalDataType adt) {
 }
 
 struct Variable {
-	DataTypes type;
-	std::u32string name;
+	DataTypes type = DataTypes::Error;
+	bool isGlobal = false;
+	std::u32string name = U"";
 };
 
 struct Operator {

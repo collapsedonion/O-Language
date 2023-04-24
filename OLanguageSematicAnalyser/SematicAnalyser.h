@@ -67,7 +67,7 @@ namespace O {
 		Instruction proccessElseIfInstruction(Analyser::TokenisedFile token);
 		Instruction proccessElseInstruction(Analyser::TokenisedFile token);
 		Instruction proccessFuncInstrucion(Analyser::TokenisedFile token, bool isExtern = false);
-		Instruction proccessVarInstruction(Analyser::Token token, bool isExtern = false);
+		Instruction proccessVarInstruction(Analyser::Token token, bool isExtern = false, bool isGlobal = false);
 
 		Instruction ProcessToken(Analyser::TokenisedFile token, bool add = true);
 

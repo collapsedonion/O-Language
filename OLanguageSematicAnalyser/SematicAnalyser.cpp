@@ -7,6 +7,8 @@
 
 #define VAR_CREATION_NAME U"var"
 
+#define GLOBAL_CREATION_NAME U"global"
+
 #define FUNC_CREATION_NAME U"func"
 
 #define RETURN_NAME U"return"
@@ -657,7 +659,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
     return toRet;
 }
 
-Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bool isExtern)
+Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bool isExtern, bool isGlobal)
 {
 	Instruction toRet;
 	toRet.IsVariable = true;
@@ -685,6 +687,7 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
 		Variable v;
 		v.name = toRet.name;
 		v.type = toRet.type;
+		v.isGlobal = isGlobal;
 		variables.push_back(v);
         if(!isExtern) {
             variablesCreatedAtThatField.push_back(v);
@@ -763,6 +766,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
 
     if(token.name.token == VAR_CREATION_NAME){
         inst = proccessVarInstruction(token.name);
+    }else if(token.name.token == GLOBAL_CREATION_NAME){
+   	inst = proccessVarInstruction(token.name, false, true);	
     }
     else if(token.name.token == STRUCTURE_DEFINITION_TOKEN){
         proccessStructureCreation(token);

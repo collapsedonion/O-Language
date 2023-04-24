@@ -97,6 +97,7 @@ namespace O{
             INSTSETUPTWOPARAM(mulf)
             INSTSETUPTWOPARAM(divf)
             INSTSETUPTWOPARAM(cmpf)
+	    INSTSETUPONEPARAM(ga, lu);
         }
     }
 }

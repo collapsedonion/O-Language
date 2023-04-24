@@ -375,6 +375,7 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int 
 O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int line_id, std::u32string file_name)
 {
     int idOfVar = stringNotInFunction(str, U"var");
+    int idOfGlobal = stringNotInFunction(str, U"global");
     int idOfFunc = stringNotInFunction(str, U"func");
 
     Token res;
@@ -433,6 +434,19 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
 	    r.file_name = file_name;
             return r;
         }
+    }else if(idOfGlobal == 0){
+    	 int idOfDoubleDot = charNotInFunction(str, ':');
+         if (idOfDoubleDot != -1) {
+            auto splited = sliceString(str, idOfDoubleDot);
+            Token r;
+            r.type = Type::ServiceName;
+            r.twoSided = true;
+            r.token = U"global";
+            r.childToken = { StringToTree(splited.second, line_id, file_name)};
+            r.line_id = line_id;
+	    r.file_name = file_name;
+            return r;
+	 }
     }
     else if (idOfFunc == 0) {
         int idOfDoubleDot = charNotInFunction(str, ':');
