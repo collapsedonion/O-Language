@@ -15,7 +15,7 @@ struct:RPChar{
 }
 
 func:RPChar operator "+" (RPChar rpC, int a){
-    return(RPChar(int(rpC) + a));
+    return(RPChar(int(rpC) + (a * 1)));
 }
 
 struct:RPInt{
@@ -33,7 +33,7 @@ struct:RPInt{
 }
 
 func:RPInt operator "+" (RPInt rpI, int a){
-    return(RPInt(int(rpI) + a));
+    return(RPInt(int(rpI) + (a * 4)));
 }
 
 struct:RPFloat{
@@ -51,5 +51,23 @@ struct:RPFloat{
 }
 
 func:RPFloat operator "+" (RPFloat rpF, int a){
-    return(RPFloat(int(rpF) + a));
+    return(RPFloat(int(rpF) + (a * 4)));
+}
+
+struct:RPLong{
+    func set(int data){
+        setRPointerData(RPointer(me), 8, int(data));
+    }
+
+    func:int get(){
+        return(int(getRPointerContent(RPointer(me), 8)));
+    }
+
+    func:RPLong initRPFloat(float~ pI){
+        return(RPLong(getRPointer(void~(pI))));
+    }
+}
+
+func:RPLong operator "+" (RPLong rpF, int a){
+    return(RPLong(int(rpF) + (a * 8)));
 }

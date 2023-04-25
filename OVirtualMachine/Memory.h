@@ -44,8 +44,8 @@ namespace O {
         };
 
     private:
-        std::vector<long> _mem;
-        std::map<int, std::vector<long>> _heap;
+        std::vector<long long> _mem;
+        std::map<int, std::vector<long long>> _heap;
         std::stack<int> heapFree;
         SectorDescription registerSectionDescriptor;
         std::map<std::string, SectorDescription> _sectors;
@@ -55,10 +55,10 @@ namespace O {
         Memory(int stackSize);
         SectorDescription getSectorDescription(std::string name);
         int getFreeHeap();
-        int LoadProgram(std::string sectorName, std::vector<long> content);
-        long* GetRegisterAccess(Registers reg);
-        long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
-        long GetIdByMAD(MemoryAddressDescriptor mad);
+        int LoadProgram(std::string sectorName, std::vector<long long> content);
+        long long* GetRegisterAccess(Registers reg);
+        long long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
+        long long GetIdByMAD(MemoryAddressDescriptor mad);
         void push(Registers reg);
         void push(MemoryAddressDescriptor mad);
         void push(int value);
@@ -68,13 +68,13 @@ namespace O {
         void malloc(Registers reg);
         void malloc(MemoryAddressDescriptor mad);
         void malloc(int value);
-        void free(long value);
+        void free(long long value);
         void free(Registers reg);
         void free(MemoryAddressDescriptor mad);
         void pushs();
         void pops();
         MEM_POINTER getMemPointer();
-        long* getMem();
+        long long* getMem();
     };
 
 } // O

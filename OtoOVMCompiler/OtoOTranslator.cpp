@@ -40,7 +40,7 @@ namespace O {
         Instructions = &mainFlow;
 
 
-        LoadVariables(f.variables);
+        LoadVariables(f.variables, true);
 
         LoadFunctions(f.functions);
 
@@ -48,44 +48,50 @@ namespace O {
 
         Instructions->insert(Instructions->end(), mov.begin(), mov.end());
 
+        LoadVariables(f.variables, false);
+
         for(auto inst : f.instructions){
             ProccessInstruction(inst);
         }
     }
 
-    void OtoOTranslator::LoadVariables(std::vector<Variable> variables, bool add) {
+    void OtoOTranslator::LoadVariables(std::vector<Variable> variables, bool globals, bool add) {
         int offset = addOffset;
 
         for(auto elem : variables){
-	if(elem.isGlobal){
-		VariableStored vs;
-		vs.name = elem.name;
-		vs.sector = elem.name;
-		vs.fromEbpOffset = 0;
-		vs.useEbp = false;
-	        if(!add) {
-                	this->variables.push_back(vs);
-            	}else{
-                	this->additionalVariables.push_back(vs);
-            	}
-		addSectors.insert({elem.name, {0}});
-	}
-	else{
-            	offset+= GetDataSize(elem.type);
-            	VariableStored vs;
-           	 vs.sector = U"";
-		 vs.useEbp = true;
-           	 vs.fromEbpOffset = (offset * -1);
-           	 if(add){
-                	vs.fromEbpOffset += 1;
-           	 }
-           	 vs.name = elem.name;
-           	 if(!add) {
-               			 this->variables.push_back(vs);
-            		}else{
-                		this->additionalVariables.push_back(vs);
-            		}
-	}
+            if(elem.isGlobal && globals){
+                VariableStored vs;
+                vs.name = elem.name;
+                vs.sector = elem.name;
+                vs.fromEbpOffset = 0;
+                vs.useEbp = false;
+                if(!add) {
+                    this->variables.push_back(vs);
+                }else{
+                    this->additionalVariables.push_back(vs);
+                }
+                addSectors.insert({elem.name, {0}});
+            }
+            else if(!elem.isGlobal && !globals){
+                offset+= GetDataSize(elem.type);
+                VariableStored vs;
+                vs.sector = U"";
+                vs.useEbp = true;
+                vs.fromEbpOffset = (offset * -1);
+                if(add){
+                    vs.fromEbpOffset += 1;
+                }
+                vs.name = elem.name;
+                if(!add) {
+                    this->variables.push_back(vs);
+                }else{
+                    this->additionalVariables.push_back(vs);
+                }
+            }
+        }
+
+        if(globals){
+            return;
         }
 
         if(add){
@@ -216,9 +222,9 @@ namespace O {
             newFT.structs = std::vector<Structure>(this->structs);
             newFT.storedFunctions = std::vector<FunctionStored>(this->storedFunctions);
             newFT.adtTable = this->adtTable;
-            newFT.LoadVariables(fun.arguments, true);
+            newFT.LoadVariables(fun.arguments, false, true);
             newFT.addOffset += 1;
-            newFT.LoadVariables(fun.variables, true);
+            newFT.LoadVariables(fun.variables, false, true);
             newFT.Instructions = &newFT.mainFlow;
 
             int countOfLocalVariable = newFT.addOffset - fun.arguments.size() - 1;
@@ -429,19 +435,18 @@ namespace O {
                     ADDVTV(Instructions, add)
                 }else {
                     auto v = getVar(inst.Parameters[0].name);
-		   if(v.useEbp){ 
-                   	 auto moveEbp = G::mov(reg, GR::ebp);
-                   	 auto subTarget = G::add(reg, v.fromEbpOffset);
-                   	 ADDVTV(Instructions, moveEbp);
-                   	 ADDVTV(Instructions, subTarget)
-		   }else{
-			auto ga = G::ga(v.sector, 0, GR::NULLREG);
-			auto mv = G::mov(reg, GR::mc3);
-			ADDVTV(Instructions, ga);
-			ADDVTV(Instructions, mv);
-		   }   
+		            if(v.useEbp){ 
+                   	    auto moveEbp = G::mov(reg, GR::ebp);
+                   	    auto subTarget = G::add(reg, v.fromEbpOffset);
+                   	    ADDVTV(Instructions, moveEbp);
+                   	    ADDVTV(Instructions, subTarget)
+		            }else{
+			            auto ga = G::ga(v.sector, 0, GR::NULLREG);
+			            auto mv = G::mov(reg, GR::mc3);
+			            ADDVTV(Instructions, ga);
+			            ADDVTV(Instructions, mv);
+		            }   
                 }
-
             }else if(inst.name == ARRAY_CREATION_NAME){
                 auto malloc = G::malloc((int)inst.Parameters[0].name[0]);
                 ADDVTV(Instructions, malloc);
@@ -482,7 +487,7 @@ namespace O {
             auto op1 = getVar(inst.name);
 	    if(op1.useEbp == false){
 	    	auto mm1 = G::mov(reg, op1.sector, 0, GR::NULLREG);	
-		ADDVTV(Instructions, mm1);		
+		    ADDVTV(Instructions, mm1);		
 	    }else{
                 auto mm1 = G::mov(reg,FILLVAR(op1));
                 ADDVTV(Instructions, mm1);

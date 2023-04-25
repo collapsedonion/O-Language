@@ -34,7 +34,7 @@ struct SectorDescription{
     int size;
 };
 
-inline std::pair<bool, std::pair<int, int>> decodeAddress(long address){
+inline std::pair<bool, std::pair<int, int>> decodeAddress(long long address){
     int page = address >> 32;
     if(page != 0){
         return {true, {page, (int)address}};
@@ -44,15 +44,15 @@ inline std::pair<bool, std::pair<int, int>> decodeAddress(long address){
 }
 
 struct MEM_POINTER{
-    std::vector<long>* _mem;
-    std::map<int, std::vector<long>>* _heap;
+    std::vector<long long>* _mem;
+    std::map<int, std::vector<long long>>* _heap;
     std::map<std::string, SectorDescription>* sectors;
-    long esp;
-    long ebp;
-    long* eax;
+    long long esp;
+    long long ebp;
+    long long* eax;
 };
 
-inline long* getObjectReferenceByAddress(MEM_POINTER mem, long address){
+inline long long* getObjectReferenceByAddress(MEM_POINTER mem, long long address){
     auto decodedAddress = decodeAddress(address);
 
     if(!decodedAddress.first){

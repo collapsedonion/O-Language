@@ -20,11 +20,11 @@ namespace O {
         _sectors.insert({"__STACK__",  sd});
         _mem.resize(stackSize + _mem.size());
         stackStart = sd.start;
-        long* esp = GetRegisterAccess(Registers::esp);
+        long long* esp = GetRegisterAccess(Registers::esp);
         *esp = sd.start + sd.size;
     }
 
-    int Memory::LoadProgram(std::string sectorName, std::vector<long> content) {
+    int Memory::LoadProgram(std::string sectorName, std::vector<long long> content) {
         int lastId = _mem.size();
         SectorDescription sd;
         sd.start = lastId;
@@ -37,7 +37,7 @@ namespace O {
         return lastId;
     }
 
-    long *Memory::GetRegisterAccess(Memory::Registers reg) {
+    long long *Memory::GetRegisterAccess(Memory::Registers reg) {
 
         int index = registerSectionDescriptor.start + (int)reg;
 
@@ -45,8 +45,8 @@ namespace O {
     }
 
     void Memory::push(Memory::Registers reg) {
-        long* registerSource = GetRegisterAccess(reg);
-        long* esp = GetRegisterAccess(Registers::esp);
+        long long * registerSource = GetRegisterAccess(reg);
+        long long * esp = GetRegisterAccess(Registers::esp);
         (*esp)--;
         if((*esp) < stackStart){
             throw std::exception();
@@ -55,7 +55,7 @@ namespace O {
     }
 
     void Memory::push(int value) {
-        long* esp = GetRegisterAccess(Registers::esp);
+        long long * esp = GetRegisterAccess(Registers::esp);
         (*esp)--;
         if((*esp) < stackStart){
             throw std::exception();
@@ -64,13 +64,13 @@ namespace O {
     }
 
     void Memory::pop(Memory::Registers reg) {
-        long* esp = GetRegisterAccess(Registers::esp);
-        long* dest = GetRegisterAccess(reg);
+        long long * esp = GetRegisterAccess(Registers::esp);
+        long long * dest = GetRegisterAccess(reg);
         *dest = _mem[*esp];
         (*esp)++;
     }
 
-    long *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
+    long long *Memory::GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad) {
         SectorDescription sd = registerSectionDescriptor;
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
@@ -80,12 +80,12 @@ namespace O {
             }
         }
 
-        long anchor = 0;
+        long long anchor = 0;
         if((int)mad.anchor != -1){
             anchor = *GetRegisterAccess(mad.anchor);
         }
 
-        long index = sd.start + anchor + mad.offset;
+        long long index = sd.start + anchor + mad.offset;
 
         int pageIndex = index >> 32;
 
@@ -108,11 +108,11 @@ namespace O {
         throw std::exception();
     }
 
-    long *Memory::getMem() {
+    long long *Memory::getMem() {
         return _mem.data();
     }
 
-    long Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
+    long long Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
         SectorDescription sd;
         if(mad.sectorName == ""){
             sd = registerSectionDescriptor;
@@ -121,7 +121,7 @@ namespace O {
                 sd = _sectors[mad.sectorName];
             }
         }
-        long anchor = 0;
+        long long anchor = 0;
         if((int)mad.anchor != -1){
             anchor = *GetRegisterAccess(mad.anchor);
         }
@@ -158,7 +158,7 @@ namespace O {
 
     void Memory::malloc(int value) {
         auto start = getFreeHeap();
-        _heap.insert({start, std::vector<long>()});
+        _heap.insert({start, std::vector<long long>()});
 
         _heap[start].resize(value);
 
@@ -167,13 +167,13 @@ namespace O {
         sd.start = start;
         _sectors.insert({std::to_string(start) + "ALLOC", sd});
 
-        long result = start;
+        long long result = start;
         result <<= 32;
 
         *GetRegisterAccess(Registers::eax) = result;
     }
 
-    void Memory::free(long value) {
+    void Memory::free(long long value) {
         auto name = std::to_string(value >> 32) + "ALLOC";
 
         int toErase = int(value >> 32);

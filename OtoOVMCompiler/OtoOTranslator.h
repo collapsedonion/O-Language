@@ -51,7 +51,7 @@ namespace O {
         std::map<std::u32string, std::vector<int>> addSectors;
 
     private:
-        void LoadVariables(std::vector<Variable> variables, bool add = false);
+        void LoadVariables(std::vector<Variable> variables, bool globals, bool add = false);
         void LoadFunctions(std::vector<Function> functions);
         void ProccessInstruction(Instruction inst);
         void MovVariableToRegister(std::u32string name, Geneerator::Registers dest);

@@ -10,30 +10,30 @@
 #include <time.h>
 
 void GetHighFloat(MEM_POINTER mem){
-    long* origin = &(*mem._mem)[mem.ebp];
+    long long* origin = &(*mem._mem)[mem.ebp];
     *mem.eax = (int)(*(float*)origin);
 }
 
 void LoadPackage(MEM_POINTER mem){
-    long* destPackage = &((*mem._mem)[(*mem._mem)[mem.ebp]]);
-    long sourceData = (*mem._mem)[mem.ebp - 1];
+    long long* destPackage = &((*mem._mem)[(*mem._mem)[mem.ebp]]);
+    long long sourceData = (*mem._mem)[mem.ebp - 1];
     unsigned char elementIndex = (*mem._mem)[mem.ebp - 2];
     unsigned char length = (*mem._mem)[mem.ebp - 3];
 
     switch (length) {
         case 1: {
-            long val = (char)sourceData & 0b1;
-            long clearMask = ~(1 << elementIndex);
+            long long val = (char)sourceData & 0b1;
+            long long clearMask = ~(1 << elementIndex);
             val <<= elementIndex;
             *destPackage &= clearMask;
             *destPackage |= val;
             break;
         }
         case 8: {
-            long val = (char)sourceData;
-            long shift = elementIndex * 8;
+            long long val = (char)sourceData;
+            long long shift = elementIndex * 8;
 
-            long clearMask = 0b11111111;
+            long long clearMask = 0b11111111;
             clearMask <<= shift;
             clearMask = ~clearMask;
 
@@ -43,10 +43,10 @@ void LoadPackage(MEM_POINTER mem){
             break;
         }
         case 32: {
-            long value = (int)sourceData;
-            long shift = elementIndex * 32;
+            long long value = (int)sourceData;
+            long long shift = elementIndex * 32;
 
-            long clearMask = 0xFFFFFFFF;
+            long long clearMask = 0xFFFFFFFF;
             clearMask <<= shift;
             clearMask = ~clearMask;
             value <<= shift;
@@ -65,34 +65,54 @@ void GetSystemID(MEM_POINTER mem){
 #endif
 }
 
+void OpenDynamicLib(MEM_POINTER mem){
+	char* lPP = (char*)*getObjectReferenceByAddress(mem, mem.ebp);
+	cdc_dynamic_lib_handle dl = cdc_open_dynamic_lib(lPP);
+	*mem.eax = (long long)dl;
+}
+
+void GetDlMember(MEM_POINTER mem){
+	cdc_dynamic_lib_handle dl = (cdc_dynamic_lib_handle)*getObjectReferenceByAddress(mem, mem.ebp);
+	char* member_name = (char*)*getObjectReferenceByAddress(mem, mem.ebp - 1);
+	*mem.eax = (long long)cdc_get_dynamic_lib_member(dl, member_name);
+}
+
+void CallCFunction(MEM_POINTER mem){
+	void* fPointer = (void*)*getObjectReferenceByAddress(mem, mem.ebp);
+	long long pCount = *getObjectReferenceByAddress(mem, mem.ebp - 1);
+	long long* arguments = getObjectReferenceByAddress(mem, *getObjectReferenceByAddress(mem, mem.ebp - 2));
+	char* arg_types = (char*)*getObjectReferenceByAddress(mem, mem.ebp - 3);
+	*mem.eax = cdc_invoke(fPointer, pCount, arguments, arg_types);
+}
+
 void ExtractPackage(MEM_POINTER mem){
-    long sourceData = (*mem._mem)[mem.ebp];
+    long long sourceData = (*mem._mem)[mem.ebp];
     unsigned char elementIndex = (*mem._mem)[mem.ebp - 1];
     unsigned char length = (*mem._mem)[mem.ebp - 2];
 
     switch (length) {
         case 1: {
-            long value = sourceData & (0b1 << elementIndex);
+            long long value = sourceData & (0b1 << elementIndex);
             value >>= elementIndex;
             *mem.eax = value;
             break;
         }
         case 8: {
-            long shift = elementIndex * 8;
-            long mask = 0xFF;
+            long long shift = elementIndex * 8;
+            long long mask = 0xFF;
             mask <<= shift;
 
-            long value = sourceData & mask;
+            long long value = sourceData & mask;
             value >>= elementIndex * 8;
             *mem.eax = value;
             break;
         }
         case 32: {
-            long shift = elementIndex * 32;
-            long mask = 0xFFFFFFFF;
+            long long shift = elementIndex * 32;
+            long long mask = 0xFFFFFFFF;
             mask <<= shift;
 
-            long value = sourceData & mask;
+            long long value = sourceData & mask;
             value >>= elementIndex * 32;
             *mem.eax = value;
             break;
@@ -104,7 +124,7 @@ void ExtractPackage(MEM_POINTER mem){
 
 void Reallocate(MEM_POINTER mem){
     int pageIndex = ((*mem._mem)[mem.ebp]) >> 32;
-    std::vector<long>* page = &(*mem._heap)[pageIndex];
+    std::vector<long long>* page = &(*mem._heap)[pageIndex];
     int newSize = ((*mem._mem))[mem.ebp - 1];
 
     page->resize(newSize);
@@ -112,20 +132,20 @@ void Reallocate(MEM_POINTER mem){
 
 void GetAlLocatedSize(MEM_POINTER mem){
     int pageIndex =((*mem._mem)[mem.ebp]) >> 32;
-    std::vector<long>* page = &(*mem._heap)[pageIndex];
+    std::vector<long long>* page = &(*mem._heap)[pageIndex];
     *mem.eax = page->size();
 }
 
 void Sin(MEM_POINTER mem){
     float x = *(float*)(getObjectReferenceByAddress(mem, mem.ebp));
     float result = sin(x);
-    *mem.eax = *(long*)&(result);
+    *mem.eax = *(long long*)&(result);
 }
 
 void Cos(MEM_POINTER mem){
     float x = *(float*)(getObjectReferenceByAddress(mem, mem.ebp));
     float result = cos(x);
-    *mem.eax = *(long*)&(result);
+    *mem.eax = *(long long*)&(result);
 }
 
 void GetClockTime(MEM_POINTER mem){
@@ -141,15 +161,15 @@ void GetRunTime(MEM_POINTER mem){
 }
 
 void GetRealPointer(MEM_POINTER mem){
-    long* address = getObjectReferenceByAddress(mem, *getObjectReferenceByAddress(mem, mem.ebp));
+    long long* address = getObjectReferenceByAddress(mem, *getObjectReferenceByAddress(mem, mem.ebp));
 
-    *mem.eax = (long)address;
+    *mem.eax = (long long)address;
 }
 
 void SetRealPointer(MEM_POINTER mem){
-    long* pointer = (long*)(*getObjectReferenceByAddress(mem, mem.ebp));
-    long sizeInBytes = (long)(*getObjectReferenceByAddress(mem, mem.ebp - 1));
-    long data = (*getObjectReferenceByAddress(mem, mem.ebp - 2));
+    long long* pointer = (long long*)(*getObjectReferenceByAddress(mem, mem.ebp));
+    long long sizeInBytes = (long long)(*getObjectReferenceByAddress(mem, mem.ebp - 1));
+    long long data = (*getObjectReferenceByAddress(mem, mem.ebp - 2));
 
     switch (sizeInBytes) {
         case 1: {
@@ -165,15 +185,15 @@ void SetRealPointer(MEM_POINTER mem){
             break;
         }
         case 8: {
-            *(long *) pointer = (long) data;
+            *(long long *) pointer = (long long) data;
             break;
         }
     }
 }
 
 void GetRealPointerContent(MEM_POINTER mem){
-    long* pointer = (long*)(*getObjectReferenceByAddress(mem, mem.ebp));
-    long sizeInBytes = (long)(*getObjectReferenceByAddress(mem, mem.ebp - 1));
+    long long* pointer = (long long*)(*getObjectReferenceByAddress(mem, mem.ebp));
+    long long sizeInBytes = (long long)(*getObjectReferenceByAddress(mem, mem.ebp - 1));
 
     switch (sizeInBytes) {
         case 1: {
@@ -189,7 +209,7 @@ void GetRealPointerContent(MEM_POINTER mem){
             break;
         }
         case 8: {
-            *mem.eax = *(long * )pointer;
+            *mem.eax = *(long long * )pointer;
             break;
         }
     }
@@ -243,6 +263,9 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("setRPointerData", SetRealPointer);
     lu.AddNewInterrupt("getRPointerContent", GetRealPointerContent);
     lu.AddNewInterrupt("getSysId", GetSystemID);
+    lu.AddNewInterrupt("openDL", OpenDynamicLib);
+    lu.AddNewInterrupt("extractDLMember", GetDlMember);
+    lu.AddNewInterrupt("nativeInvoke", CallCFunction);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
@@ -268,7 +291,7 @@ int main(int argc, char* args[]) {
 
         f.read((char*)data.data(), size * sizeof(char32_t));
 
-        std::vector<long> lData(data.begin(), data.end());
+        std::vector<long long> lData(data.begin(), data.end());
 
         mem.LoadProgram(std::string(sectorName), lData);
 
@@ -290,6 +313,5 @@ int main(int argc, char* args[]) {
         *(mem.GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
         O::Scenary::EvaluateWord(scenary.second, &lu, &mem);
     }
-
     return 0;
 }

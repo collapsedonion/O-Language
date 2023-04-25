@@ -1,0 +1,13 @@
+#include stdTypes.olf
+
+struct:DynamicLib{
+
+}
+
+struct:NativeFunction{
+    
+}
+
+extern:func:DynamicLib openDL(RPChar path);
+extern:func:NativeFunction extractDLMember(DynamicLib dl, RPChar memberName);
+extern:func:int nativeInvoke(NativeFunction function, int arg_count, int~ arguments, RPChar arg_types);

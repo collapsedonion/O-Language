@@ -1,3 +1,5 @@
+#include stdTypes.olf
+#include Io.olf
 
 func:int stringSize(char~ str){
     var:int index = 0;
@@ -105,4 +107,22 @@ func:bool compareString(char~ str1, char~ str2){
     }
 
     return(true);
+}
+
+func:RPChar strToCstr(char~ str){
+    var:int size = stringSize(str);
+    var:char~ allocSpace = malloc(char~, size + 1);
+    var:int index = 0;
+    var:RPChar realStr = [realStr initRPChar(allocSpace)];
+
+    while(index < size){
+        [realStr set(str[index])];
+
+        @index += 1;
+        @realStr = realStr + 1;
+    }
+
+    [realStr set('\0')];
+    @realStr = [realStr initRPChar(allocSpace)];
+    return(realStr);
 }
