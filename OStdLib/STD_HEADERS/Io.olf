@@ -1,5 +1,47 @@
-extern:func putChar(char c);
-extern:func:char tookChar();
+#include dynamic_lib.olf
+#include stdTypes.olf;
+
+global:NativeFunction nf_c_put_char;
+global:RPChar nf_c_put_char_args;
+global:NativeFunction nf_c_get_char;
+global:RPChar nf_c_get_char_args;
+
+func io_link(){
+    var:char~ put_name = "putchar";
+    var:RPChar put_c_name = strToCstr(put_name);
+    @nf_c_put_char = extractDLMember(c_std_lib_handler, put_c_name);
+    free(put_c_name);
+    free(put_name);
+
+    var:char~ put_args = "c";
+    @nf_c_put_char_args = strToCstr(put_args);
+    free(put_args);
+
+    var:char~ took_name = "getchar";
+    var:RPChar took_c_name = strToCstr(took_name);
+    @nf_c_get_char = extractDLMember(c_std_lib_handler, took_c_name);
+    free(took_c_name);
+    free(took_name);
+
+    var:char~ took_args = "";
+    @nf_c_get_char_args = strToCstr(took_args);
+    free(took_args);    
+}
+
+io_link();
+
+func putChar(char c){
+    var:char~ arguments = [c];
+    nativeInvoke(nf_c_put_char, 1, int~(arguments), nf_c_put_char_args);
+    free(arguments);
+}
+
+func:char tookChar(){
+    var:int~ arguments = malloc(int~, 1);
+    var:char result = char(nativeInvoke(nf_c_get_char, 0, arguments, nf_c_get_char_args));
+    free(arguments);
+    return(result); 
+}
 
 func readStr(char~ out, int countToRead){
 
@@ -21,7 +63,7 @@ func readStr(char~ out, int countToRead){
         @index = index + 1;
     }
 
-    @out[countToRead - 1] = '\0';
+    @out[index] = '\0';
 }
 
 func printStr(char~ str){

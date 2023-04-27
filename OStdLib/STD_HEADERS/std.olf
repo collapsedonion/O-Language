@@ -92,3 +92,20 @@ template:For{
         iterationEnd;
     }
 }
+
+#include dynamic_lib.olf
+#include stdString.olf
+#include stdTypes.olf
+
+global:DynamicLib c_std_lib_handler;
+
+func initC_std(){
+    var:char~ name = "";
+    var:RPChar cName = strToCstr(name);
+
+    @c_std_lib_handler = openDL(cName);
+    free(cName);
+    free(name);
+}
+
+initC_std();

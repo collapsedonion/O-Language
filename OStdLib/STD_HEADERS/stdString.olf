@@ -1,5 +1,4 @@
 #include stdTypes.olf
-#include Io.olf
 
 func:int stringSize(char~ str){
     var:int index = 0;

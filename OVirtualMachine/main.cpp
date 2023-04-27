@@ -8,6 +8,7 @@
 #include <math.h>
 #include <cdc.h>
 #include <time.h>
+#include <stdio.h>
 
 void GetHighFloat(MEM_POINTER mem){
     long long* origin = &(*mem._mem)[mem.ebp];

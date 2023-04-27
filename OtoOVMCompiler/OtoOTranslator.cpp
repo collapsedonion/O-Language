@@ -142,16 +142,18 @@ namespace O {
     }
 
     OtoOTranslator::VariableStored OtoOTranslator::getVar(std::u32string name) {
-        for(auto v:variables){
-            if(v.name == name){
-                return v;
+        for(int i = additionalVariables.size()-1; i >= 0; i--){
+            if(additionalVariables[i].name == name){
+                return additionalVariables[i];
             }
         }
-        for(auto v:additionalVariables){
-            if(v.name == name){
-                return v;
+
+        for(int i = variables.size()-1; i >= 0; i--){
+            if(variables[i].name == name){
+                return variables[i];
             }
         }
+
         return VariableStored();
     }
 
@@ -231,8 +233,10 @@ namespace O {
 
             newFT.localSize = countOfLocalVariable;
 
-            auto sub0 = G::sub(GR::esp, countOfLocalVariable);
-            ADDVTV(newFT.Instructions, sub0);
+            if(countOfLocalVariable >= 0){
+                auto sub0 = G::sub(GR::esp, countOfLocalVariable);
+                ADDVTV(newFT.Instructions, sub0);
+            }
 
             for(auto argument : fun.arguments){
                 newF.parameters.push_back(argument.type);
@@ -243,7 +247,7 @@ namespace O {
             }
 
             if(fun.returnType == DataTypes::Void){
-                if(countOfLocalVariable != 0) {
+                if(countOfLocalVariable >= 0) {
                     auto add0 = G::add(GR::esp, countOfLocalVariable);
                     ADDVTV(newFT.Instructions, add0);
                 }
@@ -286,6 +290,11 @@ namespace O {
             auto m0 = G::mov(GR::ebp, GR::esp);
             ADDVTV(Instructions, m0);
             auto a0 = G::add(GR::ebp, inst.Parameters.size() - 1);
+            ADDVTV(Instructions, a0);
+        }else{
+            auto m0 = G::mov(GR::ebp, GR::esp);
+            ADDVTV(Instructions, m0);
+            auto a0 = G::sub(GR::ebp, 1);
             ADDVTV(Instructions, a0);
         }
 
@@ -382,6 +391,7 @@ namespace O {
             auto saveMC2 = G::push(GR::mc2);
             auto loadMC1 = G::pop(GR::mc1);
             auto loadMC2 = G::pop(GR::mc2);
+            
             ProccessStdLogic(inst.Parameters[0], inst.Parameters[1], inst.name);
             ADDVTV(Instructions, saveMC1)
             ADDVTV(Instructions, saveMC2)

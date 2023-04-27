@@ -131,6 +131,9 @@ int O::Analyser::charNotInFunction(std::u32string str, char32_t c)
         }
 
         if (str[i] == c && level == -1 && !inQuets && levelInCube == -1) {
+            if(i - 1 >= 0 && i + 1 < str.size() && str[i - 1] == '\'' && str[i + 1] == '\''){
+                continue;
+            }
             return i;
         }
     }
