@@ -104,7 +104,6 @@ func initC_std(){
     var:RPChar cName = strToCstr(name);
 
     @c_std_lib_handler = openDL(cName);
-    free(cName);
     free(name);
 }
 

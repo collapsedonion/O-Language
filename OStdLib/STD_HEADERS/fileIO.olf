@@ -1,37 +1,131 @@
+#include dynamic_lib.olf
+#include stdTypes.olf
+
 struct:File{
 }
 
-extern:func:File openFile(char~ path);
-extern:func:bool endOfFile(File file);
-extern:func:bool fGood(File file);
-extern:func:char fReadChar(File file);
-extern:func fPutChar(File file, char ch);
-extern:func closeFile(File file);
+global:NativeFunction nf_c_fopen_file;
+global:RPChar nf_c_fopen_file_args;
+
+global:NativeFunction nf_c_fclose_file;
+global:RPChar nf_c_fclose_file_args;
+
+global:NativeFunction nf_c_eof;
+
+global:NativeFunction nf_c_fread;
+
+global:NativeFunction nf_c_fput;
+global:RPChar nf_c_fput_args;
+
+
+func file_io_link(){ 
+    var:char~ open_name = "fopen";
+    var:RPChar open_c_name = strToCstr(open_name);
+    @nf_c_fopen_file = extractDLMember(c_std_lib_handler, open_c_name);
+    free(open_name);
+
+    var:char~ open_args = "ll";
+    @nf_c_fopen_file_args = strToCstr(open_args);
+    free(open_args);
+
+    var:char~ close_open = "fclose";
+    var:RPChar close_c_name = strToCstr(close_open);
+    @nf_c_fclose_file = extractDLMember(c_std_lib_handler, close_c_name);
+    free(close_open);
+
+    var:char~ close_args = "l";
+    @nf_c_fclose_file_args = strToCstr(close_args);
+    free(close_args);
+
+    var:char~ eof_name = "feof";
+    var:RPChar eof_c_name = strToCstr(eof_name);
+    @nf_c_eof = extractDLMember(c_std_lib_handler, eof_c_name);
+    free(eof_name);
+
+    var:char~ get_char_name = "fgetc";
+    var:RPChar get_char_c_name = strToCstr(get_char_name);
+    @nf_c_fread = extractDLMember(c_std_lib_handler, get_char_c_name);
+    free(get_char_name);
+
+    var:char~ put_char_name = "fputc";
+    var:RPChar put_char_c_name = strToCstr(put_char_name);
+    @nf_c_fput = extractDLMember(c_std_lib_handler, put_char_c_name);
+    free(put_char_name);
+
+    var:char~ put_args = "lc";
+    @nf_c_fput_args = strToCstr(put_args);
+    free(put_args);
+}
+
+file_io_link();
+
+func:File openFile(char~ path, char~ mode){
+    var:int~ arguments = malloc(int~, 2);
+    var:RPChar c_path = strToCstr(path);
+    var:RPChar c_mode = strToCstr(mode);
+    @arguments[0] = int(c_path);
+    @arguments[1] = int(c_mode);
+
+    var:int file = nativeInvoke(nf_c_fopen_file, 2, arguments, nf_c_fopen_file_args);
+
+    free(arguments);
+    return(File(file));
+}
+
+func:bool endOfFile(File file){
+    var:int~ arguments = malloc(int~, 1);
+    @arguments[0] = int(file);
+    var:int endOf = nativeInvoke(nf_c_eof, 1, arguments, nf_c_fclose_file_args);
+    free(arguments);
+    return(bool(endOf));
+}
+
+func:char fReadChar(File file){
+    var:int~ arguments = malloc(int~, 1);
+    @arguments[0] = int(file);
+    var:int res = nativeInvoke(nf_c_fread, 1, arguments, nf_c_fclose_file_args);
+    free(arguments);
+    return(char(res));
+}
+
+func fPutChar(File file, char ch){
+    var:int~ arguments = malloc(int~, 2);
+    @arguments[1] = int(file);
+    @arguments[0] = int(ch);
+
+    nativeInvoke(nf_c_fput, 2, arguments, nf_c_fput_args);
+
+    free(arguments);
+}
+
+func closeFile(File file){
+    var:int~ arguments = malloc(int~, 1);
+    @arguments[0] = int(file);
+    nativeInvoke(nf_c_fclose_file, 1, arguments, nf_c_fclose_file_args);
+    free(arguments);
+}  
 
 func fReadToString(File file, char~ str, int stringSize){
 
     var:int index = 0;
 
     var:bool lineEnd = false;
+    var:char newChar = fReadChar(file);
+    while(endOfFile(file) ? false & lineEnd ? false & index + 2 < stringSize){
 
-    while(fGood(file) & endOfFile(file) ? false & lineEnd ? false & index + 2 < stringSize){
-        var:char newChar = fReadChar(file);
         if(newChar ? '\n'){
             @lineEnd = true;
         }else{
             @str[index] = newChar;
         }
         @index = index + 1;
+        @newChar = fReadChar(file);
     }
 
     @str[index] = '\0';
 }
 
 func fWriteString(File file, char~ str){
-    if(fGood(file) ? false){
-        return();
-    }
-
     var:bool notComplete = true;
 
     var:int index = 0;
