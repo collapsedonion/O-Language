@@ -35,19 +35,22 @@ namespace O {
                 buffer += i;
             }
 
-            if(i == '\n') {
-                
-                if(*(result.end() - 1) == ';'){
-                    result += U"\n";
-                    result += U"#LINE_ID";
-		            std::string line_id_str = std::to_string(strId);
-		            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-                    result += converter.from_bytes(line_id_str);
-                    result += U";";
-		    result += U"\n#FILE_NAME" + this->file_name + U";";
-                }
-		strId++;
-		continue;
+            if(i == '\n') {            
+		        strId++;
+		        continue;
+            }
+
+            if(!bufferLoad && i == ';' || i == '}' || i == '{'){
+                result += i;
+                result += U"\n";
+                result += U"\n";
+                result += U"#LINE_ID";
+		        std::string line_id_str = std::to_string(strId);
+	            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+                result += converter.from_bytes(line_id_str);
+                result += U";";
+                result += U"\n#FILE_NAME" + this->file_name + U";";
+                continue;
             }
 
             if(!bufferLoad && i != '\t') {
@@ -82,10 +85,10 @@ namespace O {
             std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
             std::u32string content = convertor.from_bytes(s);
             f.close();
-	    std::u32string pred_name = this->file_name;
-	    this->file_name = params[1];
-	    std::u32string new_content = proccess(content);
-	    this->file_name = pred_name;
+	        std::u32string pred_name = this->file_name;
+	        this->file_name = params[1];
+	        std::u32string new_content = proccess(content);
+	        this->file_name = pred_name;
             return new_content;
         }
 
