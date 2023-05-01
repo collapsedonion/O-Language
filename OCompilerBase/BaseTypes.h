@@ -157,6 +157,8 @@ struct Instruction {
 	bool ArithmeticProccess = false;
 	bool IsVariable = false;
 	bool IsFunction = false;
+	int line = 0;
+	std::u32string file_name;
 	std::vector<Instruction> Parameters;
 };
 

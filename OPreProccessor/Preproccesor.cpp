@@ -17,6 +17,13 @@ namespace O {
 
         bool bufferLoad = false;
 
+        result += U"\n";
+        result += U"\n";
+        result += U"#LINE_ID";
+        result += U"1";
+        result += U";";
+        result += U"\n#FILE_NAME" + this->filePath + this->file_name + U";";
+
         for(auto i : str){
 
             if(i == '\n' && bufferLoad){
@@ -49,7 +56,7 @@ namespace O {
 	            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
                 result += converter.from_bytes(line_id_str);
                 result += U";";
-                result += U"\n#FILE_NAME" + this->file_name + U";";
+                result += U"\n#FILE_NAME" + this->filePath + this->file_name + U";";
                 continue;
             }
 

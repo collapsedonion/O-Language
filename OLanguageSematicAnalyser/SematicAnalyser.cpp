@@ -127,6 +127,8 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
 
         if (dt != DataTypes::Error && retInst.Parameters.size() == 1) {
             retInst.Parameters[0].type = dt;
+            retInst.Parameters[0].line = token.line_id;
+            retInst.Parameters[0].file_name = token.file_name;
             return retInst.Parameters[0];
         }
 
@@ -136,6 +138,8 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
     }
 
     retInst.type = f;
+    retInst.line = token.line_id;
+    retInst.file_name = token.file_name;
 
     return retInst;
 }
@@ -148,6 +152,8 @@ Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
 	else {
         Instruction inst = proccessInstCall(token.childToken[0]);
         if(inst.name == POINTER_ACCESS_INSTRUCTION_NAME){
+            inst.Parameters[0].line = token.line_id;
+            inst.Parameters[0].file_name = token.file_name;
             return inst.Parameters[0];
         }
 		Analyser::Token typeToken;
@@ -159,6 +165,8 @@ Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
 		toRet.name = POINTER_GET_INSTRUCTION_NAME;
 		toRet.type = getDataType(typeToken);
 		toRet.Parameters.push_back(inst);
+        toRet.file_name = token.file_name;
+        toRet.line = token.line_id;
 		return toRet;
 	}
 }
@@ -219,7 +227,8 @@ Instruction O::SematicAnalyser::proccessPointerAccess(Analyser::Token token)
 	retInst.name = POINTER_ACCESS_INSTRUCTION_NAME;
 	retInst.type = stringToDataType(dtStrReprasentation.substr(1, dtStrReprasentation.size()-1), adt);
 	retInst.Parameters.push_back(inst);
-
+    retInst.file_name = token.file_name;
+    retInst.line = token.line_id;
 	return retInst;
 }
 
@@ -239,12 +248,16 @@ Instruction O::SematicAnalyser::proccessString(Analyser::Token token)
 		else {
 			newC.token = token.token[i];
 		}
+        newC.line_id = token.line_id;
+        newC.file_name = token.file_name;
 		t.childToken.push_back(newC);
 	}
 	Analyser::Token newC;
 	newC.type = Analyser::Type::Char;
 	newC.token= U"\\0";
 	t.childToken.push_back(newC);
+    t.file_name = token.file_name;
+    t.line_id = token.line_id;
 	return proccessArrayCreationInstruction(t);
 }
 
@@ -264,6 +277,8 @@ Instruction O::SematicAnalyser::proccessWhileCycleInstruction(Analyser::Tokenise
 	toRet.name = WHILE_CYCLE_NAME;
 	toRet.type = DataTypes::Void;
 	toRet.Parameters.push_back(inst);
+    toRet.file_name = token.name.file_name;
+    toRet.line = token.name.line_id;
 
 	if(token.subToken.size() != 0) {
 		SematicAnalyser sa(this);
@@ -309,11 +324,15 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
         ind.type = DataTypes::Void;
         toRet.Parameters.push_back(ind);
         toRet.Parameters.push_back(dataSource);
+        toRet.file_name = token.file_name;
+        toRet.line = token.line_id;
         return toRet;
     }
     DataTypes originalType = dataSource.type;
 
 	Instruction index = proccessInstCall(token.childToken[1]);
+    index.file_name = token.file_name;
+    index.line = token.line_id;
 
 	std::u32string reprasentation = dataTypeToString(dataSource.type, adt);
 	if (reprasentation[0] != '~') {
@@ -330,11 +349,15 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
     plus.type = originalType;
     plus.ArithmeticProccess = true;
     plus.name = U"+";
+    plus.file_name = token.file_name;
+    plus.line = token.line_id;
 
     Instruction toRet;
     toRet.type = stringToDataType(reprasentation, adt);
     toRet.name = POINTER_ACCESS_INSTRUCTION_NAME;
     toRet.Parameters.push_back(plus);
+    toRet.file_name = token.file_name;
+    toRet.line = token.line_id;
 
 	return toRet;
 }
@@ -376,6 +399,9 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 		instTypeToken.token = dataTypeToString(toRet.Parameters[1].type, adt);
 		typeToken.childToken.push_back(instTypeToken);
 		toRet.type = getDataType(typeToken);
+
+        toRet.file_name = token.file_name;
+        toRet.line = token.line_id;
 		return toRet;
 	}
 	else {
@@ -404,13 +430,16 @@ Instruction O::SematicAnalyser::proccessReturnCall(Analyser::Token token)
         inst.name = RETURN_NAME;
 
         this->returnCalls += 1;
+        inst.file_name = token.file_name;
+        inst.line = token.line_id;
 
         return inst;
     }else{
         Instruction inst;
         inst.type = DataTypes::Void;
         inst.name = RETURN_NAME;
-
+        inst.line = token.line_id;
+        inst.file_name = token.file_name;
         return inst;
     }
 
@@ -448,6 +477,9 @@ Instruction O::SematicAnalyser::proccessIfInstruction(Analyser::TokenisedFile to
             toRet.Parameters.push_back(sa.instructions[i]);
         }
     }
+
+    toRet.line = token.name.line_id;
+    toRet.file_name = token.name.file_name;
 
 	return toRet;
 }
@@ -489,6 +521,9 @@ Instruction O::SematicAnalyser::proccessElseIfInstruction(Analyser::TokenisedFil
         }
     }
 
+    toRet.file_name = token.name.file_name;
+    toRet.line = token.name.line_id;
+
 	return toRet;
 }
 
@@ -515,6 +550,9 @@ Instruction O::SematicAnalyser::proccessElseInstruction(Analyser::TokenisedFile 
             toRet.Parameters.push_back(sa.instructions[i]);
         }
     }
+
+    toRet.file_name = token.name.file_name;
+    toRet.line = token.name.line_id;
 
 	return toRet;
 }
@@ -654,7 +692,8 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
     }
     toRet.name = func.name;
     toRet.type = func.returnType;
-
+    toRet.file_name = token.name.file_name;
+    toRet.line = token.name.line_id;
 
     return toRet;
 }
@@ -754,6 +793,8 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
     dt_token.childToken = {Analyser::Token()};
     dt_token.childToken[0].token = dataTypeToString(toRet.type, adt);
     pointer.type = getDataType(dt_token);
+    pointer.file_name = token.file_name;
+    pointer.line = token.line_id;
 
 	return pointer;
 }
@@ -821,6 +862,9 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
     else {
         inst = proccessInstCall(token.name);
     }
+
+    inst.line = token.name.line_id;
+    inst.file_name = token.name.file_name;
 
     if(add && !inst.IsVariable && inst.name != U"UNSIGNED_TOKEN") {
         instructions.push_back(inst);
@@ -931,12 +975,16 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
 
     toRet.name = newStruct.name;
     toRet.type = newStruct.myDt;
+    toRet.file_name = token.name.file_name;
+    toRet.line = token.name.line_id;
 
     return toRet;
 }
 
 Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
     Instruction res;
+    res.line = token.line_id;
+    res.file_name = token.file_name;
 
     if (token.type == Analyser::Type::MathematicalOperator) {
         if (token.twoSided) {
@@ -1057,6 +1105,8 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
     else if (token.type == Analyser::Type::Char) {
         res.name = token.token;
         res.type = DataTypes::Character;
+        res.line = token.line_id;
+        res.file_name = token.file_name;
         return res;
     }
     else if (token.type == Analyser::Type::Number) {
@@ -1109,6 +1159,8 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         }
 
     }
+    res.file_name = token.file_name;
+    res.line = token.line_id;
     return res;
 }
 
