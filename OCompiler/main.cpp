@@ -101,6 +101,7 @@ int main(int argC, char* args[]) {
     O::OtoOTranslator translator;
     translator.Build(sematiser.getFileRepresantation());
     translator.WriteResulToFile(realOutFilePath);
+    translator.WriteDebugSymbols(realOutFilePath + U".ovm_dbg");
 
     std::cout << "Succesfuly compiled\n";
 

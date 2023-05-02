@@ -18,7 +18,7 @@ namespace O {
             std::u32string name;
             std::u32string sector;
             int fromEbpOffset = 0;
-	    bool useEbp;
+	        bool useEbp;
         };
 
         struct FunctionStored{
@@ -27,6 +27,14 @@ namespace O {
             std::vector<DataTypes> parameters;
             int stackSize = 0;
             int fromZeroOffset = 0;
+        };
+
+        struct OVMDebug{
+            int line = 0;
+            std::u32string file;
+            int esp_min = 0;
+            int esp_max = 0;
+            std::u32string sector;
         };
 
         enum StdLogicType {
@@ -49,6 +57,7 @@ namespace O {
         std::vector<int> mainFlow;
         std::vector<FunctionStored> storedFunctions;
         std::map<std::u32string, std::vector<int>> addSectors;
+        std::vector<OVMDebug> debug_info;
 
     private:
         void LoadVariables(std::vector<Variable> variables, bool globals, bool add = false);
@@ -78,6 +87,7 @@ namespace O {
 
     public:
         void Build(File f);
+        void WriteDebugSymbols(std::u32string path);
         void WriteResulToFile(std::u32string filepath);
     };
 

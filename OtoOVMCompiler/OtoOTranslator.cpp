@@ -113,6 +113,12 @@ namespace O {
     }
 
     void OtoOTranslator::ProccessInstruction(Instruction inst) {
+        OVMDebug new_info;
+        new_info.file = inst.file_name;
+        new_info.line = inst.line;
+        new_info.sector = sectorName;
+        new_info.esp_min = Instructions->size() - 1;
+
         if(inst.name == FREE_INSTRUCTION_NAME){
             FreeInstruction(inst);
         }
@@ -139,6 +145,9 @@ namespace O {
         }else if(inst.ArithmeticProccess){
             MathematicalProccess(inst);
         }
+
+        new_info.esp_max = Instructions->size() - 1;
+        debug_info.push_back(new_info);
     }
 
     OtoOTranslator::VariableStored OtoOTranslator::getVar(std::u32string name) {
@@ -204,6 +213,28 @@ namespace O {
         f.close();
     }
 
+    void OtoOTranslator::WriteDebugSymbols(std::u32string path){
+        std::ofstream f(path);
+
+        int symbol_count = this->debug_info.size();
+        f.write((char*)&symbol_count, sizeof(int) / sizeof(char));
+
+        for(auto symbol : debug_info){
+            int sector_name_size = symbol.sector.size();
+            int path_size = symbol.file.size();
+
+            f.write((char*)&path_size, sizeof(int) / sizeof(char));
+            f.write((char*)symbol.file.c_str(), path_size * sizeof(char32_t) / sizeof(char));
+            f.write((char*)&sector_name_size, sizeof(int) / sizeof(char));
+            f.write((char*)symbol.sector.c_str(), sector_name_size * sizeof(char32_t) / sizeof(char));
+            f.write((char*)&symbol.line, sizeof(int) / sizeof(char));
+            f.write((char*)&symbol.esp_min, sizeof(int) / sizeof(char));
+            f.write((char*)&symbol.esp_max, sizeof(int) / sizeof(char));
+        }
+
+        f.close();
+    }
+
     void OtoOTranslator::LoadFunctions(std::vector<Function> functions) {
 
         for(auto fun : functions) {
@@ -257,6 +288,7 @@ namespace O {
             newF.name = fun.name;
             newF.stackSize = addOffset;
             storedFunctions.push_back(newF);
+            debug_info.insert(debug_info.end(), newFT.debug_info.begin(), newFT.debug_info.end());
 
             addSectors.insert({fName, std::vector<int>(*newFT.Instructions)});
 
