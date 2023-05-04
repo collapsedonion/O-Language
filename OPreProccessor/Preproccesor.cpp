@@ -28,9 +28,17 @@ namespace O {
 
             if(i == '\n' && bufferLoad){
                 bufferLoad = false;
-                result += getInst(buffer);
-                strId++;
+                result += getInst(buffer, strId, this->filePath + this->file_name);
                 buffer = U"";
+                result += U"\n";
+                result += U"\n";
+                result += U"#LINE_ID";
+		        std::string line_id_str = std::to_string(strId);
+	            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+                result += converter.from_bytes(line_id_str);
+                result += U";";
+                result += U"\n#FILE_NAME" + this->filePath + this->file_name + U";";
+                strId++;
                 continue;
             }
 
@@ -128,14 +136,21 @@ namespace O {
         return toRet;
     }
 
-    std::u32string Preproccesor::getInst(std::u32string promt) {
+    std::u32string Preproccesor::getInst(std::u32string promt, int line, std::u32string file_name) {
         auto p = getParameters(promt);
 
         if(p[0] == U"#include"){
             return Include(promt);
         }
+        else if(p[0] == U"#brkpnt"){
+            BreakPoint(line, file_name);
+        }
 
         return U"";
+    }
+
+    void Preproccesor::BreakPoint(int line, std::u32string file){
+        break_points.push_back({file, line});
     }
 
     Preproccesor::Preproccesor(std::u32string filePath, std::u32string execPath) {

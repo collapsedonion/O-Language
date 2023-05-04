@@ -3,8 +3,9 @@
 //
 
 #include "LogicUnit.h"
-
+#include "Scenary.h"
 #include <iostream>
+#include <fstream>
 #include <cdc.h>
 #define GETREG(varname) *_mem->GetRegisterAccess(varname)
 #define GETMAD(varname) *_mem->GetAccessByMemoryDescriptor(varname)
@@ -13,6 +14,106 @@ namespace O {
 
     LogicUnit::LogicUnit(Memory* memoryUnit) {
          this->_mem = memoryUnit;
+    }
+
+    void LogicUnit::RunAtSector(std::string sector_name){
+        SectorDescription mainSector = _mem->getSectorDescription(sector_name);
+
+        this->mov(O::Memory::Registers::eip, mainSector.start);
+
+        while (true){
+            for(int i = 0; i < stop_lines.size(); i++){
+                if(stop_lines[i]+1 == *_mem->GetRegisterAccess(O::Memory::Registers::eip)){
+                    DebugMode();
+                }
+            }
+            
+            auto scenary = O::Scenary::generateScript(_mem->getMem(), *(_mem->GetRegisterAccess(O::Memory::Registers::eip)));
+            *(_mem->GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
+            O::Scenary::EvaluateWord(scenary.second, this, _mem);
+            if(*(_mem->GetRegisterAccess(O::Memory::Registers::eip)) == mainSector.start + mainSector.size){
+                break;
+            }
+        }
+    }
+
+    void LogicUnit::DebugMode(){
+        std::cout << "\nProccess stoped at eip = 0x" << std::hex << *_mem->GetRegisterAccess(O::Memory::Registers::eip) << "\n";
+        std::string command;
+        while(true){
+            command = "";
+            std::cout << ">>";
+            std::cin >> command;
+            if(command == "continue" || command == "c"){
+                break;
+            }else{
+                std::cout << "Unrecognised command\n";
+            }
+        }
+    }
+
+    void LogicUnit::AddBreakPoint(std::u32string path, int line){
+        for(auto sym : debug_symbols){
+            if(sym.file == path && sym.line >= line){
+                int path = _mem->getSectorDescription(sym.sector).start;
+                path += sym.esp_min;
+                stop_lines.push_back(path);
+                break;
+            }
+        }
+    }
+
+    void LogicUnit::LoadDebugSymbols(std::string path){
+        std::ifstream input_file(path);
+        if(input_file.good()){
+            int break_point_count = 0;
+            input_file.read((char*)&break_point_count, sizeof(int) / sizeof(char));
+
+            for(int i = 0; i < break_point_count; i++){
+                int name_size = 0;
+                input_file.read((char*)&name_size, sizeof(int) / sizeof(char));
+                std::u32string str;
+                for(int j = 0; j < name_size; j++){
+                    char32_t new_c;
+                    input_file.read((char*)&new_c, sizeof(char32_t) / sizeof(char));
+                    str += new_c;
+                }
+                input_file.read((char*)&name_size, sizeof(int) / sizeof(char));
+                break_points.push_back({str, name_size});
+            }
+
+            int debug_symbols_count = 0;
+            input_file.read((char*)&debug_symbols_count, sizeof(int) / sizeof(char));
+
+            for(int i = 0; i < debug_symbols_count; i++){
+                DebugSymbol new_ds;
+                
+                int name_size = 0;
+                input_file.read((char*)&name_size, sizeof(int) / sizeof(char));
+                for(int j = 0; j < name_size; j++){
+                    char32_t new_c;
+                    input_file.read((char*)&new_c, sizeof(char32_t) / sizeof(char));
+                    new_ds.file += new_c;
+                }
+
+                input_file.read((char*)&name_size, sizeof(int) / sizeof(char));
+                for(int j = 0; j < name_size; j++){
+                    char32_t new_c;
+                    input_file.read((char*)&new_c, sizeof(char32_t) / sizeof(char));
+                    new_ds.sector += new_c;
+                }
+                input_file.read((char*)&new_ds.line, sizeof(int) / sizeof(char));
+                input_file.read((char*)&new_ds.esp_min, sizeof(int) / sizeof(char));
+                input_file.read((char*)&new_ds.esp_max, sizeof(int) / sizeof(char));
+
+                debug_symbols.push_back(new_ds);
+            }
+
+            input_file.close();
+        }
+        for(auto br:break_points){
+            AddBreakPoint(br.first, br.second);
+        }
     }
 
     void LogicUnit::ga(O::Memory::MemoryAddressDescriptor desc){

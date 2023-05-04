@@ -304,15 +304,8 @@ int main(int argc, char* args[]) {
     if(argc == 3){
         LoadDL(args[2], &lu);
     }
+    lu.LoadDebugSymbols(loadFile + ".ovm_dbg");
+    lu.RunAtSector("main");
 
-    SectorDescription mainSector = mem.getSectorDescription("main");
-
-    lu.mov(O::Memory::Registers::eip, mainSector.start);
-
-    while (*(mem.GetRegisterAccess(O::Memory::Registers::eip)) < mainSector.start + mainSector.size){
-        auto scenary = O::Scenary::generateScript(mem.getMem(), *(mem.GetRegisterAccess(O::Memory::Registers::eip)));
-        *(mem.GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
-        O::Scenary::EvaluateWord(scenary.second, &lu, &mem);
-    }
     return 0;
 }

@@ -13,6 +13,9 @@
 namespace O {
 
     class Preproccesor {
+    public:
+        std::vector<std::pair<std::u32string, int>> break_points; 
+
     private:
         std::vector<std::u32string> included;
         std::u32string filePath;
@@ -23,9 +26,11 @@ namespace O {
 
         std::vector<std::u32string> getParameters(std::u32string promt);
 
-        std::u32string getInst(std::u32string promt);
+        std::u32string getInst(std::u32string promt, int line = 0, std::u32string file_name = 0);
 
         std::u32string Include(std::u32string str);
+
+        void BreakPoint(int line, std::u32string file_name);
 
         std::u32string execPath;
 

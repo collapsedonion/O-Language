@@ -87,7 +87,7 @@ namespace O {
 
     public:
         void Build(File f);
-        void WriteDebugSymbols(std::u32string path);
+        void WriteDebugSymbols(std::u32string path, std::vector<std::pair<std::u32string, int>> breakPoints);
         void WriteResulToFile(std::u32string filepath);
     };
 

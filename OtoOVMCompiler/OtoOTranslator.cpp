@@ -213,8 +213,17 @@ namespace O {
         f.close();
     }
 
-    void OtoOTranslator::WriteDebugSymbols(std::u32string path){
+    void OtoOTranslator::WriteDebugSymbols(std::u32string path, std::vector<std::pair<std::u32string, int>> breakPoints){
         std::ofstream f(path);
+
+        int break_point_count = breakPoints.size();
+        f.write((char*)&break_point_count, sizeof(int) / sizeof(char));
+        for(auto bp : breakPoints){
+            int name_size = bp.first.size();
+            f.write((char*)&name_size, sizeof(int) / sizeof(char));
+            f.write((char*)bp.first.c_str(), name_size * sizeof(char32_t) / sizeof(char));
+            f.write((char*)&bp.second, sizeof(int) / sizeof(char));
+        }
 
         int symbol_count = this->debug_info.size();
         f.write((char*)&symbol_count, sizeof(int) / sizeof(char));
