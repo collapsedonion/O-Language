@@ -37,6 +37,18 @@ namespace O {
             std::u32string sector;
         };
 
+        struct VariableSymbol{
+            std::u32string name;
+            Geneerator::Registers offset_registor;
+            int offset;
+            std::u32string sector;
+        };
+
+        struct ComponentSymbol{
+            std::u32string sector;
+            std::vector<VariableSymbol> vs;
+        };
+
         enum StdLogicType {
             I,
             B,
@@ -56,6 +68,7 @@ namespace O {
         std::vector<int>* Instructions;
         std::vector<int> mainFlow;
         std::vector<FunctionStored> storedFunctions;
+        std::vector<ComponentSymbol> components;
         std::map<std::u32string, std::vector<int>> addSectors;
         std::vector<OVMDebug> debug_info;
 

@@ -25,6 +25,20 @@ namespace O {
             std::string sector = "";
         };
 
+        struct VariableSymbol
+        {
+            std::string name;
+            O::Memory::Registers offset_registor;
+            int offset;
+            std::string sector;
+        };
+
+        struct StopLine{
+            std::string sector;
+            int stop_address;
+        };
+        
+
     private:
         Memory* _mem = nullptr;
 
@@ -32,9 +46,11 @@ namespace O {
 
         std::vector<std::pair<std::u32string, int>> break_points;
 
-        std::vector<int> stop_lines;
+        std::vector<StopLine> stop_lines;
 
         std::vector<DebugSymbol> debug_symbols;
+
+        std::map<std::string, std::vector<VariableSymbol>> components;
 
     public:
         LogicUnit(Memory* memoryUnit);
@@ -47,7 +63,7 @@ namespace O {
 
         void AddBreakPoint(std::u32string path, int line);
 
-        void DebugMode();
+        void DebugMode(StopLine sl);
 
         void AddNewInterrupt(std::string name, InterruptHandler interrupt);
 

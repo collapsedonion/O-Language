@@ -53,6 +53,21 @@ namespace O {
         for(auto inst : f.instructions){
             ProccessInstruction(inst);
         }
+
+        ComponentSymbol cs;
+
+        for(auto a : this->variables){
+            VariableSymbol vs;
+            vs.name = a.name;
+            vs.sector = a.sector;
+            vs.offset_registor = a.useEbp ? GR::ebp : GR::NULLREG;
+            vs.offset = a.fromEbpOffset;
+            cs.vs.push_back(vs);
+        }
+
+        cs.sector = U"main";
+
+        components.push_back(cs);
     }
 
     void OtoOTranslator::LoadVariables(std::vector<Variable> variables, bool globals, bool add) {
@@ -225,6 +240,30 @@ namespace O {
             f.write((char*)&bp.second, sizeof(int) / sizeof(char));
         }
 
+        int components_count = components.size();
+        f.write((char*)&components_count, sizeof(int) / sizeof(char));
+
+        for(auto component : components){
+            int sector_size = component.sector.size();
+            f.write((char*)&sector_size, sizeof(int) / sizeof(char));
+            f.write((char*)component.sector.c_str(), sector_size * sizeof(char32_t) / sizeof(char));
+
+            int variables_count = component.vs.size();
+            f.write((char*)&variables_count, sizeof(int) / sizeof(char));
+
+            for(auto variable : component.vs){
+                int name_size = variable.name.size();
+                int sector_size = variable.sector.size();
+
+                f.write((char*)&name_size, sizeof(int) / sizeof(char));
+                f.write((char*)variable.name.c_str(), name_size * sizeof(char32_t) / sizeof(char));
+                f.write((char*)&sector_size, sizeof(int) / sizeof(char));
+                f.write((char*)variable.sector.c_str(), sector_size * sizeof(char32_t) / sizeof(char));
+                f.write((char*)&variable.offset, sizeof(int) / sizeof(char));
+                f.write((char*)&variable.offset_registor, sizeof(int) / sizeof(char));
+            }
+        }
+
         int symbol_count = this->debug_info.size();
         f.write((char*)&symbol_count, sizeof(int) / sizeof(char));
 
@@ -300,6 +339,20 @@ namespace O {
             debug_info.insert(debug_info.end(), newFT.debug_info.begin(), newFT.debug_info.end());
 
             addSectors.insert({fName, std::vector<int>(*newFT.Instructions)});
+            ComponentSymbol cs;
+
+            for(auto a : newFT.additionalVariables){
+                VariableSymbol vs;
+                vs.name = a.name;
+                vs.sector = a.sector;
+                vs.offset_registor = a.useEbp ? GR::ebp : GR::NULLREG;
+                vs.offset = a.fromEbpOffset;
+                cs.vs.push_back(vs);
+            }
+
+            cs.sector = fName;
+
+            components.push_back(cs);
 
             addOffset = 0;
             additionalVariables.clear();

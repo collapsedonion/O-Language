@@ -23,8 +23,8 @@ namespace O {
 
         while (true){
             for(int i = 0; i < stop_lines.size(); i++){
-                if(stop_lines[i]+1 == *_mem->GetRegisterAccess(O::Memory::Registers::eip)){
-                    DebugMode();
+                if(stop_lines[i].stop_address+1 == *_mem->GetRegisterAccess(O::Memory::Registers::eip)){
+                    DebugMode(stop_lines[i]);
                 }
             }
             
@@ -37,7 +37,7 @@ namespace O {
         }
     }
 
-    void LogicUnit::DebugMode(){
+    void LogicUnit::DebugMode(StopLine sl){
         std::cout << "\nProccess stoped at eip = 0x" << std::hex << *_mem->GetRegisterAccess(O::Memory::Registers::eip) << "\n";
         std::string command;
         while(true){
@@ -46,6 +46,39 @@ namespace O {
             std::cin >> command;
             if(command == "continue" || command == "c"){
                 break;
+            }else if(command == "variables" || command == "vs"){
+                char flag;
+                if(command == "variables"){       
+                    std::cin >> flag;      
+                    if(flag != 'l' && flag != 'g' && flag != 'a'){
+                        std::cout << "Invalid selector flag\n";
+                        continue;
+                    }
+                }else{
+                    flag = 'a';
+                }
+
+                if(components.count(sl.sector) == 1){
+                    for(auto a : components[sl.sector]){
+                        O::Memory::MemoryAddressDescriptor mad;
+                        if(flag == 'l'){
+                            if(a.offset_registor != O::Memory::Registers::ebp){
+                                continue;
+                            }
+                        }else if(flag == 'g'){
+                            if(a.offset_registor == O::Memory::Registers::ebp){
+                                continue;
+                            }
+                        }
+
+                        mad.anchor = a.offset_registor;
+                        mad.offset = a.offset;
+                        mad.sectorName = a.sector;
+                        long long* variable = _mem->GetAccessByMemoryDescriptor(mad);
+                        std::cout << "(0x"<< std::hex <<_mem->GetIdByMAD(mad) << "): " 
+                            << a.name << " = " << *variable << ";\n";
+                    }
+                }
             }else{
                 std::cout << "Unrecognised command\n";
             }
@@ -57,7 +90,10 @@ namespace O {
             if(sym.file == path && sym.line >= line){
                 int path = _mem->getSectorDescription(sym.sector).start;
                 path += sym.esp_min;
-                stop_lines.push_back(path);
+                StopLine sl;
+                sl.sector = sym.sector;
+                sl.stop_address = path;
+                stop_lines.push_back(sl);
                 break;
             }
         }
@@ -80,6 +116,47 @@ namespace O {
                 }
                 input_file.read((char*)&name_size, sizeof(int) / sizeof(char));
                 break_points.push_back({str, name_size});
+            }
+
+            int component_count = 0;
+            input_file.read((char*)&component_count, sizeof(int) / sizeof(char));
+
+            for(int i = 0; i < component_count; i++){
+                int str_size = 0;
+                input_file.read((char*)&str_size, sizeof(int) / sizeof(char));
+                std::string sector_name;
+                for(int j = 0; j < str_size; j++){
+                    char32_t new_c;
+                    input_file.read((char*)&new_c, sizeof(char32_t) / sizeof(char));
+                    sector_name += new_c;
+                }
+                std::vector<VariableSymbol> variables;
+                int variable_count = 0;
+                input_file.read((char*)&variable_count, sizeof(int) / sizeof(char));
+                for(int j = 0; j < variable_count; j++){
+                    VariableSymbol new_vs;
+                    
+                    int name_size = 0;
+                    int sector_size = 0;
+
+                    input_file.read((char*)&name_size, sizeof(char32_t) / sizeof(char));
+                    for(int l = 0; l < name_size; l++){
+                        char32_t new_c;
+                        input_file.read((char*)&new_c, sizeof(char32_t) / sizeof(char));
+                        new_vs.name += new_c;
+                    }
+                    input_file.read((char*)&sector_size, sizeof(char32_t) / sizeof(char));
+                    for(int l = 0; l < sector_size; l++){
+                        char32_t new_c;
+                        input_file.read((char*)&new_c, sizeof(char32_t) / sizeof(char));
+                        new_vs.sector += new_c;
+                    }
+
+                    input_file.read((char*)&new_vs.offset, sizeof(char32_t) / sizeof(char));
+                    input_file.read((char*)&new_vs.offset_registor, sizeof(char32_t) / sizeof(char));
+                    variables.push_back(new_vs);
+                }
+                components.insert({sector_name, variables});
             }
 
             int debug_symbols_count = 0;
