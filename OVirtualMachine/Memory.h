@@ -40,7 +40,7 @@ namespace O {
         struct MemoryAddressDescriptor{
             std::string sectorName;
             Registers anchor = (Registers)-1;
-            int offset = 0;
+            long long offset = 0;
         };
 
     private:

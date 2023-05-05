@@ -6,6 +6,7 @@
 #include "Scenary.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cdc.h>
 #define GETREG(varname) *_mem->GetRegisterAccess(varname)
 #define GETMAD(varname) *_mem->GetAccessByMemoryDescriptor(varname)
@@ -76,10 +77,62 @@ namespace O {
                         mad.sectorName = a.sector;
                         long long* variable = _mem->GetAccessByMemoryDescriptor(mad);
                         std::cout << "(0x"<< std::hex <<_mem->GetIdByMAD(mad) << "): " 
-                            << a.name << " = " << *variable << ";\n";
+                            << a.name << " = 0x" << *variable << ";\n";
+                    }
+                    std::cout << "\n";
+                }
+            }
+            else if(command == "dump"){
+                long long address = 0;
+                std::string input;
+                std::getline(std::cin, input);
+                std::stringstream input_stream;
+                input_stream << input;        
+                std::string st_adress;
+                input_stream >> st_adress;
+                long long count = 1;
+                input_stream >> std::dec >> count;
+
+                if(st_adress.size() >= 2 && st_adress[0] == '0' && st_adress[1] == 'x'){
+                    std::stringstream ads(st_adress);
+                    ads >> std::hex >> address;
+                }else{
+                    auto component = components[sl.sector];
+                    bool found = false;
+                    for(auto elem : component){
+                        if(elem.name == st_adress){
+                            O::Memory::MemoryAddressDescriptor mad;
+                            mad.anchor = elem.offset_registor;
+                            mad.offset = elem.offset;
+                            mad.sectorName = elem.sector;
+                            found = true;
+                            address = *_mem->GetAccessByMemoryDescriptor(mad);
+                            break;
+                        }
+                    }
+                    if(!found){
+                        std::cout << "Now such variable with name " << st_adress << "\n";
+                        continue;
                     }
                 }
-            }else{
+                
+                for(int i = 0; i < count; i++){
+                    std::cout << "(0x" << std::hex << address << ")";
+                    O::Memory::MemoryAddressDescriptor mad;
+                    mad.anchor = (O::Memory::Registers)-1;
+                    mad.offset = address;
+                    long long a ;
+                    try{
+                       a = *_mem->GetAccessByMemoryDescriptor(mad);
+                    }catch(...){
+                        break;
+                    }
+                    std::cout << "value = 0x" << std::hex << a << "\n";
+                    address++;
+                }
+                std::cout << "\n";
+            }
+            else{
                 std::cout << "Unrecognised command\n";
             }
         }
