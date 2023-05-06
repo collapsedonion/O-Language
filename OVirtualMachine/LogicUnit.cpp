@@ -92,6 +92,8 @@ namespace O {
                 input_stream >> st_adress;
                 long long count = 1;
                 input_stream >> std::dec >> count;
+                char format = 'h';
+                input_stream >> format;
 
                 if(st_adress.size() >= 2 && st_adress[0] == '0' && st_adress[1] == 'x'){
                     std::stringstream ads(st_adress);
@@ -121,13 +123,28 @@ namespace O {
                     O::Memory::MemoryAddressDescriptor mad;
                     mad.anchor = (O::Memory::Registers)-1;
                     mad.offset = address;
-                    long long a ;
+                    long long a;
                     try{
                        a = *_mem->GetAccessByMemoryDescriptor(mad);
                     }catch(...){
                         break;
                     }
-                    std::cout << "value = 0x" << std::hex << a << "\n";
+                    std::cout << "value = ";
+                    if(format == 'h'){
+                        std::cout << "0x" << std::hex << a << '\n';
+                    }else if(format == 'd'){
+                        std::cout << std::dec << a << '\n';
+                    }else if(format == 'c'){
+                        char* as_c = (char*)&a;
+                        for(int i = 0; i < 8; i++){
+                            std::cout << '\'' << as_c << '\'';
+                            as_c++;
+                        }
+                        std::cout << '\n';
+                    }else{
+                        std::cout << "Invalid format\n";
+                        break;
+                    }
                     address++;
                 }
                 std::cout << "\n";
