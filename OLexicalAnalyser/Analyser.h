@@ -21,13 +21,13 @@ namespace O {
 
 		struct Token {
 		public:
-			Type type;
-			std::u32string token;
-			std::u32string file_name;
-            int line_id;
+			Type type = Type::Name;
+			std::u32string token = U"";
+			std::u32string file_name = U"";
+            int line_id = -1;
 			bool twoSided = false;
 			bool forward = false;
-			std::vector<Token> childToken;
+			std::vector<Token> childToken = {};
 		};
 
         enum class OperatorType{

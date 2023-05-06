@@ -54,7 +54,7 @@ int main(int argC, char* args[]) {
 
     std::u32string filesource;
 
-    std::ifstream f(realFilePath);    
+    std::ifstream f(filepath);    
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utfConvertor;
     std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
     filesource = utfConvertor.from_bytes(s);
@@ -72,9 +72,8 @@ int main(int argC, char* args[]) {
 
     try {
         sematiser.ProccessTokenisedFile(TokenisedFile);
-    }catch (CompilationException& exception){
-
-        std::ifstream error_file(exception.file_name);
+    }catch (CompilationException& exception){      
+        std::ifstream error_file(utfConvertor.to_bytes(exception.file_name));
 
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
         std::string res = converter.to_bytes(exception.getText());

@@ -201,7 +201,8 @@ namespace O {
     }
 
     void OtoOTranslator::WriteResulToFile(std::u32string filepath) {
-        std::ofstream f(filepath);
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
+        std::ofstream f(convertor.to_bytes(filepath), std::ios::binary);
 
         int sectorCount = this->addSectors.size() + 1;
 
@@ -229,7 +230,8 @@ namespace O {
     }
 
     void OtoOTranslator::WriteDebugSymbols(std::u32string path, std::vector<std::pair<std::u32string, int>> breakPoints){
-        std::ofstream f(path);
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
+        std::ofstream f(convertor.to_bytes(path), std::ios::binary);
 
         int break_point_count = breakPoints.size();
         f.write((char*)&break_point_count, sizeof(int) / sizeof(char));
@@ -486,7 +488,6 @@ namespace O {
             auto loadMC1 = G::pop(GR::mc1);
             auto loadMC2 = G::pop(GR::mc2);
             
-            ProccessStdLogic(inst.Parameters[0], inst.Parameters[1], inst.name);
             ADDVTV(Instructions, saveMC1)
             ADDVTV(Instructions, saveMC2)
             LoadInstToReg(inst.Parameters[0], GR::mc1);

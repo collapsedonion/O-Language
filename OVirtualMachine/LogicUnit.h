@@ -8,7 +8,6 @@
 #include "Memory.h"
 #include <map>
 #include <OVM_SDK.h>
-#include <dlfcn.h>
 
 #define DOUBLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg, long long value);void instName(O::Memory::Registers destReg, O::Memory::Registers sourceReg);void instName(O::Memory::MemoryAddressDescriptor dest, long long value);void instName(O::Memory::MemoryAddressDescriptor dest, O::Memory::MemoryAddressDescriptor source);void instName(O::Memory::Registers dest, O::Memory::MemoryAddressDescriptor source);void instName(O::Memory::MemoryAddressDescriptor dest, O::Memory::Registers source);
 #define SINGLEOPINSTRUCTIONDESCRIPTION(instName) void instName(O::Memory::Registers destReg); void instName(O::Memory::MemoryAddressDescriptor mad); void instName(long long value);

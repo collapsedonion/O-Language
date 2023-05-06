@@ -250,9 +250,8 @@ void LoadDL(std::string path, O::LogicUnit* lu){
 	}
     }
 }
-
+typedef int(*gc)();
 int main(int argc, char* args[]) {
-
     if(argc == 1){
         return -1;
     }
@@ -264,7 +263,7 @@ int main(int argc, char* args[]) {
  
     std::string loadFile = args[1];
 
-    std::ifstream f(loadFile);
+    std::ifstream f(loadFile, std::ios::binary);
 
     O::Memory mem(20000);
     O::LogicUnit lu(&mem);
@@ -290,11 +289,11 @@ int main(int argc, char* args[]) {
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 
     int sectorCount;
-    f.read((char*)&sectorCount, sizeof(int));
+    f.read((char*)&sectorCount, sizeof(int) / sizeof(char));
 
     for(int i = 0; i < sectorCount; i++){
         int nameSize;
-        f.read((char*)&nameSize, sizeof(int));
+        f.read((char*)&nameSize, sizeof(int) / sizeof(char));
         char* sectorName = (char*)malloc((nameSize + 1) * sizeof(char));
 
         for(int j = 0; j < nameSize; j++){
@@ -302,16 +301,18 @@ int main(int argc, char* args[]) {
             f.read((char*)&newC, sizeof(char32_t ) / sizeof(char ));
             sectorName[j] = (char)newC;
         }
+        sectorName[nameSize] = '\0';
 
         int size;
         f.read((char*)&size, sizeof(int));
 
-        std::vector<int> data;
-        data.resize(size);
+        std::vector<long long> lData;
 
-        f.read((char*)data.data(), size * sizeof(char32_t));
-
-        std::vector<long long> lData(data.begin(), data.end());
+        for (int j = 0; j < size; j++) {
+            int new_elem;
+            f.read((char*)&new_elem, sizeof(int));
+            lData.push_back(new_elem);
+        }
 
         mem.LoadProgram(std::string(sectorName), lData);
 

@@ -92,11 +92,11 @@ namespace O {
 
         if(!isAlredyIncluded(params[1])){
             included.push_back(params[1]);
-            std::ifstream f(filePath + params[1]);
+            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
+            std::ifstream f(convertor.to_bytes(filePath + params[1]));
             if(!f.good()){
-                f = std::ifstream(execPath + U"/stdLib/" + params[1]);
+                f = std::ifstream(convertor.to_bytes(execPath + U"/stdLib/" + params[1]));
             }
-	        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
             std::string s((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
             std::u32string content = convertor.from_bytes(s);
             f.close();
@@ -154,7 +154,12 @@ namespace O {
     }
 
     Preproccesor::Preproccesor(std::u32string filePath, std::u32string execPath) {
+        
+#if defined(__APPLE__)
         auto indexOfLast = filePath.rfind('/');
+#elif defined(_WIN32)
+        auto indexOfLast = filePath.rfind('\\');
+#endif
         if(indexOfLast != std::string::npos)
         {
            this->filePath = filePath.substr(0, indexOfLast) + U"/";

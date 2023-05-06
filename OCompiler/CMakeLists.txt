@@ -35,7 +35,7 @@ target_link_libraries(OCompiler LINK_PUBLIC OtoOVMCompiler)
 
 target_link_libraries(OCompiler LINK_PRIVATE CDC)
 
-add_custom_command(TARGET OCompiler  POST_BUILD
+add_custom_command(TARGET OCompiler  PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${PROJECT_SOURCE_DIR}/../OStdLib/STD_HEADERS
-	${PROJECT_BINARY_DIR}/stdlib)
+	${CMAKE_BINARY_DIR}/stdlib)

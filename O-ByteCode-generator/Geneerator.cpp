@@ -2,7 +2,7 @@
 // Created by Роман  Тимофеев on 01.03.2023.
 //
 
-#include "Geneerator.h"
+#include "Geneerator.hpp"
 
 
 #define TORET std::vector<int> toRet;

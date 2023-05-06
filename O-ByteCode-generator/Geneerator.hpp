@@ -12,7 +12,7 @@
 #define GENERATEZEROPARAMDEF(NAME) static std::vector<int> NAME();
 #define GENERATEONEPARAMDEF(NAME) static std::vector<int> NAME(int value); static std::vector<int> NAME(Registers op); static std::vector<int> NAME(std::u32string sector, int offset, Registers anchor);
 
-static class Geneerator {
+class Geneerator {
 public:
     enum class Registers{
         NULLREG= -1,

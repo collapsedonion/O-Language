@@ -6,7 +6,7 @@
 	#include <mach-o/dyld.h>
 	#include <dlfcn.h>
 #endif
-#ifdef __CYGWIN__
+#if defined(_WIN32) || defined(__CYGWIN__)
 	#include <Windows.h>
 #endif
 
@@ -22,7 +22,7 @@ char* cdc_get_current_directory(){
 	}
 	return buf;
 #endif
-#ifdef __CYGWIN__
+#ifdef WIN32
 	size_t buffer_size = GetCurrentDirectory(0, NULL);
 	char* buf = (char*)malloc(buffer_size);
 	GetCurrentDirectory(buffer_size, buf);
@@ -40,7 +40,7 @@ char* cdc_get_executable_directory() {
 		buf = (char*)realloc(buf, buffer_size);
 	}
 #endif
-#ifdef __CYGWIN__
+#if defined(WIN32)
 	size_t buffer_size = 0;
 	char* buf = (char*)malloc(buffer_size);
 	do {
@@ -67,7 +67,7 @@ cdc_dynamic_lib_handle cdc_open_dynamic_lib(char* path_to_dl) {
 #ifdef __APPLE__
 	new_str_len += 6;
 	char* extension = ".dylib";
-#elif defined(__CYGWIN__)
+#elif defined(WIN32)
 	new_str_len += 4;
 	char* extension = ".dll";
 #endif
@@ -80,10 +80,13 @@ cdc_dynamic_lib_handle cdc_open_dynamic_lib(char* path_to_dl) {
 	}
 #ifdef __APPLE__
 	void* handler = dlopen(real_path, RTLD_NOW);
-#elif defined(__CYGWIN__)
+#elif defined(WIN32)
 	HINSTANCE handler;
 	if (real_path == 0) {
 		handler = GetModuleHandle("ucrtbase.dll");
+		if (handler == 0) {
+			handler = GetModuleHandle("ucrtbased.dll");
+		}
 	}
 	else {
 		handler = LoadLibrary(real_path);
@@ -99,7 +102,7 @@ cdc_dynamic_lib_handle cdc_open_dynamic_lib(char* path_to_dl) {
 void* cdc_get_dynamic_lib_member(cdc_dynamic_lib_handle dl_handle, char* member_name){
 #ifdef __APPLE__
 	return dlsym(dl_handle, member_name);
-#elif defined(__CYGWIN__)
+#elif defined(__CYGWIN__) || defined(WIN32)
 	return GetProcAddress(dl_handle, member_name);
 #endif
 }
@@ -108,7 +111,7 @@ void* cdc_get_dynamic_lib_member(cdc_dynamic_lib_handle dl_handle, char* member_
 void cdc_close_dynamic_lib(cdc_dynamic_lib_handle dl_handle){
 #ifdef __APPLE__
 	dlclose(dl_handle);
-#elif defined(__CYGWIN__)
+#elif defined(WIN32)
 	FreeLibrary(dl_handle);
 #endif
 }

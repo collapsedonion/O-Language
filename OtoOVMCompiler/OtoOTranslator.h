@@ -6,7 +6,7 @@
 #define OTOOVMCOMPILER_OTOOTRANSLATOR_H
 
 #include <BaseTypes.h>
-#include <Geneerator.h>
+#include <Geneerator.hpp>
 #include <fstream>
 #include <map>
 

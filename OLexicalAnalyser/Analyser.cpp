@@ -143,7 +143,7 @@ int O::Analyser::charNotInFunction(std::u32string str, char32_t c)
 std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBracketOperator(std::u32string str, char32_t left, char32_t right)
 {
     int level = -1;
-    if ((*(str.end() - 1)) != right || str[0] == left) {
+    if (str.empty() || (*(str.end() - 1)) != right || str[0] == left) {
         return { false, {U"", U""} };
     }
 
@@ -292,7 +292,7 @@ std::u32string O::Analyser::removeSpaceBars(std::u32string str)
         }
     }
 
-    if (*(res.end() - 1) == ' ') {
+    if (res.size() > 0 && * (res.end() - 1) == ' ') {
         res.pop_back();
     }
 
@@ -388,7 +388,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         res.type = Type::ServiceName;
         res.childToken = { StringToTree(str.substr(0, str.size() - 1), line_id, file_name)};
         res.line_id = line_id;
-	res.file_name = file_name;
+	    res.file_name = file_name;
         return res;
     }
     if (str & U"extern:"){
@@ -561,6 +561,10 @@ O::Analyser::Token O::Analyser::StringToTree(std::u32string str, int line_id, st
     std::u32string withOutSpaces = removeSpaceBars(str);
     withOutSpaces = removeBrackes(withOutSpaces);
 
+    if (withOutSpaces.empty()) {
+        return {};
+    }
+
     Token result;
     auto t = getMathematicExpression(withOutSpaces, line_id, file_name);
     if (t.token != U"") {
@@ -633,18 +637,18 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
         else {
             if (str[i] == ';') {
                 if(removeSpaceBars(last) & U"#LINE_ID")
-		{
-		    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
-		    std::string num = convert.to_bytes(removeSpaceBars(last).substr(8, last.size()-8));
+		        {       
+		            std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+		            std::string num = convert.to_bytes(removeSpaceBars(last).substr(8, last.size()-8));
                     line  = std::stoi(num);
                     last = U"";
-		}else if(removeSpaceBars(last) & U"#FILE_NAME"){
-	            current_file_name = removeSpaceBars(last).substr(10, last.size() - 10);
-		    last = U"";
-		}else {
+		        }else if(removeSpaceBars(last) & U"#FILE_NAME"){
+	                current_file_name = removeSpaceBars(last).substr(10, last.size() - 10);
+		            last = U"";
+		        }else {
                     newL.name = last;
                     newL.line_id = line;
-		    newL.file_name = current_file_name;
+		            newL.file_name = current_file_name;
                     main.subFile.push_back(newL);
                     newL = StructurisedFile();
                     last = U"";
@@ -743,7 +747,7 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32strin
                 return {true, {
                         Type::MathematicalOperator,
                         anOperator.name,
-			file_name,
+			            file_name,
                         line_id,
                         false,
                         true,

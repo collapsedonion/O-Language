@@ -9,7 +9,7 @@
 #else
 	#define DL_EXTERN extern
 #endif
-#elif defined(__CYGWIN__)
+#elif defined(_WIN32) || defined(__CYGWIN__)
 #define cdc_path_separator '\\'
 
 #ifdef __cplusplus

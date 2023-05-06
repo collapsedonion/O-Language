@@ -170,7 +170,7 @@ namespace O {
     }
 
     void LogicUnit::LoadDebugSymbols(std::string path){
-        std::ifstream input_file(path);
+        std::ifstream input_file(path, std::ios::binary);
         if(input_file.good()){
             int break_point_count = 0;
             input_file.read((char*)&break_point_count, sizeof(int) / sizeof(char));
