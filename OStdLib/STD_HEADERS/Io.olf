@@ -7,9 +7,12 @@ global:NativeFunction nf_c_get_char;
 global:RPChar nf_c_get_char_args;
 
 func io_link(){
+    var:void~ real_name;
     var:char~ put_name = "putchar";
     var:RPChar put_c_name = strToCstr(put_name);
     @nf_c_put_char = extractDLMember(c_std_lib_handler, put_c_name);
+    @real_name = getRelativePointer(RPointer(put_c_name));
+    free(real_name);
     free(put_name);
 
     var:char~ put_args = "c";
@@ -19,6 +22,8 @@ func io_link(){
     var:char~ took_name = "getchar";
     var:RPChar took_c_name = strToCstr(took_name);
     @nf_c_get_char = extractDLMember(c_std_lib_handler, took_c_name);
+    @real_name = getRelativePointer(RPointer(took_c_name));
+    free(real_name);
     free(took_name);
 
     var:char~ took_args = "";

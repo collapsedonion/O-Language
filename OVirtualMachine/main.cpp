@@ -216,6 +216,24 @@ void GetRealPointerContent(MEM_POINTER mem){
     }
 }
 
+void GetRelativePointer(MEM_POINTER mem){
+    long long real_pointer = *getObjectReferenceByAddress(mem, mem.ebp);
+    if(real_pointer - (long long)(&(mem._mem[0])) < mem._mem->size()){
+        *mem.eax = real_pointer - (long long)mem._mem->data();
+    }else{
+        auto b = mem._heap->begin();
+        for(int i = 0; i < mem._heap->size(); i++){          
+            if(real_pointer - (long long)(&(*b).second[0]) < (*b).second.size()){
+                long long to_ret = (*b).first;
+                to_ret <<= 32;
+                to_ret += real_pointer - (long long)(&(*b).second[0]);
+                *mem.eax = to_ret;
+            }
+            b++;
+        }
+    }
+}
+
 void LoadDL(std::string path, O::LogicUnit* lu){
     std::ifstream f(path);
 
@@ -267,6 +285,7 @@ int main(int argc, char* args[]) {
     lu.AddNewInterrupt("openDL", OpenDynamicLib);
     lu.AddNewInterrupt("extractDLMember", GetDlMember);
     lu.AddNewInterrupt("nativeInvoke", CallCFunction);
+    lu.AddNewInterrupt("getRelativePointer", GetRelativePointer);
 
     LoadDL(execPath + "/stdbin/libs.conf", &lu);
 

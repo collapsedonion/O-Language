@@ -19,9 +19,13 @@ global:RPChar nf_c_fput_args;
 
 
 func file_io_link(){ 
+    var:void~ real_name;
+
     var:char~ open_name = "fopen";
     var:RPChar open_c_name = strToCstr(open_name);
     @nf_c_fopen_file = extractDLMember(c_std_lib_handler, open_c_name);
+    @real_name = getRelativePointer(RPointer(open_c_name));
+    free(real_name);
     free(open_name);
 
     var:char~ open_args = "ll";
@@ -31,6 +35,8 @@ func file_io_link(){
     var:char~ close_open = "fclose";
     var:RPChar close_c_name = strToCstr(close_open);
     @nf_c_fclose_file = extractDLMember(c_std_lib_handler, close_c_name);
+    @real_name = getRelativePointer(RPointer(close_c_name));
+    free(real_name);
     free(close_open);
 
     var:char~ close_args = "l";
@@ -40,16 +46,22 @@ func file_io_link(){
     var:char~ eof_name = "feof";
     var:RPChar eof_c_name = strToCstr(eof_name);
     @nf_c_eof = extractDLMember(c_std_lib_handler, eof_c_name);
+    @real_name = getRelativePointer(RPointer(eof_c_name));
+    free(real_name);
     free(eof_name);
 
     var:char~ get_char_name = "fgetc";
     var:RPChar get_char_c_name = strToCstr(get_char_name);
     @nf_c_fread = extractDLMember(c_std_lib_handler, get_char_c_name);
+    @real_name = getRelativePointer(RPointer(get_char_c_name));
+    free(real_name);
     free(get_char_name);
 
     var:char~ put_char_name = "fputc";
     var:RPChar put_char_c_name = strToCstr(put_char_name);
     @nf_c_fput = extractDLMember(c_std_lib_handler, put_char_c_name);
+    @real_name = getRelativePointer(RPointer(put_char_c_name));
+    free(real_name);
     free(put_char_name);
 
     var:char~ put_args = "lc";
@@ -60,6 +72,7 @@ func file_io_link(){
 file_io_link();
 
 func:File openFile(char~ path, char~ mode){
+    var:void~ real_name;
     var:int~ arguments = malloc(int~, 2);
     var:RPChar c_path = strToCstr(path);
     var:RPChar c_mode = strToCstr(mode);
@@ -67,6 +80,12 @@ func:File openFile(char~ path, char~ mode){
     @arguments[1] = int(c_mode);
 
     var:int file = nativeInvoke(nf_c_fopen_file, 2, arguments, nf_c_fopen_file_args);
+
+    @real_name = getRelativePointer(RPointer(c_path));
+    free(real_name);
+
+    @real_name = getRelativePointer(RPointer(c_mode));
+    free(real_name);
 
     free(arguments);
     return(File(file));

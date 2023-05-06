@@ -110,7 +110,7 @@ func:bool compareString(char~ str1, char~ str2){
 
 func:RPChar strToCstr(char~ str){
     var:int size = stringSize(str);
-    var:char~ allocSpace = malloc(char~, size + 1);
+    var:char~ allocSpace = malloc(char~, size / 8 + 2);
     var:int index = 0;
     var:RPChar realStr = [realStr initRPChar(allocSpace)];
 

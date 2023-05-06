@@ -83,6 +83,7 @@ struct:RPointer{
 extern:func:RPointer getRPointer(void~ pointer);
 extern:func setRPointerData(RPointer rp, int size, int data);
 extern:func:int getRPointerContent(RPointer rp, int size);
+extern:func:void~ getRelativePointer(RPointer rp);
 
 template:For{
     init;
@@ -101,9 +102,12 @@ global:DynamicLib c_std_lib_handler;
 
 func initC_std(){
     var:char~ name = "";
+    var:void~ real_name;
     var:RPChar cName = strToCstr(name);
-
+    
     @c_std_lib_handler = openDL(cName);
+    @real_name = getRelativePointer(RPointer(cName));
+    free(real_name);
     free(name);
 }
 
