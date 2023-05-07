@@ -30,8 +30,8 @@ enum class Registers{
 };
 
 struct SectorDescription{
-    int start;
-    int size;
+    long long start;
+    long long size;
 };
 
 inline std::pair<bool, std::pair<int, int>> decodeAddress(long long address){

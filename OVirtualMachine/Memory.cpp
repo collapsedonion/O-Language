@@ -24,8 +24,8 @@ namespace O {
         *esp = sd.start + sd.size;
     }
 
-    int Memory::LoadProgram(std::string sectorName, std::vector<long long> content) {
-        int lastId = _mem.size();
+    long long Memory::LoadProgram(std::string sectorName, std::vector<long long> content) {
+        long long lastId = _mem.size();
         SectorDescription sd;
         sd.start = lastId;
         sd.size = content.size();
@@ -39,7 +39,7 @@ namespace O {
 
     long long *Memory::GetRegisterAccess(Memory::Registers reg) {
 
-        int index = registerSectionDescriptor.start + (int)reg;
+        long long index = registerSectionDescriptor.start + (int)reg;
 
         return &(_mem[index]);
     }
@@ -54,7 +54,7 @@ namespace O {
         _mem[*esp] = *registerSource;
     }
 
-    void Memory::push(int value) {
+    void Memory::push(long long value) {
         long long * esp = GetRegisterAccess(Registers::esp);
         (*esp)--;
         if((*esp) < stackStart){
@@ -96,7 +96,7 @@ namespace O {
         return &_mem[index];
     }
 
-    void Memory::pop(int value) {
+    void Memory::pop(long long value) {
         throw std::exception();
     }
 
@@ -156,7 +156,7 @@ namespace O {
         malloc(*GetAccessByMemoryDescriptor(mad));
     }
 
-    void Memory::malloc(int value) {
+    void Memory::malloc(long long value) {
         auto start = getFreeHeap();
         _heap.insert({start, std::vector<long long>()});
 
@@ -202,7 +202,7 @@ namespace O {
         return mp;
     }
 
-    int Memory::getFreeHeap() {
+    long long Memory::getFreeHeap() {
 
         if(!heapFree.empty()){
             int value = heapFree.top();
@@ -219,5 +219,69 @@ namespace O {
         return _sectors[name];
     }
 
+    std::string toString(Memory::Registers reg){
+        switch (reg) {
+            case Memory::Registers::NULL_REG:
+                return "0";
+            case Memory::Registers::eax:
+                return "eax";
+            case Memory::Registers::ebx:
+                return "ebx";
+                break;
+            case Memory::Registers::ecx:
+                return "ecx";
+                break;
+            case Memory::Registers::edx:
+                return "edx";
+                break;
+            case Memory::Registers::eip:
+                return "eip";
+                break;
+            case Memory::Registers::esp:
+                return "esp";
+                break;
+            case Memory::Registers::edp:
+                return "edp";
+                break;
+            case Memory::Registers::esi:
+                return "esi";
+                break;
+            case Memory::Registers::edi:
+                return "edi";
+                break;
+            case Memory::Registers::mc0:
+                return "mc0";
+                break;
+            case Memory::Registers::mc1:
+                return "mc1";
+                break;
+            case Memory::Registers::mc2:
+                return "mc2";
+                break;
+            case Memory::Registers::mc3:
+                return "mc3";
+                break;
+            case Memory::Registers::aa0:
+                return "aa0";
+                break;
+            case Memory::Registers::aa1:
+                return "aa1";
+                break;
+            case Memory::Registers::ebp:
+                return "ebp";
+                break;
+            case Memory::Registers::flag:
+                return "flag";
+                break;
+        }
+    }
 
+    std::string toString(Memory::MemoryAddressDescriptor mad){
+        std::string toRet = "[";
+        toRet += (mad.sectorName.empty() ? "0" : mad.sectorName) + "+";
+        toRet += toString(mad.anchor) + "+";
+        toRet += "(" + std::to_string(mad.offset) + ")";
+        toRet += "]";
+        return toRet;
+    }
 } // O

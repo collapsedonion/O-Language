@@ -148,6 +148,17 @@ namespace O {
                     address++;
                 }
                 std::cout << "\n";
+            }else if(command == "disasm" || command == "da"){
+                int c;
+                long long adress = *_mem->GetRegisterAccess(O::Memory::Registers::eip);
+                long long max_adress = _mem->getSectorDescription(sl.sector).start +  _mem->getSectorDescription(sl.sector).size;
+                std::cin >> c;
+                
+                for(int i = 0; i < c && adress < max_adress; i++){
+                    auto scenary = O::Scenary::generateScript(_mem->getMem(), adress);
+                    adress+=scenary.first;
+                    std::cout << "\t(0x" << std::hex << adress << ")" << scenary.second.toString() << "\n";
+                }
             }
             else{
                 std::cout << "Unrecognised command\n";

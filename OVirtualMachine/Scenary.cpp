@@ -10,6 +10,38 @@
 
 namespace O{
 
+    const std::vector<std::string> Scenary::instruction_string_name = {
+        "mov",
+        "add",
+        "sub",
+        "pop",
+        "push",
+        "ret",
+        "call",
+        "pushs",
+        "pops",
+        "cmp",
+        "movg",
+        "movl",
+        "move",
+        "jmp",
+        "jme",
+        "malloc",
+        "free",
+        "interrupt",
+        "mul",
+        "div",
+        "mod",
+        "and",
+        "or",
+        "addf",
+        "subf",
+        "mulf",
+        "divf",
+        "cmpf",
+        "get adress",
+    };
+
     std::pair<int, Scenary::ScriptWord> Scenary::generateScript(long long *a, long long id) {
         long long readSize = 0;
         auto type = (InstructionType)a[id];
@@ -30,6 +62,59 @@ namespace O{
         sw.top1 = opT1;
         sw.top2 = opT2;
         return {readSize, sw};
+    }
+
+    std::string Scenary::ScriptWord::toString(){
+        std::string result;
+        if(this->instruction < instruction_string_name.size()){
+            result += instruction_string_name[this->instruction];
+            result += ": ";
+        }else{
+            result += this->instruction;
+            result += ": ";
+        }
+        
+        switch (this->top1) {
+            case value:
+                result+="V(";
+                result+= std::to_string(this->op1.value);
+                result+="):";
+                break;
+            case registerO:
+                result+="R(";
+                result+=O::toString(this->op1.reg);
+                result+="):";
+                break;
+            case MAD:
+                result+="M(";
+                result+=O::toString(this->op1.mad);
+                result+="):";
+                break;
+            default:
+                break;
+        }
+        
+        switch (this->top2) {
+            case value:
+                result+="V(";
+                result+= std::to_string(this->op2.value);
+                result+=")";
+                break;
+            case registerO:
+                result+="R(";
+                result+=O::toString(this->op2.reg);
+                result+=")";
+                break;
+            case MAD:
+                result+="M(";
+                result+=O::toString(this->op2.mad);
+                result+=")";
+                break;
+            default:
+                break;
+        }
+        
+        return result;
     }
 
     std::pair<int, Scenary::Operand> Scenary::readOperand(Scenary::OperandType opT, long long *a, long long id) {
@@ -54,7 +139,7 @@ namespace O{
                 readSize += 1;
                 O::Memory::Registers reg = (O::Memory::Registers)a[id + readSize];
                 readSize++;
-                int offset = a[id+readSize];
+                long long offset = a[id+readSize];
                 readSize++;
                 O::Memory::MemoryAddressDescriptor mad;
                 mad.sectorName = str;
@@ -97,7 +182,7 @@ namespace O{
             INSTSETUPTWOPARAM(mulf)
             INSTSETUPTWOPARAM(divf)
             INSTSETUPTWOPARAM(cmpf)
-	    INSTSETUPONEPARAM(ga, lu);
+            INSTSETUPONEPARAM(ga, lu);
         }
     }
 }

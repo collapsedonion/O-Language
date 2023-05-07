@@ -46,11 +46,13 @@ namespace O {
             mulf = 25,
             divf = 26,
             cmpf = 27,
-	    ga = 28,
+            ga = 28,
         };
+        
+        static const std::vector<std::string> instruction_string_name;
 
         struct Operand{
-            int value = 0;
+            long long value = 0;
             O::Memory::Registers reg;
             O::Memory::MemoryAddressDescriptor mad;
         };
@@ -61,7 +63,11 @@ namespace O {
             Operand op1;
             OperandType top2;
             Operand op2;
+            
+            std::string toString();
         };
+        
+
 
         static std::pair<int, Operand> readOperand(OperandType opT, long long* a, long long id);
         static std::pair<int, ScriptWord> generateScript(long long* a, long long id);

@@ -16,6 +16,7 @@ namespace O {
     class Memory {
     public:
         enum class Registers{
+            NULL_REG = -1,
             eax = 0,
             ebx = 1,
             ecx = 2,
@@ -54,20 +55,20 @@ namespace O {
     public:
         Memory(int stackSize);
         SectorDescription getSectorDescription(std::string name);
-        int getFreeHeap();
-        int LoadProgram(std::string sectorName, std::vector<long long> content);
+        long long getFreeHeap();
+        long long LoadProgram(std::string sectorName, std::vector<long long> content);
         long long* GetRegisterAccess(Registers reg);
         long long* GetAccessByMemoryDescriptor(MemoryAddressDescriptor mad);
         long long GetIdByMAD(MemoryAddressDescriptor mad);
         void push(Registers reg);
         void push(MemoryAddressDescriptor mad);
-        void push(int value);
+        void push(long long value);
         void pop(Registers reg);
         void pop(MemoryAddressDescriptor mad);
-        void pop(int value);
+        void pop(long long value);
         void malloc(Registers reg);
         void malloc(MemoryAddressDescriptor mad);
-        void malloc(int value);
+        void malloc(long long value);
         void free(long long value);
         void free(Registers reg);
         void free(MemoryAddressDescriptor mad);
@@ -76,6 +77,9 @@ namespace O {
         MEM_POINTER getMemPointer();
         long long* getMem();
     };
+
+    std::string toString(Memory::Registers reg);
+    std::string toString(Memory::MemoryAddressDescriptor mad);
 
 } // O
 
