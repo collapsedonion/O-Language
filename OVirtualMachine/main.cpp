@@ -250,7 +250,7 @@ void LoadDL(std::string path, O::LogicUnit* lu){
 	}
     }
 }
-typedef int(*gc)();
+
 int main(int argc, char* args[]) {
     if(argc == 1){
         return -1;
