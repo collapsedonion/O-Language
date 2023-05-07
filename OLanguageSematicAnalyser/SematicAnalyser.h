@@ -24,22 +24,28 @@ namespace O {
         std::map<std::u32string, std::vector<Analyser::TokenisedFile>> templates;
         std::vector<std::pair<std::u32string, std::vector<Analyser::TokenisedFile>>> definedLabels;
         std::map<std::u32string, Instruction> enumerations;
+        std::map<DataTypes, std::vector<DataTypes>> auto_casts;
 
 	private:
 		// returns ERROR if not found
 		DataTypes containsFunction(std::u32string name, std::vector<DataTypes> dt);
+        std::pair<DataTypes, std::vector<DataTypes>> containsAutoCastebleFunction(std::u32string name, std::vector<DataTypes> dt);
         std::pair<bool, std::vector<Analyser::TokenisedFile>> containsLabel(std::u32string label);
+        void add_new_auto_cast(DataTypes from, DataTypes to);
 		bool containsVariable(std::u32string name);
 		bool containsOperator(std::u32string op, DataTypes left, DataTypes right);
         bool dataTypeIsStructure(DataTypes dt);
         bool isExternFunction(std::u32string name, std::vector<DataTypes> dt);
+        bool can_be_auto_casted(DataTypes from, DataTypes to, std::vector<DataTypes> alredy_checked);
         std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
         std::vector<Analyser::Token> getComma(Analyser::Token token);
 		DataTypes getReturnDataTypeOfOperator(std::u32string op, DataTypes left, DataTypes right);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
-
+        
         Instruction processEnumeration(Analyser::TokenisedFile tokenFile);
+        
+        Instruction processAddAutoCast(Analyser::Token token);
 
 		Instruction proccessPointerGet(Analyser::Token token);
 

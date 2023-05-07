@@ -50,12 +50,22 @@ namespace O {
                 buffer += i;
             }
 
-            if(i == '\n') {            
-		        strId++;
+            if(i == '\n') {
+                if(!bufferLoad && (result[result.size() - 1] == ';' || result[result.size() - 1]  == '}' || result[result.size() - 1]  == '{')){
+                    result += U"\n";
+                    result += U"\n";
+                    result += U"#LINE_ID";
+                    std::string line_id_str = std::to_string(strId);
+                    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+                    result += converter.from_bytes(line_id_str);
+                    result += U";";
+                    result += U"\n#FILE_NAME" + this->filePath + this->file_name + U";";
+                }
+                strId++;
 		        continue;
             }
 
-            if(!bufferLoad && i == ';' || i == '}' || i == '{'){
+            if(!bufferLoad && (i == ';' || i == '}' || i == '{')){
                 result += i;
                 result += U"\n";
                 result += U"\n";

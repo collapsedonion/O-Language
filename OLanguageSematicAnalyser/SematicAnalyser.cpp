@@ -5,6 +5,8 @@
 #define MAIN_FLOW_NAME U"___MAIN___"
 #define SET_VALUE_NAME U"SET_VALUE"
 
+#define ADD_AUTO_CAST U"add_auto_cast"
+
 #define VAR_CREATION_NAME U"var"
 
 #define GLOBAL_CREATION_NAME U"global"
@@ -63,12 +65,11 @@
 DataTypes O::SematicAnalyser::containsFunction(std::u32string name, std::vector<DataTypes> dt)
 {
 	for (auto elem : functions) {
-        bool test = elem.getArgumentsDataTypes() == dt;
 		if (elem.name == name && elem.getArgumentsDataTypes() == dt) {
 			return elem.returnType;
 		}
 	}
-
+    
 	return DataTypes::Error;
 }
 
@@ -105,6 +106,54 @@ DataTypes O::SematicAnalyser::getReturnDataTypeOfOperator(std::u32string op, Dat
 	return DataTypes::Error;
 }
 
+bool O::SematicAnalyser::can_be_auto_casted(DataTypes from, DataTypes to, std::vector<DataTypes> alredy_checked){
+    std::vector<DataTypes> next_checked = std::vector<DataTypes>(alredy_checked);
+    
+    for(auto elem : alredy_checked){
+        if(elem == from){
+            return false;
+        }
+    }
+    
+    next_checked.push_back(from);
+    
+    if(from == to){
+        return true;
+    }
+    
+    if(auto_casts.find(from) != auto_casts.end()){
+        for(auto elem : auto_casts[from]){
+            if(can_be_auto_casted(elem, to, next_checked)){
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+std::pair<DataTypes, std::vector<DataTypes>> O::SematicAnalyser::containsAutoCastebleFunction(std::u32string name, std::vector<DataTypes> dt){
+    
+    for (auto elem : functions) {
+        if (elem.name == name && elem.arguments.size() == dt.size()) {
+            bool auto_casted = true;
+            
+            for(int i = 0; i < elem.arguments.size(); i++){
+                if(!can_be_auto_casted(dt[i], elem.arguments[i].type, {})){
+                    auto_casted = false;
+                    break;
+                }
+            }
+            
+            if(auto_casted){
+                return {elem.returnType, elem.getArgumentsDataTypes()};
+            }
+        }
+    }
+    
+    return {DataTypes::Error, {}};
+}
+
 Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
     std::vector<DataTypes> dataTypes;
     Instruction retInst;
@@ -121,27 +170,64 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
     }
 
     auto f = containsFunction(retInst.name, dataTypes);
+    retInst.type = f;
 
     if (f == DataTypes::Error) {
-        auto dt = getDataType(token.childToken[0]);
-
-        if (dt != DataTypes::Error && retInst.Parameters.size() == 1) {
-            retInst.Parameters[0].type = dt;
-            retInst.Parameters[0].line = token.line_id;
-            retInst.Parameters[0].file_name = token.file_name;
-            return retInst.Parameters[0];
+        auto auto_cast = containsAutoCastebleFunction(retInst.name, dataTypes);
+        
+        if(auto_cast.first != DataTypes::Error){
+            retInst.type = auto_cast.first;
+            
+            for(int i = 0; i < retInst.Parameters.size(); i++){
+                retInst.Parameters[i].type = auto_cast.second[i];
+            }
+            
+        }else{
+            auto dt = getDataType(token.childToken[0]);
+            
+            if (dt != DataTypes::Error && retInst.Parameters.size() == 1) {
+                retInst.Parameters[0].type = dt;
+                retInst.Parameters[0].line = token.line_id;
+                retInst.Parameters[0].file_name = token.file_name;
+                return retInst.Parameters[0];
+            }
+            
+            std::u32string message = U"Unable to find function with name \"" + retInst.name + U"\"";
+            
+            throw CompilationException(token.line_id, token.file_name, message);
         }
-
-        std::u32string message = U"Unable to find function with name \"" + retInst.name + U"\"";
-
-        throw CompilationException(token.line_id, token.file_name, message);
     }
 
-    retInst.type = f;
     retInst.line = token.line_id;
     retInst.file_name = token.file_name;
 
     return retInst;
+}
+
+Instruction O::SematicAnalyser::processAddAutoCast(Analyser::Token token){
+    if(token.childToken.size() != 2){
+        throw CompilationException(token.line_id, token.file_name, U"Auto-cast instruction works only with 2 arguments");
+    }
+    
+    auto dt = getComma(token.childToken[1]);
+    
+    if(dt.size() != 2){
+        throw CompilationException(token.line_id, token.file_name, U"Auto-cast instruction works only with 2 arguments");
+    }
+    
+    auto from = stringToDataType(dt[0].token, adt);
+    auto to = stringToDataType(dt[1].token, adt);
+    
+    add_new_auto_cast(from, to);
+    return {};
+}
+
+void O::SematicAnalyser::add_new_auto_cast(DataTypes from, DataTypes to){
+    if(auto_casts.find(from) == auto_casts.end()){
+        auto_casts.insert({from, {}});
+    }
+    
+    auto_casts[from].push_back(to);
 }
 
 Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
@@ -823,7 +909,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
     token.name.childToken[0].token == EXTERN_DEFINITION_TOKEN ||
     token.name.childToken[0].token == IF_NAME ||
     token.name.childToken[0].token == UNIT_DEFINITION_TOKEN ||
-    token.name.childToken[0].token == WHILE_CYCLE_TOKEN)){
+    token.name.childToken[0].token == WHILE_CYCLE_TOKEN ||
+    token.name.childToken[0].token == ADD_AUTO_CAST)){
         if(token.name.childToken[0].token == FUNC_CREATION_NAME){
             proccessFuncInstrucion(token);
         }else if(token.name.childToken[0].token == IF_NAME){
@@ -840,6 +927,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
             if(token.name.childToken[0].childToken[0].token == FUNC_CREATION_NAME) {
                 proccessFuncInstrucion(token, true);
             }
+        }else if(token.name.childToken[0].token == ADD_AUTO_CAST){
+            processAddAutoCast(token.name);
         }
     }
     else if(token.name.token == ELSE_NAME){
