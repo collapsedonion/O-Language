@@ -26,6 +26,7 @@ extern:func:int getSysId();
 
 enum{
 	MACOS_SYS_ID = 0;
+    WINDOWS_SYS_ID = 1;
 }
 
 func operator "+=" (int~ a, int b){

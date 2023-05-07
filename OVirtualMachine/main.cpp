@@ -63,6 +63,8 @@ void LoadPackage(MEM_POINTER mem){
 void GetSystemID(MEM_POINTER mem){
 #ifdef __APPLE__
 	*mem.eax = 0;
+#elif defined(_WIN32) || defined(__CYGWIN__)
+    *mem.eax = 1;
 #endif
 }
 
