@@ -409,7 +409,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         auto splited = sliceString(str, idOfSeparator);
         res.childToken.push_back(StringToTree(splited.second, line_id, file_name));
         res.line_id = line_id;
-	res.file_name = file_name;
+        res.file_name = file_name;
         return res;
     }
 
@@ -420,7 +420,18 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
         auto splited = sliceString(str, idOfSeparator);
         res.childToken.push_back(StringToTree(splited.second, line_id, file_name));
         res.line_id = line_id;
-	res.file_name = file_name;
+        res.file_name = file_name;
+        return res;
+    }
+    
+    if(str & U"extends:"){
+        res.token = U"extend";
+        res.type = Type::ServiceName;
+        int idOfSeparator = charNotInFunction(str, ':');
+        auto splited = sliceString(str, idOfSeparator);
+        res.childToken.push_back(StringToTree(splited.second, line_id, file_name));
+        res.line_id = line_id;
+        res.file_name = file_name;
         return res;
     }
     
@@ -486,9 +497,8 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
             Func.childToken.push_back(name);
         }
 
-        //Func.childToken.push_back();
         Func.line_id = line_id;
-	Func.file_name = file_name;
+        Func.file_name = file_name;
         return Func;
     }
     else if (str[0] == '[' && (*(str.end() - 1)) == ']') {
@@ -669,7 +679,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
     if (last != U"" && removeSpaceBars(last)[0] != '#') {
         newL.name = last;
         newL.line_id = line;
-	newL.file_name = current_file_name;
+        newL.file_name = current_file_name;
         main.subFile.push_back(newL);
     }
 

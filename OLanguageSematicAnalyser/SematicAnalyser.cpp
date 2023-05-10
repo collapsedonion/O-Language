@@ -5,9 +5,13 @@
 #define MAIN_FLOW_NAME U"___MAIN___"
 #define SET_VALUE_NAME U"SET_VALUE"
 
+#define INITIALISATOR_KEYWORD U"init"
+
 #define ADD_AUTO_CAST U"add_auto_cast"
 
 #define VAR_CREATION_NAME U"var"
+
+#define STRUCTURE_EXTENDS_NAME U"extend"
 
 #define GLOBAL_CREATION_NAME U"global"
 
@@ -401,6 +405,10 @@ Instruction O::SematicAnalyser::proccessArrayAccessInstruction(Analyser::Token t
                 destInfo = v;
                 break;
             }
+        }
+        
+        if(destInfo.type == DataTypes::Error){
+            throw CompilationException(token.line_id, token.file_name, U"No such element at structure type: \"" + structureTest.second.name + U"\" with name \"" + token.childToken[1].token + U"\"");
         }
         Instruction toRet;
         toRet.type = destInfo.type;
@@ -1003,10 +1011,17 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     newStruct.name = token.name.childToken[0].token;
 
     std::vector<Analyser::TokenisedFile> methods;
-
+    
     if(stringToDataType(newStruct.name, adt) != DataTypes::Error){
         throw CompilationException(token.name.childToken[0].line_id, token.name.childToken[0].file_name, U"Data-type already defined");
     }
+    
+    adt.lastId += 1;
+    adt.additionalNumber.push_back(adt.lastId);
+    adt.additionalName.push_back(newStruct.name);
+    newStruct.myDt = stringToDataType(newStruct.name, adt);
+    
+    bool init_exists = false;
 
     for(auto elem : token.subToken){
         if(elem.name.token == UNIT_DEFINITION_TOKEN){
@@ -1017,15 +1032,100 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
             v.type = getDataType(elem.name.childToken[0]);
             v.name = elem.name.childToken[1].token;
             newStruct.variables.push_back(v);
-        }else{
-            methods.push_back(elem);
+        }
+        else if(elem.name.token == STRUCTURE_EXTENDS_NAME){
+            if(newStruct.variables.size() != 0){
+                throw CompilationException(elem.name.line_id, elem.name.file_name, U"You cant extend structure after adding members to children");
+            }
+            
+            if(elem.name.childToken.size() != 1){
+                throw CompilationException(elem.name.line_id, elem.name.file_name, U"Unexpected data at structure extend label");
+            }
+            
+            DataTypes extended_dt = stringToDataType(elem.name.childToken[0].token, adt);
+            
+            if(!dataTypeIsStructure(extended_dt)){
+                throw CompilationException(elem.name.line_id, elem.name.file_name, U"Structure can extend only another structure");
+            }
+            
+            auto e_data = containsStructureByDataType(extended_dt);
+            
+            add_new_auto_cast(newStruct.myDt, extended_dt);
+            
+            for(auto elem:e_data.second.variables){
+                newStruct.variables.push_back(elem);
+            }
+        }else if(elem.name.token == FUNCTION_CALL){
+            if(elem.name.childToken[0].token == U"init"){
+                Analyser::TokenisedFile tf = elem;
+                init_exists = true;
+                Analyser::Token init_return_type;
+                init_return_type.line_id = elem.name.line_id;
+                init_return_type.file_name = elem.name.file_name;
+                init_return_type.token = newStruct.name;
+                init_return_type.type = Analyser::Type::ServiceName;
+                
+                Analyser::Token func_creat;
+                func_creat.type = Analyser::Type::ServiceName;
+                func_creat.token = FUNC_CREATION_NAME;
+                func_creat.line_id = elem.name.line_id;
+                func_creat.file_name = elem.name.file_name;
+                func_creat.childToken = {init_return_type, elem.name.childToken[0]};
+                tf.name.childToken[0] = func_creat;
+                
+                methods.push_back(tf);
+            }else{
+                methods.push_back(elem);
+            }
         }
     }
-
-    adt.lastId += 1;
-    adt.additionalNumber.push_back(adt.lastId);
-    adt.additionalName.push_back(newStruct.name);
-    newStruct.myDt = stringToDataType(newStruct.name, adt);
+    
+    if(!init_exists){
+        Analyser::TokenisedFile tf;
+        Analyser::Token init_return_type;
+        init_return_type.line_id = -1;
+        init_return_type.file_name = U"_NOFILE";
+        init_return_type.token = newStruct.name;
+        init_return_type.type = Analyser::Type::ServiceName;
+        
+        Analyser::Token init_name;
+        init_name.line_id = -1;
+        init_name.file_name = U"_NOFILE";
+        init_name.token = U"init";
+        
+        Analyser::Token func_creat;
+        func_creat.type = Analyser::Type::ServiceName;
+        func_creat.token = FUNC_CREATION_NAME;
+        func_creat.line_id = -1;
+        func_creat.file_name = U"_NOFILE";
+        func_creat.childToken = {init_return_type, init_name};
+        
+        Analyser::Token call_brackets;
+        call_brackets.token = U"()";
+        call_brackets.type = Analyser::Type::MathematicalOperator;
+        call_brackets.forward = true;
+        call_brackets.childToken = {func_creat, {}};
+        
+        tf.name = call_brackets;
+        
+        Analyser::Token return_name;
+        return_name.type = Analyser::Type::ServiceName;
+        return_name.token = RETURN_NAME;
+        
+        Analyser::Token me;
+        me.token = U"me";
+        
+        Analyser::Token return_node;
+        return_node.token = FUNCTION_CALL;
+        return_node.type = Analyser::Type::MathematicalOperator;
+        return_node.forward = true;
+        return_node.childToken = {return_name, me};
+        
+        Analyser::TokenisedFile rtf;
+        rtf.name = return_node;
+        tf.subToken.push_back(rtf);
+        methods.push_back(tf);
+    }
 
     definedStructures.push_back(newStruct);
 
@@ -1096,7 +1196,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
             else {
                 if (token.token == MATH_SET) {
                     std::u32string firstDt = dataTypeToString(t1.type, adt);
-                    if (firstDt[0] == '~' && stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt) == t2.type) {
+                    if (firstDt[0] == '~' && stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt) == t2.type || can_be_auto_casted(t2.type, stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt), {})) {
                         res.name = U"SET_VALUE";
                         res.ArithmeticProccess = true;
                         res.type = DataTypes::ServiceInstruction;

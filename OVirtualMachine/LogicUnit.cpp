@@ -124,11 +124,17 @@ namespace O {
                     mad.anchor = (O::Memory::Registers)-1;
                     mad.offset = address;
                     long long a;
+                    
+                    bool b = false;
                     try{
                        a = *_mem->GetAccessByMemoryDescriptor(mad);
                     }catch(...){
+                        b = true;
+                    }
+                    if(b){
                         break;
                     }
+                    
                     std::cout << "value = ";
                     if(format == 'h'){
                         std::cout << "0x" << std::hex << a << '\n';
