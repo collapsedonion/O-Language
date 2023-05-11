@@ -1007,7 +1007,7 @@ File O::SematicAnalyser::getFileRepresantation()
 
 Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::TokenisedFile token) {
     Structure newStruct;
-
+    
     newStruct.name = token.name.childToken[0].token;
 
     std::vector<Analyser::TokenisedFile> methods;
@@ -1022,7 +1022,12 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     newStruct.myDt = stringToDataType(newStruct.name, adt);
     
     bool init_exists = false;
+    
+    DataTypes father;
 
+    Analyser::Token super_constructor_call;
+    bool active_constructor = false;
+    
     for(auto elem : token.subToken){
         if(elem.name.token == UNIT_DEFINITION_TOKEN){
             Variable v;
@@ -1052,11 +1057,49 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
             
             add_new_auto_cast(newStruct.myDt, extended_dt);
             
+            father = extended_dt;
+            
             for(auto elem:e_data.second.variables){
                 newStruct.variables.push_back(elem);
             }
-        }else if(elem.name.token == FUNCTION_CALL){
-            if(elem.name.childToken[0].token == U"init"){
+        }else if(elem.name.token == SQUARE_OPERATOR){
+            if(elem.name.childToken[0].token == FUNCTION_CALL){
+                Analyser::Token directive_content = elem.name.childToken[0];
+                if(directive_content.childToken[0].token == U"super"){
+                    Analyser::Token father_name;
+                    father_name.type = Analyser::Type::ServiceName;
+                    father_name.token = dataTypeToString(father, adt);
+                    
+                    Analyser::Token name;
+                    name.token = U"me";
+                    
+                    Analyser::Token convert_to_father;
+                    convert_to_father.type = Analyser::Type::MathematicalOperator;
+                    convert_to_father.token = FUNCTION_CALL;
+                    convert_to_father.forward = true;
+                    convert_to_father.childToken = {father_name, name};
+                    
+                    directive_content.childToken[0].token = INITIALISATOR_KEYWORD;
+                    
+                    Analyser::Token init;
+                    init.token = UNIT_DEFINITION_TOKEN;
+                    init.childToken = {convert_to_father, directive_content.childToken[0]};
+                    
+                    directive_content.childToken[0] = init;
+                    
+                    Analyser::Token call;
+                    call.token = SQUARE_OPERATOR;
+                    call.childToken = {directive_content};
+                    call.forward = true;
+                    call.type = Analyser::Type::MathematicalOperator;
+                    
+                    super_constructor_call = call;
+                    active_constructor = true;
+                }
+            }
+        }
+        else if(elem.name.token == FUNCTION_CALL){
+            if(elem.name.childToken[0].token == INITIALISATOR_KEYWORD){
                 Analyser::TokenisedFile tf = elem;
                 init_exists = true;
                 Analyser::Token init_return_type;
@@ -1073,8 +1116,20 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                 func_creat.childToken = {init_return_type, elem.name.childToken[0]};
                 tf.name.childToken[0] = func_creat;
                 
+                if(active_constructor){
+                    std::vector<Analyser::TokenisedFile> body;
+                    Analyser::TokenisedFile scc;
+                    scc.name = super_constructor_call;
+                    body.push_back(scc);
+                    body.insert(body.end(), tf.subToken.begin(), tf.subToken.end());
+                    tf.subToken = body;
+                }
+                
+                active_constructor = false;
+                
                 methods.push_back(tf);
             }else{
+                active_constructor = false;
                 methods.push_back(elem);
             }
         }
