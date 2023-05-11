@@ -1,5 +1,4 @@
 #include "Analyser.h"
-#include "pch.h"
 #include <codecvt>
 #include <locale>
 
@@ -58,7 +57,8 @@ std::u32string O::Analyser::defaultServiceNames[] = {
     U"while",
     U"malloc",
     U"free",
-    U"return"
+    U"return",
+    U"sizeof"
 };
 
 int O::Analyser::charNotInBrackets(std::u32string str, char32_t c)
@@ -526,7 +526,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
             res.type = Type::Char;
         }
         else {
-            int idOfBracket = charNotInQuets(str, '(');
+           /* int idOfBracket = charNotInQuets(str, '(');
             if (idOfBracket != -1) {
                 auto sliced = sliceString(str, idOfBracket);
                 res.token = sliced.first;
@@ -548,7 +548,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
                     }
                 }
             }
-            else {
+            else {*/
                 auto idOfSeparator = charNotInFunction(str, ' ');
                 if(idOfSeparator != -1){
                     res.token = U"__init__";
@@ -558,7 +558,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
                     res.token = str;
                     res.type = Type::Name;
                 }
-            }
+            //}
         }
         
     }
@@ -780,3 +780,8 @@ bool O::Analyser::isNumericPostfix(std::u32string str) {
 
     return false;
 }
+
+O::Analyser::TokenisedFile O::Analyser::quickProcess(std::u32string content) { 
+    return TokeniseFile(StructuriseFile(content));
+}
+

@@ -7,6 +7,6 @@ set(PROJECT_BINARY_DIR ${PROJECT_SOURCE_DIR}/build)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/../OCompilerBase/ ${PROJECT_SOURCE_DIR}/build/ocb)
 
-add_library(OLexicalAnalyser STATIC ${PROJECT_SOURCE_DIR}/pch.cpp ${PROJECT_SOURCE_DIR}/Analyser.cpp)
+add_library(OLexicalAnalyser STATIC ${PROJECT_SOURCE_DIR}/Analyser.cpp ${PROJECT_SOURCE_DIR}/Analyser.h)
 
 target_include_directories(OLexicalAnalyser PRIVATE ${PROJECT_SOURCE_DIR}/../OCompilerBase/)

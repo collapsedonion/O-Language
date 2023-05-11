@@ -84,6 +84,7 @@ namespace O {
 		static Token ProccessNameOrCreation(std::u32string str, int line_id, std::u32string file_name);
 
 	public:
+        static TokenisedFile quickProcess(std::u32string content);
 		static Token StringToTree(std::u32string str, int line_id, std::u32string file_name);
 		static StructurisedFile StructuriseFile(std::u32string str, std::u32string name = U"___MAIN___", int line = 1, std::u32string file_name = U"NONE_FILE");
 		static TokenisedFile TokeniseFile(StructurisedFile sf);

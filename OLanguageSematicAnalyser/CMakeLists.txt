@@ -8,7 +8,7 @@ set(PROJECT_BINARY_DIR ${PROJECT_SOURCE_DIR}/build)
 add_subdirectory(${PROJECT_SOURCE_DIR}/../OLexicalAnalyser/ ${PROJECT_SOURCE_DIR}/buid/)
 add_subdirectory(${PROJECT_SOURCE_DIR}/../OCompilerBase/ ${PROJECT_SOURCE_DIR}/build/)
 
-add_library(OLanguageSematicAnalyser STATIC ${PROJECT_SOURCE_DIR}/SematicAnalyser.cpp)
+add_library(OLanguageSematicAnalyser STATIC ${PROJECT_SOURCE_DIR}/SematicAnalyser.cpp ${PROJECT_SOURCE_DIR}/SematicAnalyser.h)
 
 target_include_directories(OLanguageSematicAnalyser PRIVATE ${PROJECT_SOURCE_DIR}/../OLexicalAnalyser)
 target_include_directories(OLanguageSematicAnalyser PRIVATE ${PROJECT_SOURCE_DIR}/../OCompilerBase)

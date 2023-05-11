@@ -17,6 +17,10 @@
 
 #define FUNC_CREATION_NAME U"func"
 
+#define ALLOCATE_STRUCTURE U"alloc"
+
+#define GET_SIZE U"sizeof"
+
 #define RETURN_NAME U"return"
 
 #define TEMPLATE_TOKEN U"template"
@@ -824,55 +828,6 @@ Instruction O::SematicAnalyser::proccessVarInstruction(Analyser::Token token, bo
 		variables.push_back(v);
         if(!isExtern) {
             variablesCreatedAtThatField.push_back(v);
-            if(dataTypeIsStructure(getType)){
-                Structure structure = containsStructureByDataType(getType).second;
-                if(structure.variables.size() != 0){
-                    Analyser::Token size;
-		    std::wstring wSize = std::to_wstring(structure.variables.size());
-		    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-		    std::u32string uSize = converter.from_bytes((char*)wSize.c_str());
-                    size.token = uSize;
-                    size.type = Analyser::Type::Number;
-
-                    Analyser::Token dataType;
-                    dataType.token = dataTypeToString(structure.myDt, adt);
-                    dataType.type = Analyser::Type::Name;
-
-                    Analyser::Token parameters;
-                    parameters.token = COMMA_OPERATOR;
-                    parameters.type = Analyser::Type::MathematicalOperator;
-                    parameters.twoSided = true;
-                    parameters.childToken = {dataType, size};
-
-                    Analyser::Token mallocName;
-                    mallocName.token = MALLOC_INSTRUCTION_TOKEN;
-                    mallocName.type = Analyser::Type::ServiceName;
-
-                    Analyser::Token malloc;
-                    malloc.token = U"()";
-                    malloc.type = Analyser::Type::MathematicalOperator;
-                    malloc.forward = true;
-                    malloc.childToken = {mallocName, parameters};
-
-                    Analyser::Token destination;
-                    destination.token = v.name;
-                    destination.type = Analyser::Type::Name;
-
-                    Analyser::Token destination_pointer;
-                    destination_pointer.token = U"@";
-                    destination_pointer.type = Analyser::Type::MathematicalOperator;
-                    destination_pointer.forward = true;
-                    destination_pointer.childToken = {destination};
-
-                    Analyser::Token structureMallocToken;
-                    structureMallocToken.token = MATH_SET;
-                    structureMallocToken.type = Analyser::Type::MathematicalOperator;
-                    structureMallocToken.twoSided = true;
-                    structureMallocToken.childToken = {destination_pointer, malloc};
-
-                    instructions.push_back(proccessInstCall(structureMallocToken));
-                }
-            }
         }
 	}
 	else {
@@ -918,7 +873,8 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
     token.name.childToken[0].token == IF_NAME ||
     token.name.childToken[0].token == UNIT_DEFINITION_TOKEN ||
     token.name.childToken[0].token == WHILE_CYCLE_TOKEN ||
-    token.name.childToken[0].token == ADD_AUTO_CAST)){
+    token.name.childToken[0].token == ADD_AUTO_CAST ||
+    token.name.childToken[0].token == GET_SIZE)){
         if(token.name.childToken[0].token == FUNC_CREATION_NAME){
             proccessFuncInstrucion(token);
         }else if(token.name.childToken[0].token == IF_NAME){
@@ -937,12 +893,14 @@ Instruction O::SematicAnalyser::ProcessToken(Analyser::TokenisedFile token, bool
             }
         }else if(token.name.childToken[0].token == ADD_AUTO_CAST){
             processAddAutoCast(token.name);
+        }else if(token.name.childToken[0].token == GET_SIZE){
+            inst = getSizeOf(token.name);
         }
     }
     else if(token.name.token == ELSE_NAME){
         inst = proccessElseInstruction(token);
     }
-    else if(token.name.token == SQUARE_OPERATOR && token.name.childToken.size() == 1 && token.name.childToken[0].token == FUNCTION_CALL){
+    else if(token.name.token == SQUARE_OPERATOR && token.name.childToken.size() == 1 && token.name.childToken[0].token == FUNCTION_CALL && token.name.childToken[0].childToken[0].token == UNIT_DEFINITION_TOKEN){
         inst = processElementCall(token.name);
     }else if(templates.find(token.name.token) != templates.end()){
         processFetchTemplate(token);
@@ -1022,6 +980,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     newStruct.myDt = stringToDataType(newStruct.name, adt);
     
     bool init_exists = false;
+    bool allocator_exists = false;
     
     DataTypes father;
 
@@ -1099,9 +1058,10 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
             }
         }
         else if(elem.name.token == FUNCTION_CALL){
-            if(elem.name.childToken[0].token == INITIALISATOR_KEYWORD){
+            if(elem.name.childToken[0].token == INITIALISATOR_KEYWORD ||
+               elem.name.childToken[0].token == ALLOCATE_STRUCTURE){
                 Analyser::TokenisedFile tf = elem;
-                init_exists = true;
+                *(elem.name.childToken[0].token == INITIALISATOR_KEYWORD ? &init_exists : &allocator_exists) = true;
                 Analyser::Token init_return_type;
                 init_return_type.line_id = elem.name.line_id;
                 init_return_type.file_name = elem.name.file_name;
@@ -1116,7 +1076,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                 func_creat.childToken = {init_return_type, elem.name.childToken[0]};
                 tf.name.childToken[0] = func_creat;
                 
-                if(active_constructor){
+                if(active_constructor && elem.name.childToken[0].token == INITIALISATOR_KEYWORD){
                     std::vector<Analyser::TokenisedFile> body;
                     Analyser::TokenisedFile scc;
                     scc.name = super_constructor_call;
@@ -1128,11 +1088,20 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                 active_constructor = false;
                 
                 methods.push_back(tf);
-            }else{
+            }
+            else{
                 active_constructor = false;
                 methods.push_back(elem);
             }
         }
+    }
+    
+    if(!allocator_exists){
+        std::u32string allocator =
+        U"func:" + dataTypeToString(newStruct.myDt, adt) + U" alloc(){\n"
+        "   return(malloc(" + dataTypeToString(newStruct.myDt, adt) + U", sizeof(" + dataTypeToString(newStruct.myDt,adt) + U")));\n" + U"}";
+        auto main_tf = Analyser::quickProcess(allocator);
+        methods.push_back(main_tf.subToken[0]);
     }
     
     if(!init_exists){
@@ -1146,7 +1115,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
         Analyser::Token init_name;
         init_name.line_id = -1;
         init_name.file_name = U"_NOFILE";
-        init_name.token = U"init";
+        init_name.token = INITIALISATOR_KEYWORD;
         
         Analyser::Token func_creat;
         func_creat.type = Analyser::Type::ServiceName;
@@ -1279,6 +1248,8 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                         res.type = getDataType(arguments[0]);
                         res.Parameters.push_back(proccessInstCall(arguments[1]));
                         res.name = MALLOC_INSTRUCTION_NAME;
+                    } else if(token.childToken[0].token == GET_SIZE){
+                        res = getSizeOf(token);
                     }else {
                         res = checkAndGetFunction(token);
                     }
@@ -1287,7 +1258,10 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                 }
             }
             else if (token.token == SQUARE_OPERATOR) {
-                if(token.childToken.size() == 1){
+                if(token.childToken.size() == 1 && token.childToken[0].token == FUNCTION_CALL && token.childToken[0].childToken[0].token == UNIT_DEFINITION_TOKEN){
+                    res = processElementCall(token);
+                }
+                else if(token.childToken.size() == 1){
                    res = proccessArrayCreationInstruction(token);
                 }
                 else{
@@ -1354,7 +1328,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
         return res;
     }
     else if (token.type == Analyser::Type::Number) {
-	std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
         if(isStringEndsWith(token.token, U"f") || isStringEndsWith(token.token, U"F")){
             res.name = token.token.substr(0, token.token.size() - 1);
             res.type = DataTypes::FloatingPoint;
@@ -1536,7 +1510,7 @@ O::SematicAnalyser::SematicAnalyser(const O::SematicAnalyser* const origin) {
 }
 
 std::pair<bool, std::vector<O::Analyser::TokenisedFile>> O::SematicAnalyser::containsLabel(std::u32string label) {
-    for(int i = definedLabels.size() - 1; i >= 0; i--){
+    for(long long i = definedLabels.size() - 1; i >= 0; i--){
         if(definedLabels[i].first == label){
             return  {true,definedLabels[i].second};
         }
@@ -1555,3 +1529,33 @@ void O::SematicAnalyser::merge(const O::SematicAnalyser *const sa) {
     this->operators = sa->operators;
     this->instructions.insert(this->instructions.end(), sa->instructions.begin(), sa->instructions.end());
 }
+
+Instruction O::SematicAnalyser::getSizeOf(Analyser::Token token) { 
+    Instruction inst;
+    inst.type = DataTypes::Integer;
+    inst.line = token.line_id;
+    inst.file_name = token.file_name;
+    auto type_name = token.childToken[1].token;
+    auto dt = stringToDataType(type_name, adt);
+    if(dt == DataTypes::Error){
+        throw CompilationException(token.line_id, token.file_name, U"Invalid DataType at sizeof instruction");
+    }
+    
+    inst.name = std::to_ustring(getSize(dt));
+    return inst;;
+}
+
+int O::SematicAnalyser::getSize(DataTypes dt) { 
+    if(dataTypeIsStructure(dt)){
+        int total = 0;
+        
+        for(auto elem : containsStructureByDataType(dt).second.variables){
+            total += getSize(elem.type);
+        }
+        
+        return total;
+    }
+    return 1;
+}
+
+

@@ -243,3 +243,12 @@ inline bool operator == (std::vector<T> v1, std::vector<T> v2) {
 inline bool operator == (Variable v1, Variable v2) {
 	return v1.name == v2.name && v1.type == v2.type;
 }
+
+
+namespace std{
+    inline std::u32string to_ustring(int size){
+        static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
+        return convertor.from_bytes(std::to_string(size));
+    }
+}
+

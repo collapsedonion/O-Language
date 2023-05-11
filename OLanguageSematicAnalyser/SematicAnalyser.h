@@ -29,6 +29,7 @@ namespace O {
 	private:
 		// returns ERROR if not found
 		DataTypes containsFunction(std::u32string name, std::vector<DataTypes> dt);
+        int getSize(DataTypes dt);
         std::pair<DataTypes, std::vector<DataTypes>> containsAutoCastebleFunction(std::u32string name, std::vector<DataTypes> dt);
         std::pair<bool, std::vector<Analyser::TokenisedFile>> containsLabel(std::u32string label);
         void add_new_auto_cast(DataTypes from, DataTypes to);
@@ -62,6 +63,8 @@ namespace O {
         Instruction processElementCall(Analyser::Token token);
 
         Instruction processFetchTemplate(Analyser::TokenisedFile token);
+        
+        Instruction getSizeOf(Analyser::Token token);
 
 		Instruction proccessString(Analyser::Token token);
         Instruction proccessStructureCreation(Analyser::TokenisedFile token);
