@@ -244,6 +244,31 @@ inline bool operator == (Variable v1, Variable v2) {
 	return v1.name == v2.name && v1.type == v2.type;
 }
 
+inline bool isNumber(std::u32string str){
+    
+    for(auto elem : str){
+        if(!isdigit(elem))
+        {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+inline DataTypes getLiteralType(std::u32string type){
+    if(type[0] == '\'' && type[type.size() - 1] == '\''){
+        return DataTypes::Character;
+    }else if(type == U"TRUE" || type == U"FALSE"){
+        return DataTypes::Boolean;
+    }else if(type.find('.') == 1){
+        return DataTypes::FloatingPoint;
+    }else if(isNumber(type)){
+        return DataTypes::Integer;
+    }
+    
+    return DataTypes::Character;
+}
 
 namespace std{
     inline std::u32string to_ustring(int size){

@@ -437,7 +437,7 @@ namespace O {
         int source;
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
         std::string num;
-        switch (inst.type) {
+        switch (getLiteralType(inst.name)) {
             case DataTypes::Integer:
                 num = converter.to_bytes(inst.name);
                 source = std::stoi(num);

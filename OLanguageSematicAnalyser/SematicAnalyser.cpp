@@ -213,7 +213,11 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
                     }
                     
                     if(!(args_ret.second == dataTypes)){
-                        throw CompilationException(token.line_id, token.file_name, message);
+                        for(int i = 0; i < dataTypes.size(); i++){
+                            if(!can_be_auto_casted(dataTypes[i], args_ret.second[i], {})){
+                                throw CompilationException(token.line_id, token.file_name, message);
+                            }
+                        }
                     }
                     
                     retInst.line = token.line_id;
