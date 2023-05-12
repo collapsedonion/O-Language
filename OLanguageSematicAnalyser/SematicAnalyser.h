@@ -29,6 +29,7 @@ namespace O {
 	private:
 		// returns ERROR if not found
 		DataTypes containsFunction(std::u32string name, std::vector<DataTypes> dt);
+        std::pair<DataTypes, std::vector<DataTypes>> getFunctionPointerType(std::u32string str);
         int getSize(DataTypes dt);
         std::pair<DataTypes, std::vector<DataTypes>> containsAutoCastebleFunction(std::u32string name, std::vector<DataTypes> dt);
         std::pair<bool, std::vector<Analyser::TokenisedFile>> containsLabel(std::u32string label);

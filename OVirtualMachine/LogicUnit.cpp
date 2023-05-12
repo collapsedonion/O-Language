@@ -380,7 +380,8 @@ namespace O {
     }
 
     void LogicUnit::call(O::Memory::Registers destReg) {
-        throw std::exception();
+        _mem->push(O::Memory::Registers::eip);
+        GETREG(O::Memory::Registers::eip) = GETREG(destReg);
     }
 
     void LogicUnit::call(O::Memory::MemoryAddressDescriptor mad) {

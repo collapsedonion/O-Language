@@ -17,6 +17,7 @@
 #define STRUCTURE_ELEMENT_ACCESS_NAME U"STRUCTURE_ACCESS"
 #define WHILE_CYCLE_NAME U"WHILE_CYCLE"
 #define MALLOC_INSTRUCTION_NAME U"_MALLOC"
+#define GET_FUNCTION_POINTER U"FUNCTION_POINTER"
 
 #define ADDVTV(vd, vs) vd->insert(vd->end(), vs.begin(), vs.end());
 
@@ -369,6 +370,11 @@ namespace O {
         }
 
         auto func = getFun(inst.name, argumentsDataTypes);
+        auto var = getVar(inst.name);
+        if(func.sector == U"" && var.name == inst.name){
+            auto mov_toCall = G::mov(GR::edx, var.sector, var.fromEbpOffset, (var.useEbp) ? GR::ebp : GR::NULLREG);
+            ADDVTV(Instructions, mov_toCall);
+        }
 
         auto saveService = Geneerator::pushs();
         ADDVTV(Instructions, saveService);
@@ -397,6 +403,8 @@ namespace O {
         std::vector<int> c;
         if(func.sector != U"") {
             c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
+        }else if(var.name == inst.name){
+            c = Geneerator::call(GR::edx);
         }else{
             c = Geneerator::call(inst.name, 0, GR::NULLREG);
         }
@@ -552,7 +560,24 @@ namespace O {
 			            ADDVTV(Instructions, mv);
 		            }   
                 }
-            }else if(inst.name == ARRAY_CREATION_NAME){
+            }
+            else if(inst.name == GET_FUNCTION_POINTER){
+                auto name = inst.Parameters[0].name;
+                std::vector<DataTypes> argument_type;
+                for(int i = 1; i < inst.Parameters.size(); i++){
+                    argument_type.push_back(inst.Parameters[i].type);
+                }
+                
+                auto function = getFun(name, argument_type);
+                
+                auto ga = G::ga(function.sector, 0, GR::NULLREG);
+                ADDVTV(Instructions, ga);
+                auto add = G::add(GR::mc3, function.fromZeroOffset);
+                ADDVTV(Instructions, add);
+                auto mov = G::mov(reg, GR::mc3);
+                ADDVTV(Instructions, mov);
+            }
+            else if(inst.name == ARRAY_CREATION_NAME){
                 auto malloc = G::malloc((int)inst.Parameters[0].name[0]);
                 ADDVTV(Instructions, malloc);
                 auto movRes = G::mov(reg, GR::eax);

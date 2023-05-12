@@ -720,13 +720,11 @@ std::pair<bool, O::Analyser::Token> O::Analyser::getOperator(const std::u32strin
             if (position != -1) {
                 auto splitOperator = sliceString(str, position);
                 auto left = splitOperator.first;
-                auto right = splitOperator.second.substr(anOperator.name.size(),
-                                                         splitOperator.second.size() -
-                                                         anOperator.name.size() + 1);
+                auto right = anOperator.name.size() != 1 ? (splitOperator.second.substr(anOperator.name.size(), splitOperator.second.size() - anOperator.name.size() + 1)) : splitOperator.second;
                 if (left != U"") {
                     return {true, {Type::MathematicalOperator,
                                    anOperator.name,
-				   file_name,
+                        file_name,
                                    line_id,
                                    true,
                                    false,
