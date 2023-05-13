@@ -204,27 +204,32 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
             
             std::u32string message = U"Unable to find function with name \"" + retInst.name + U"\"";
      
-            for(auto elem : variables){
-                if(elem.name == retInst.name){
-                    auto elem_type = dataTypeToString(elem.type, adt);
-                    auto args_ret = getFunctionPointerType(elem_type);
-                    if(args_ret.first == DataTypes::Error){
-                        throw CompilationException(token.line_id, token.file_name, message);
-                    }
+            
+            auto name_inst = proccessInstCall(token.childToken[0]);
+            if(name_inst.type != DataTypes::Error){
+                auto elem_type = dataTypeToString(name_inst.type, adt);
+                auto args_ret = getFunctionPointerType(elem_type);
+                if(args_ret.first == DataTypes::Error){
+                    throw CompilationException(token.line_id, token.file_name, message);
+                }
                     
-                    if(!(args_ret.second == dataTypes)){
-                        for(int i = 0; i < dataTypes.size(); i++){
-                            if(!can_be_auto_casted(dataTypes[i], args_ret.second[i], {})){
-                                throw CompilationException(token.line_id, token.file_name, message);
-                            }
+                if(!(args_ret.second == dataTypes)){
+                    for(int i = 0; i < dataTypes.size(); i++){
+                        if(!can_be_auto_casted(dataTypes[i], args_ret.second[i], {})){
+                            throw CompilationException(token.line_id, token.file_name, message);
                         }
                     }
-                    
-                    retInst.line = token.line_id;
-                    retInst.file_name = token.file_name;
-                    retInst.type = args_ret.first;
-                    return retInst;
                 }
+                
+                auto params = std::vector<Instruction>();
+                params.push_back(name_inst);
+                params.insert(params.end(), retInst.Parameters.begin(), retInst.Parameters.end());
+                retInst.Parameters = params;
+                retInst.name = U"__pointer_call";
+                retInst.line = token.line_id;
+                retInst.file_name = token.file_name;
+                retInst.type = args_ret.first;
+                return retInst;
             }
                    
             throw CompilationException(token.line_id, token.file_name, message);
@@ -279,9 +284,9 @@ Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
             }
             auto ret_dt = containsFunction(_name, data_types);
             if(ret_dt != DataTypes::Error){
-                std::u32string name = U"[" + dataTypeToString(ret_dt) + U"](";
+                std::u32string name = U"[" + dataTypeToString(ret_dt, adt) + U"](";
                 for(int i = 0; i < data_types.size(); i++){
-                    name += dataTypeToString(data_types[i]);
+                    name += dataTypeToString(data_types[i], adt);
                     if(i != data_types.size() - 1){
                         name += U",";
                     }
@@ -303,7 +308,7 @@ Instruction O::SematicAnalyser::proccessPointerGet(Analyser::Token token)
                 
                 for(auto elem : data_types){
                     Instruction arg_t;
-                    arg_t.name = dataTypeToString(elem);
+                    arg_t.name = dataTypeToString(elem, adt);
                     arg_t.type = elem;
                     inst.Parameters.push_back(arg_t);
                 }
@@ -850,6 +855,7 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
             subSematicAnalyser.operators = std::vector<Operator>(operators);
             subSematicAnalyser.definedStructures = std::vector<Structure>(definedStructures);
             subSematicAnalyser.enumerations = std::map<std::u32string, Instruction>(enumerations);
+            subSematicAnalyser.auto_casts = std::map<DataTypes, std::vector<DataTypes>>(auto_casts);
 
             for (auto elem: func.arguments) {
                 subSematicAnalyser.variables.push_back(elem);
@@ -1120,6 +1126,10 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
             for(auto elem:e_data.second.variables){
                 newStruct.variables.push_back(elem);
             }
+            
+            for(auto elem:e_data.second.method_table){
+                newStruct.method_table.push_back(elem);
+            }
         }else if(elem.name.token == SQUARE_OPERATOR){
             if(elem.name.childToken[0].token == FUNCTION_CALL){
                 Analyser::Token directive_content = elem.name.childToken[0];
@@ -1153,6 +1163,55 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                     
                     super_constructor_call = call;
                     active_constructor = true;
+                }
+            }
+            else if(elem.name.childToken[0].token == SQUARE_OPERATOR){
+                auto inner = elem.name.childToken[0];
+                if(inner.childToken[0].token == U"method"){
+                    auto method_description = inner.childToken[1];
+                    std::u32string type = U"[" + method_description.childToken[0].childToken[0].token + U"](";
+                    auto arguments = getComma(method_description.childToken[1]);
+                    type += newStruct.name + (arguments.size() == 0 ? U"" : U",");
+                    for(int i = 0; i < arguments.size(); i++){
+                        type += arguments[i].childToken[0].token;
+                        if(i != arguments.size() - 1){
+                            type += U",";
+                        }
+                    }
+                    type += U")";
+                    
+                    bool override_ = false;
+                    DataTypes overide_type;
+                    for(auto elem : newStruct.method_table){
+                        if(elem.name == U"_m_t_" + method_description.childToken[0].childToken[1].token){
+                            override_ = true;
+                            overide_type = elem.type;
+                            break;
+                        }
+                    }
+                    
+                    if(!override_){
+                        Variable v;
+                        auto type_t = getDataType(Analyser::quickProcess(type + U";").subToken[0].name);
+                        v.type = type_t;
+                        v.name = U"_m_t_" + method_description.childToken[0].childToken[1].token;
+                        newStruct.variables.push_back(v);
+                        newStruct.method_table.push_back(v);
+                    }else{
+                        add_new_auto_cast(getDataType(Analyser::quickProcess(type + U";").subToken[0].name), overide_type);
+                    }
+                                        
+                    std::u32string meth_desc = U"func:" + method_description.childToken[0].childToken[0].token + U" _m_t_" + method_description.childToken[0].childToken[1].token + U"(";
+                    for(int i = 0; i < arguments.size(); i++){
+                        meth_desc += arguments[i].childToken[0].token + U" " + arguments[i].childToken[1].token;
+                        if(i != arguments.size() - 1){
+                            meth_desc += U",";
+                        }
+                    }
+                    meth_desc += U");";
+                    auto function = Analyser::quickProcess(meth_desc).subToken[0];
+                    function.subToken = elem.subToken;
+                    methods.push_back(function);
                 }
             }
         }
@@ -1195,10 +1254,31 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
         }
     }
     
+    std::u32string methods_init = U"func methods_init(){\n";
+    for(auto method : newStruct.method_table){
+        std::u32string new_meth = U"@me[" + method.name + U"] = @" + method.name + U"(";
+        auto types = getFunctionPointerType(dataTypeToString(method.type, adt));
+        new_meth += newStruct.name + (types.second.size() == 0 ? U"": U",");
+        for(int i = 1; i < types.second.size(); i++){
+            new_meth += dataTypeToString(types.second[i], adt);
+            if(i < types.second.size() - 1){
+                new_meth += U",";
+            }
+        }
+        new_meth += U");\n";
+        methods_init += new_meth;
+    }
+    
+    methods_init += U"}";
+    
+    methods.push_back(Analyser::quickProcess(methods_init).subToken[0]);
+    
     if(!allocator_exists){
         std::u32string allocator =
-        U"func:" + dataTypeToString(newStruct.myDt, adt) + U" alloc(){\n"
-        "   return(malloc(" + dataTypeToString(newStruct.myDt, adt) + U", sizeof(" + dataTypeToString(newStruct.myDt,adt) + U")));\n" + U"}";
+        U"func:" + dataTypeToString(newStruct.myDt, adt) + U" alloc(){\n" +
+        U"  @me = malloc(" + dataTypeToString(newStruct.myDt, adt) + U", sizeof(" + dataTypeToString(newStruct.myDt,adt) + U"));\n" +
+        U" [me methods_init()];\n" +
+        U"   return(me);\n" + U"}";
         auto main_tf = Analyser::quickProcess(allocator);
         methods.push_back(main_tf.subToken[0]);
     }
@@ -1549,7 +1629,31 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
 
     O::Analyser::Token me = token.childToken[0].childToken[0].childToken[0];
     O::Analyser::Token funName = token.childToken[0].childToken[0].childToken[1];
-
+    
+    
+    auto var_me = getVariableAsInstruction(me.token);
+    
+    if(dataTypeIsStructure(var_me.type)){
+        auto _struct = containsStructureByDataType(var_me.type);
+        
+        for(auto elem: _struct.second.method_table){
+            if(elem.name == U"_m_t_" + funName.token){
+                std::u32string newCall = me.token + U"[" + elem.name + U"](";
+                auto args = getComma(token.childToken[0].childToken[1]);
+                newCall += me.token + (args.size() == 0 ? U"" : U",");
+                for(int i = 0; i < args.size(); i++){
+                    newCall += args[i].token;
+                    if(i != args.size() - 1){
+                        newCall += U",";
+                    }
+                }
+                newCall += U");";
+                auto call = Analyser::quickProcess(newCall).subToken[0].name;
+                return  checkAndGetFunction(call);
+            }
+        }
+    }
+    
     if(token.childToken[0].childToken[1].token == U""){
         converted.childToken = {funName, me};
     }else{

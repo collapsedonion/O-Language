@@ -365,16 +365,21 @@ namespace O {
     void OtoOTranslator::CallFunction(Instruction inst) {
         std::vector<DataTypes> argumentsDataTypes;
 
+        if(inst.name == U"__pointer_call"){
+            LoadInstToReg(inst.Parameters[0], GR::edx);
+            std::vector<Instruction> newParameters;
+            
+            for(int i = 1; i < inst.Parameters.size(); i++){
+                newParameters.push_back(inst.Parameters[i]);
+            }
+            inst.Parameters = newParameters;
+        }
+        
         for(auto argument : inst.Parameters){
             argumentsDataTypes.push_back(argument.type);
         }
 
         auto func = getFun(inst.name, argumentsDataTypes);
-        auto var = getVar(inst.name);
-        if(func.sector == U"" && var.name == inst.name){
-            auto mov_toCall = G::mov(GR::edx, var.sector, var.fromEbpOffset, (var.useEbp) ? GR::ebp : GR::NULLREG);
-            ADDVTV(Instructions, mov_toCall);
-        }
 
         auto saveService = Geneerator::pushs();
         ADDVTV(Instructions, saveService);
@@ -403,7 +408,7 @@ namespace O {
         std::vector<int> c;
         if(func.sector != U"") {
             c = Geneerator::call(func.sector, func.fromZeroOffset, Geneerator::Registers::NULLREG);
-        }else if(var.name == inst.name){
+        }else if(inst.name == U"__pointer_call"){
             c = Geneerator::call(GR::edx);
         }else{
             c = Geneerator::call(inst.name, 0, GR::NULLREG);

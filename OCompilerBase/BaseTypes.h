@@ -149,6 +149,7 @@ struct Structure{
     std::u32string name;
     DataTypes myDt;
     std::vector<Variable> variables;
+    std::vector<Variable> method_table;
 };
 
 struct Instruction {
