@@ -7,6 +7,14 @@
 namespace O {
 	class SematicAnalyser
 	{
+    private:
+        struct Universal{
+            std::u32string name;
+            Analyser::TokenisedFile content;
+            bool isStruct;
+            std::vector<std::u32string> type_places;
+        };
+        
 	private:
 		int returnCalls = 0;
 		DataTypes returnType = DataTypes::Void;
@@ -25,7 +33,10 @@ namespace O {
         std::vector<std::pair<std::u32string, std::vector<Analyser::TokenisedFile>>> definedLabels;
         std::map<std::u32string, Instruction> enumerations;
         std::map<DataTypes, std::vector<DataTypes>> auto_casts;
-
+        std::map<std::u32string, Universal> universals;
+        std::vector<std::u32string> universal;
+        bool use_universal = false;
+        
 	private:
 		// returns ERROR if not found
 		DataTypes containsFunction(std::u32string name, std::vector<DataTypes> dt);
@@ -42,6 +53,8 @@ namespace O {
         std::pair<bool, Structure> containsStructureByDataType(DataTypes dt);
         std::vector<Analyser::Token> getComma(Analyser::Token token);
 		DataTypes getReturnDataTypeOfOperator(std::u32string op, DataTypes left, DataTypes right);
+        
+        void addUniversal(Analyser::TokenisedFile universal_content, std::u32string universal_name, bool isStruct);
 
 		Instruction checkAndGetFunction(Analyser::Token token);
         

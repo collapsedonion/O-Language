@@ -20,6 +20,8 @@ struct AdditionalDataType {
 	int lastId = 7;
 	std::vector<int> additionalNumber;
 	std::vector<std::u32string> additionalName;
+    std::vector<int> temp;
+    std::vector<std::u32string> name_temp;
 };
 
 inline DataTypes stringToDataType(std::u32string str, AdditionalDataType adt) {
@@ -41,11 +43,17 @@ inline DataTypes stringToDataType(std::u32string str, AdditionalDataType adt) {
 		return DataTypes::Character;
 	}
 	else {
-		for (int i = 0; i < adt.lastId - 7; i++) {
+		for (int i = adt.lastId - 8; i >= 0; i--) {
 			if (adt.additionalName[i] == str) {
 				return (DataTypes)adt.additionalNumber[i];
 			}
 		}
+        
+        for(int i = adt.temp.size() - 1; i>=0;i--){
+            if(adt.name_temp[i] == str){
+                return (DataTypes)adt.temp[i];
+            }
+        }
 	}
 
 	return DataTypes::Error;
@@ -100,11 +108,16 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
 	case DataTypes::Error:
 		return U"ERROR";
 	default:
-		for (int i = 0; i < adt.lastId - 7; i++) {
+		for (int i = adt.lastId - 8; i >= 0; i--) {
 			if (adt.additionalNumber[i] == (int)dt) {
 				return adt.additionalName[i];
 			}
 		}
+        for(int i = adt.temp.size() - 1; i>=0;i--){
+            if(adt.additionalNumber[i] == (int)dt){
+                return adt.name_temp[i];
+            }
+        }
 		return U"ERROR";
 	}
 }
@@ -115,6 +128,12 @@ inline bool adtContains(std::u32string str, AdditionalDataType adt) {
 			return true;
 		}
 	}
+    
+    for(auto elem : adt.name_temp){
+        if(elem == str){
+            return true;
+        }
+    }
 
 	return false;
 }

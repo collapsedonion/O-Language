@@ -13,6 +13,8 @@
 
 #define STRUCTURE_EXTENDS_NAME U"extend"
 
+#define UNIVERSAL_DEFINITION U"universal"
+
 #define GLOBAL_CREATION_NAME U"global"
 
 #define FUNC_CREATION_NAME U"func"
@@ -401,6 +403,53 @@ DataTypes O::SematicAnalyser::getDataType(Analyser::Token token)
             adt.additionalNumber.push_back(adt.lastId);
             adt.additionalName.push_back(myName);
             return (DataTypes)adt.lastId;
+        }
+    }else if(token.token == SQUARE_OPERATOR){
+        std::u32string name = token.childToken[0].token + U"[";
+        auto types = getComma(token.childToken[1]);
+        
+        for(int i = 0; i < types.size(); i++){
+            name += dataTypeToString(getDataType(types[i]));
+            if(i < types.size()-1){
+                name += U",";
+            }
+        }
+        
+        name += U"]";
+        bool check = adtContains(name, adt);
+        if(check){
+            return stringToDataType(name, adt);
+        }else{
+            Universal extented;
+            bool found = false;
+            for(auto elem : universals){
+                if(elem.first == token.childToken[0].token && elem.second.isStruct == true){
+                    extented = elem.second;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if(!found || types.size() != extented.type_places.size()){
+                throw CompilationException(token.line_id, token.file_name, U"Extended unexisting universal type");
+            }
+            
+            for(int i = 0; i < extented.type_places.size(); i++){
+                adt.name_temp.push_back(extented.type_places[i]);
+                adt.temp.push_back((int)getDataType(types[i]));
+            }
+            
+            Analyser::TokenisedFile tfp;
+            tfp = extented.content;
+            tfp.name.childToken[0].token = name;
+            proccessStructureCreation(tfp);
+            
+            for(int i = 0; i < extented.type_places.size(); i++){
+                adt.temp.pop_back();
+                adt.name_temp.pop_back();
+            }
+            
+            return stringToDataType(name, adt);
         }
     }
 	else {
@@ -1072,6 +1121,11 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     Structure newStruct;
     
     newStruct.name = token.name.childToken[0].token;
+    
+    if(use_universal){
+        addUniversal(token, newStruct.name, true);
+        return {};
+    }
 
     std::vector<Analyser::TokenisedFile> methods;
     
@@ -1377,6 +1431,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
     Instruction res;
     res.line = token.line_id;
     res.file_name = token.file_name;
+    use_universal = false;
 
     if (token.type == Analyser::Type::MathematicalOperator) {
         if (token.twoSided) {
@@ -1437,7 +1492,19 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
                 }
             }
             else if (token.token == SQUARE_OPERATOR) {
-                if(token.childToken.size() == 1 && token.childToken[0].token == FUNCTION_CALL && token.childToken[0].childToken[0].token == UNIT_DEFINITION_TOKEN){
+                if(token.childToken.size() == 1 && token.childToken[0].childToken.size() >= 1 && token.childToken[0].childToken[0].token == UNIVERSAL_DEFINITION){
+                    use_universal = true;
+                    universal.clear();
+                    auto defs = getComma(token.childToken[0].childToken[1]);
+                    for(auto elem: defs){
+                        if(elem.token == UNIT_DEFINITION_TOKEN){
+                            if(elem.childToken[0].token == U"def"){
+                                universal.push_back(elem.childToken[1].token);
+                            }
+                        }
+                    }
+                }
+                else if(token.childToken.size() == 1 && token.childToken[0].token == FUNCTION_CALL && token.childToken[0].childToken[0].token == UNIT_DEFINITION_TOKEN){
                     res = processElementCall(token);
                 }
                 else if(token.childToken.size() == 1){
@@ -1738,8 +1805,7 @@ Instruction O::SematicAnalyser::getSizeOf(Analyser::Token token) {
     inst.type = DataTypes::Integer;
     inst.line = token.line_id;
     inst.file_name = token.file_name;
-    auto type_name = token.childToken[1].token;
-    auto dt = stringToDataType(type_name, adt);
+    auto dt = getDataType(token.childToken[1]);
     if(dt == DataTypes::Error){
         throw CompilationException(token.line_id, token.file_name, U"Invalid DataType at sizeof instruction");
     }
@@ -1777,3 +1843,14 @@ std::pair<DataTypes, std::vector<DataTypes>> O::SematicAnalyser::getFunctionPoin
         
     return {ret_dt, args};
 }
+
+void O::SematicAnalyser::addUniversal(Analyser::TokenisedFile universal_content, std::u32string universal_names, bool isStruct) {
+    Universal newU;
+    newU.name = universal_names;
+    newU.content = universal_content;
+    newU.isStruct = isStruct;
+    newU.type_places = universal;
+    use_universal = false;
+    universals.insert({universal_names, newU});
+}
+
