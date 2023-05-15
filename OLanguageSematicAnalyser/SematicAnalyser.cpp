@@ -195,7 +195,12 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
             }
             
         }else{
-            auto dt = getDataType(token.childToken[0]);
+            DataTypes dt;
+            try{
+                dt = getDataType(token.childToken[0]);
+            }catch(...){
+                dt = DataTypes::Error;
+            }
             
             if (dt != DataTypes::Error && retInst.Parameters.size() == 1) {
                 retInst.Parameters[0].type = dt;
@@ -1312,7 +1317,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     for(auto method : newStruct.method_table){
         std::u32string new_meth = U"@me[" + method.name + U"] = @" + method.name + U"(";
         auto types = getFunctionPointerType(dataTypeToString(method.type, adt));
-        new_meth += newStruct.name + (types.second.size() == 0 ? U"": U",");
+        new_meth += newStruct.name + (types.second.size() == 1 ? U"": U",");
         for(int i = 1; i < types.second.size(); i++){
             new_meth += dataTypeToString(types.second[i], adt);
             if(i < types.second.size() - 1){
@@ -1716,7 +1721,20 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
                 }
                 newCall += U");";
                 auto call = Analyser::quickProcess(newCall).subToken[0].name;
-                return  checkAndGetFunction(call);
+                
+                
+                if(token.childToken[0].childToken[1].token == U""){
+                    call.childToken[1] = me;
+                }else{
+                    O::Analyser::Token comma;
+                    comma.token = U",";
+                    comma.forward = true;
+                    comma.type = Analyser::Type::MathematicalOperator;
+                    comma.childToken = {me, token.childToken[0].childToken[1]};
+                    call.childToken[1] = comma;
+                }
+            
+                return checkAndGetFunction(call);
             }
         }
     }
