@@ -1,0 +1,49 @@
+
+
+[universal [def T]];
+struct:DynamicArray{
+    T~ _content;
+    int _size;
+    
+    init(int size){
+        @me[_content] = malloc(T~, size);
+        @me[_size] = size;
+        return(me);
+    }
+    
+    init(DynamicArray[T] source){
+        @me[_content] = malloc(T~, source[_size]);
+        @me[_size] = source[_size];
+        
+        var:int i = 0;
+        
+        while(i < me[_size]){
+            @me[_content][i] = source[_content][i];
+            @i += 1;
+        }
+        
+        return(me);
+    }
+    
+    [method [void resize(int new_size)]]{
+        realloc(void~(me[_content]), new_size);
+        @me[_size] = new_size;
+    }
+    
+    [method [void set(int index, T element)]]{
+        if(index < me[_size]){
+            @me[_content][index] = element;
+        }
+    }
+    
+    [method [int size()]]{
+        return(me[_size]);
+    }
+    
+    [method [T get(int index)]]{
+        if(index < me[_size]){
+            return(me[_content][index]);
+        }
+        return(T(0));
+    }
+}
