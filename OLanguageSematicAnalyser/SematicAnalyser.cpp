@@ -1703,14 +1703,14 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
     O::Analyser::Token funName = token.childToken[0].childToken[0].childToken[1];
     
     
-    auto var_me = getVariableAsInstruction(me.token);
+    auto var_me = proccessInstCall(me);
     
     if(dataTypeIsStructure(var_me.type)){
         auto _struct = containsStructureByDataType(var_me.type);
         
         for(auto elem: _struct.second.method_table){
             if(elem.name == U"_m_t_" + funName.token){
-                std::u32string newCall = me.token + U"[" + elem.name + U"](";
+                std::u32string newCall = U"x[" + elem.name + U"](";
                 auto args = getComma(token.childToken[0].childToken[1]);
                 newCall += me.token + (args.size() == 0 ? U"" : U",");
                 for(int i = 0; i < args.size(); i++){
@@ -1722,6 +1722,7 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
                 newCall += U");";
                 auto call = Analyser::quickProcess(newCall).subToken[0].name;
                 
+                call.childToken[0].childToken[0] = me;
                 
                 if(token.childToken[0].childToken[1].token == U""){
                     call.childToken[1] = me;

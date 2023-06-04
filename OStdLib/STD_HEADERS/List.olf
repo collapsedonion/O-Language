@@ -1,0 +1,58 @@
+#include DynamicArray.olf
+
+
+[universal [def T]];
+struct:List{
+    DynamicArray[T] _content;
+    int _size;
+    int _count;
+    
+    init(){
+        @me[_size] = 10;
+        @me[_count] = 0;
+        @me[_content] = [[me[_content] alloc()] init(me[_size])];
+        return(me);
+    }
+    
+    [method [int Count()]]{
+        return(me[_count]);
+    }
+    
+    [method [void Add(T new_element)]]{
+        if(me[_count] + 1 > me[_size]){
+            @me[_size] += 10;
+            [me[_content] resize(me[_size])];
+        }
+        
+        [me[_content] set(me[_count], new_element)];
+        @me[_count] += 1;
+    }
+    
+    [method [void set(int id, T element)]]{
+        if(id < me[_count]){
+            [me[_content] set(id, element)];
+        }
+    }
+    
+    [method [T get(int id)]]{
+        if(id < me[_count]){
+            return([me[_content] get(id)]);
+        }
+        return(T(0));
+    }
+    
+    [method [T Pick()]]{
+        if(me[_count] ? 0){
+            return(T(0));
+        }
+    
+        var:T to_ret = [me get(me[_count] - 1)];
+        @me[_count] -= 1;
+        if(me[_size] - me[_count] > 10){
+            @me[_size] -= 10;
+            [me[_content] resize(me[_size])];
+        }
+        
+        return(to_ret);
+    }
+}
