@@ -14,6 +14,13 @@ struct:List{
         return(me);
     }
     
+    [method [void Copy(List[T] source)]]{
+        @me[_size] = source[_size];
+        @me[_count] = source[_count];
+        
+        [me[_content] copy(source[_content])];
+    }
+    
     [method [int Count()]]{
         return(me[_count]);
     }
@@ -26,6 +33,22 @@ struct:List{
         
         [me[_content] set(me[_count], new_element)];
         @me[_count] += 1;
+    }
+    
+    [method [void Merge(List[T] merging)]]{
+    
+        var:int counter = 0;
+        var:int merging_size = [merging Count()];
+        
+        while(counter < merging_size){
+            var:T new_e = [merging get(counter)];
+            [me Add(new_e)];
+            @counter += 1;
+        }
+    }
+    
+    [method [T Last()]]{
+        return([me get(me[_count] - 1)]);
     }
     
     [method [void set(int id, T element)]]{

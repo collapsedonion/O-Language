@@ -1,0 +1,80 @@
+
+#include List.olf
+#include stdString.olf
+
+struct:String{
+    List[char] _data;
+    
+    init(){
+        @me[_data] = [[me[_data] alloc()] init()];
+        [me[_data] Add('\0')];
+        return(me);
+    }
+    
+    init(String source){
+        [me init()];
+        
+        [me[_data] Copy(source[_data])];
+        
+        return(me);
+    }
+    
+    init(char~ source){
+        [me init()];
+        
+        var:int size = stringSize(source);
+        var:int counter = 0;
+        
+        while(counter < size){
+            [me AddC(source[counter])];
+            @counter += 1;
+        }
+        
+        return(me);
+    }
+    
+    [method [void AddC(char c)]]{
+        [me[_data] Pick()];
+        [me[_data] Add(c)];
+        [me[_data] Add('\0')];
+    }
+    
+    [method [void Add(String str)]]{
+        [me[_data] Pick()];
+        [me[_data] Merge(str[_data])];
+        if([me[_data] Last()] ? '\0'){
+            return();
+        }
+        [me[_data] Add('\0')];
+    }
+    
+    [method [char get(int id)]]{
+        return([me[_data] get(id)]);
+    }
+    
+    [method [void set(int id, char c)]]{
+        [me[_data] set(id, c)];
+    }
+    
+    [method [int size()]]{
+        return([me[_data] Count()] - 1);
+    }
+    
+    [method [char~ c_style()]]{
+        return(me[_data][_content][_content]);
+    }
+    
+    [method [bool cmp(String str)]]{
+        if([str size()] ? [me size()]){
+            var:int counter = 0;
+        
+            while(counter < [me size()]){
+                if(([me get(counter)] ? [str get(counter)]) ? false){
+                    return(false);
+                }
+                @counter += 1;
+            }
+        }
+        return(false);
+    }
+}

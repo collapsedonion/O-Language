@@ -214,7 +214,7 @@ Instruction O::SematicAnalyser::checkAndGetFunction(Analyser::Token token) {
             
             auto name_inst = proccessInstCall(token.childToken[0]);
             if(name_inst.type != DataTypes::Error){
-                auto elem_type = dataTypeToString(name_inst.type, adt);
+                auto elem_type = dataTypeToString(name_inst.type, adt, true);
                 auto args_ret = getFunctionPointerType(elem_type);
                 if(args_ret.first == DataTypes::Error){
                     throw CompilationException(token.line_id, token.file_name, message);
@@ -1228,11 +1228,11 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                 auto inner = elem.name.childToken[0];
                 if(inner.childToken[0].token == U"method"){
                     auto method_description = inner.childToken[1];
-                    std::u32string type = U"[" + method_description.childToken[0].childToken[0].token + U"](";
+                    std::u32string type = U"[" + dataTypeToString(getDataType(method_description.childToken[0].childToken[0]), adt, true) + U"](";
                     auto arguments = getComma(method_description.childToken[1]);
                     type += newStruct.name + (arguments.size() == 0 ? U"" : U",");
                     for(int i = 0; i < arguments.size(); i++){
-                        type += arguments[i].childToken[0].token;
+                        type += dataTypeToString(getDataType(arguments[i].childToken[0]), adt);
                         if(i != arguments.size() - 1){
                             type += U",";
                         }
@@ -1260,9 +1260,9 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                         add_new_auto_cast(getDataType(Analyser::quickProcess(type + U";").subToken[0].name), overide_type);
                     }
                                         
-                    std::u32string meth_desc = U"func:" + method_description.childToken[0].childToken[0].token + U" _m_t_" + method_description.childToken[0].childToken[1].token + U"(";
+                    std::u32string meth_desc = U"func:" +  dataTypeToString(getDataType(method_description.childToken[0].childToken[0]), adt, true) + U" _m_t_" + method_description.childToken[0].childToken[1].token + U"(";
                     for(int i = 0; i < arguments.size(); i++){
-                        meth_desc += arguments[i].childToken[0].token + U" " + arguments[i].childToken[1].token;
+                        meth_desc += dataTypeToString(getDataType(arguments[i].childToken[0]), adt, true) + U" " + arguments[i].childToken[1].token;
                         if(i != arguments.size() - 1){
                             meth_desc += U",";
                         }
@@ -1319,7 +1319,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
         auto types = getFunctionPointerType(dataTypeToString(method.type, adt));
         new_meth += newStruct.name + (types.second.size() == 1 ? U"": U",");
         for(int i = 1; i < types.second.size(); i++){
-            new_meth += dataTypeToString(types.second[i], adt);
+            new_meth += dataTypeToString(types.second[i], adt, true);
             if(i < types.second.size() - 1){
                 new_meth += U",";
             }
@@ -1335,7 +1335,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     if(!allocator_exists){
         std::u32string allocator =
         U"func:" + dataTypeToString(newStruct.myDt, adt) + U" alloc(){\n" +
-        U"  @me = malloc(" + dataTypeToString(newStruct.myDt, adt) + U", sizeof(" + dataTypeToString(newStruct.myDt,adt) + U"));\n" +
+        U"  @me = malloc(" + dataTypeToString(newStruct.myDt, adt, true) + U", sizeof(" + dataTypeToString(newStruct.myDt,adt) + U"));\n" +
         U" [me methods_init()];\n" +
         U"   return(me);\n" + U"}";
         auto main_tf = Analyser::quickProcess(allocator);
@@ -1723,7 +1723,7 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
                 auto call = Analyser::quickProcess(newCall).subToken[0].name;
                 
                 call.childToken[0].childToken[0] = me;
-                
+                                
                 if(token.childToken[0].childToken[1].token == U""){
                     call.childToken[1] = me;
                 }else{

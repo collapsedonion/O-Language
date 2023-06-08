@@ -25,6 +25,16 @@ struct:DynamicArray{
         return(me);
     }
     
+    [method [void copy(DynamicArray[T] source)]]{
+        [me resize([source size()])];
+        var:int counter = 0;
+        
+        while(counter < me[_size]){
+            [me set(counter, [source get(counter)])];
+            @counter += 1;
+        }
+    }
+    
     [method [void resize(int new_size)]]{
         realloc(void~(me[_content]), new_size);
         @me[_size] = new_size;

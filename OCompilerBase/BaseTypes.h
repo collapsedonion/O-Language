@@ -88,7 +88,7 @@ inline DataTypes getTypeOfNumber(std::u32string str) {
 	return DataTypes::Integer;
 }
 
-inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType()) {
+inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType(), bool code_formated = false) {
 	switch (dt)
 	{
 	case DataTypes::ServiceInstruction:
@@ -110,12 +110,34 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
 	default:
 		for (int i = adt.lastId - 8; i >= 0; i--) {
 			if (adt.additionalNumber[i] == (int)dt) {
-				return adt.additionalName[i];
+                if(!code_formated){
+                    return adt.additionalName[i];
+                }
+                
+                auto to_ret = adt.additionalName[i];
+                
+                while(to_ret[0] == '~'){
+                    to_ret += '~';
+                    to_ret = to_ret.substr(1, to_ret.size() - 1);
+                }
+                
+                return(to_ret);
 			}
 		}
         for(int i = adt.temp.size() - 1; i>=0;i--){
             if(adt.additionalNumber[i] == (int)dt){
-                return adt.name_temp[i];
+                if(!code_formated){
+                    return adt.name_temp[i];
+                }
+                
+                auto to_ret = adt.name_temp[i];
+                
+                while(to_ret[0] == '~'){
+                    to_ret += '~';
+                    to_ret = to_ret.substr(1, to_ret.size() - 2);
+                }
+                
+                return(to_ret);
             }
         }
 		return U"ERROR";
