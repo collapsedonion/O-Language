@@ -88,7 +88,7 @@ inline DataTypes getTypeOfNumber(std::u32string str) {
 	return DataTypes::Integer;
 }
 
-inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType(), bool code_formated = false) {
+inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = AdditionalDataType(), bool code_formated = false, bool name_formated = false) {
 	switch (dt)
 	{
 	case DataTypes::ServiceInstruction:
@@ -110,7 +110,7 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
 	default:
 		for (int i = adt.lastId - 8; i >= 0; i--) {
 			if (adt.additionalNumber[i] == (int)dt) {
-                if(!code_formated){
+                if(!code_formated && !name_formated){
                     return adt.additionalName[i];
                 }
                 
@@ -121,12 +121,42 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
                     to_ret = to_ret.substr(1, to_ret.size() - 1);
                 }
                 
+                if(name_formated){
+                    for(int i = 0; i < to_ret.size(); i++){
+                        
+                        if(to_ret[i] == '~'){
+                            to_ret[i] = 'p';
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == '('){
+                            to_ret = to_ret.replace(i, 1, U"\\CBS");
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == ')'){
+                            to_ret = to_ret.replace(i, 1, U"\\CBE");
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == '['){
+                            to_ret = to_ret.replace(i, 1, U"\\SBS");
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == ']'){
+                            to_ret = to_ret.replace(i, 1, U"\\SBE");
+                            continue;
+                        }
+                    }
+                }
+                
                 return(to_ret);
 			}
 		}
         for(int i = adt.temp.size() - 1; i>=0;i--){
             if(adt.additionalNumber[i] == (int)dt){
-                if(!code_formated){
+                if(!code_formated && !name_formated){
                     return adt.name_temp[i];
                 }
                 
@@ -135,6 +165,35 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
                 while(to_ret[0] == '~'){
                     to_ret += '~';
                     to_ret = to_ret.substr(1, to_ret.size() - 2);
+                }
+                
+                if(name_formated){
+                    for(int i = 0; i < to_ret.size(); i++){
+                        if(to_ret[i] == '~'){
+                            to_ret[i] = 'p';
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == '('){
+                            to_ret = to_ret.replace(i, 1, U"\\CBS");
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == ')'){
+                            to_ret = to_ret.replace(i, 1, U"\\CBE");
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == '['){
+                            to_ret = to_ret.replace(i, 1, U"\\SBS");
+                            continue;
+                        }
+                        
+                        if(to_ret[i] == ']'){
+                            to_ret = to_ret.replace(i, 1, U"\\SBE");
+                            continue;
+                        }
+                    }
                 }
                 
                 return(to_ret);

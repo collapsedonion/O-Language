@@ -26,14 +26,14 @@ struct:String{
         var:int counter = 0;
         
         while(counter < size){
-            [me AddC(source[counter])];
+            [me Add(source[counter])];
             @counter += 1;
         }
         
         return(me);
     }
     
-    [method [void AddC(char c)]]{
+    [method [void Add(char c)]]{
         [me[_data] Pick()];
         [me[_data] Add(c)];
         [me[_data] Add('\0')];

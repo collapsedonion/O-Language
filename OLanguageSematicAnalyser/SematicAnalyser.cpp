@@ -1241,8 +1241,15 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                     
                     bool override_ = false;
                     DataTypes overide_type;
+                    
+                    std::u32string f_name = U"_m_t_" + method_description.childToken[0].childToken[1].token;
+                    
+                    for(int i = 0; i < arguments.size(); i++){
+                        f_name += dataTypeToString(getDataType(arguments[i].childToken[0]), adt, false, true);
+                    }
+                    
                     for(auto elem : newStruct.method_table){
-                        if(elem.name == U"_m_t_" + method_description.childToken[0].childToken[1].token){
+                        if(elem.name == f_name){
                             override_ = true;
                             overide_type = elem.type;
                             break;
@@ -1253,14 +1260,14 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                         Variable v;
                         auto type_t = getDataType(Analyser::quickProcess(type + U";").subToken[0].name);
                         v.type = type_t;
-                        v.name = U"_m_t_" + method_description.childToken[0].childToken[1].token;
+                        v.name = f_name;
                         newStruct.variables.push_back(v);
                         newStruct.method_table.push_back(v);
                     }else{
                         add_new_auto_cast(getDataType(Analyser::quickProcess(type + U";").subToken[0].name), overide_type);
                     }
                                         
-                    std::u32string meth_desc = U"func:" +  dataTypeToString(getDataType(method_description.childToken[0].childToken[0]), adt, true) + U" _m_t_" + method_description.childToken[0].childToken[1].token + U"(";
+                    std::u32string meth_desc = U"func:" +  dataTypeToString(getDataType(method_description.childToken[0].childToken[0]), adt, true) + U" " + f_name + U"(";
                     for(int i = 0; i < arguments.size(); i++){
                         meth_desc += dataTypeToString(getDataType(arguments[i].childToken[0]), adt, true) + U" " + arguments[i].childToken[1].token;
                         if(i != arguments.size() - 1){
@@ -1708,8 +1715,16 @@ Instruction O::SematicAnalyser::processElementCall(O::Analyser::Token token) {
     if(dataTypeIsStructure(var_me.type)){
         auto _struct = containsStructureByDataType(var_me.type);
         
+        auto f_name =  U"_m_t_" + funName.token;
+        
+        auto arguments = getComma(token.childToken[0].childToken[1]);
+        
+        for(auto elem : arguments){
+            f_name += dataTypeToString(proccessInstCall(elem).type, adt, false, true);
+        }
+        
         for(auto elem: _struct.second.method_table){
-            if(elem.name == U"_m_t_" + funName.token){
+            if(elem.name == f_name){
                 std::u32string newCall = U"x[" + elem.name + U"](";
                 auto args = getComma(token.childToken[0].childToken[1]);
                 newCall += me.token + (args.size() == 0 ? U"" : U",");
