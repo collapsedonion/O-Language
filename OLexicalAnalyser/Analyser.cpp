@@ -522,7 +522,7 @@ O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int l
             res.type = Type::StringLiteral;
         }
         else if ((str.size() == 3 || str.size() == 4) && str[0] == '\'' && ((str.size() == 3 && str[2] == '\'') || (str.size() == 4 && str[3] == '\''))){
-            res.token = str.substr(1, str.size()-2);
+            res.token = str;
             res.type = Type::Char;
         }
         else {

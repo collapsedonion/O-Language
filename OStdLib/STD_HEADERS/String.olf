@@ -33,6 +33,27 @@ struct:String{
         return(me);
     }
     
+    init(int i){
+        [me init()];
+        
+        var:int index = 0;
+
+        var:int remind = i;
+
+        while(remind > 0){
+            var:int newElement = remind % 10;
+
+            [me Add(char(newElement) + '0')];
+
+            @index = index + 1;
+            @remind = remind / 10;
+        }
+        
+        [me Reverse()];
+        
+        return(me);
+    }
+    
     [method [void Add(char c)]]{
         [me[_data] Pick()];
         [me[_data] Add(c)];
@@ -76,5 +97,49 @@ struct:String{
             }
         }
         return(false);
+    }
+    
+    [method [void Reverse()]]{
+        var:int first = 0;
+        var:int last = [me size()] - 1;
+        
+        while(last > first){
+            var:char buf1 = [me get(first)];
+            var:char buf2 = [me get(last)];
+            
+            [me set(last, buf1)];
+            [me set(first, buf2)];
+            
+            @first += 1;
+            @last -= 1;
+        }
+    }
+    
+    [method [int ParseInt()]]{
+        var:int result = 0;
+        
+        var:int multiplier = 10;
+        
+        var:int index = 0;
+        var:int start = [me size()];
+        
+        while(index < [me size()]){
+            if(isDigit([me get(index)]) ? false){
+                return(result);
+            }
+            var:int new_elem = int([me get(start - 1)] - '0');
+            
+            if(index ? 0){
+                @result = new_elem;
+            }else{
+                @result += new_elem * multiplier;
+                @multiplier *= 10;
+            }
+            
+            @index += 1;
+            @start -= 1;
+        }
+        
+        return(result);
     }
 }

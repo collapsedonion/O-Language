@@ -442,14 +442,20 @@ namespace O {
         int source;
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
         std::string num;
+        std::u32string val;
         switch (getLiteralType(inst.name)) {
             case DataTypes::Integer:
                 num = converter.to_bytes(inst.name);
                 source = std::stoi(num);
                 break;
             case DataTypes::Character:
-                if(inst.name[0] == '\\'){
-                    switch (inst.name[1]) {
+                val = inst.name;
+                if(inst.name.size() > 1 && inst.name[0] == '\'' && inst.name[inst.name.size() - 1] == '\''){
+                    val = val.substr(1, val.size() - 2);
+                }
+                
+                if(val[0] == '\\'){
+                    switch (val[1]) {
                         case 'n':
                             source = '\n';
                             break;
@@ -462,7 +468,7 @@ namespace O {
                     }
                 }
                 else {
-                    source = (int) inst.name[0];
+                    source = (int) val[0];
                 }
                 break;
             case DataTypes::Boolean:
