@@ -372,9 +372,9 @@ inline DataTypes getLiteralType(std::u32string type){
 }
 
 namespace std{
-    inline std::u32string to_ustring(int size){
+    inline std::u32string to_ustring(int val){
         static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
-        return convertor.from_bytes(std::to_string(size));
+        return convertor.from_bytes(std::to_string(val));
     }
 }
 

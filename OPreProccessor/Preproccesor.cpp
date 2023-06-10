@@ -17,6 +17,8 @@ namespace O {
 
         bool bufferLoad = false;
 
+        bool string = false;
+        
         result += U"\n";
         result += U"\n";
         result += U"#LINE_ID";
@@ -25,6 +27,10 @@ namespace O {
         result += U"\n#FILE_NAME" + this->filePath + this->file_name + U";";
 
         for(auto i : str){
+            
+            if(i == '"'){
+                string = !string;
+            }
 
             if(i == '\n' && bufferLoad){
                 bufferLoad = false;
@@ -51,7 +57,7 @@ namespace O {
             }
 
             if(i == '\n') {
-                if(!bufferLoad && (result[result.size() - 1] == ';' || result[result.size() - 1]  == '}' || result[result.size() - 1]  == '{')){
+                if(!bufferLoad && ((result[result.size() - 1] == ';' && !string)|| result[result.size() - 1]  == '}' || result[result.size() - 1]  == '{')){
                     result += U"\n";
                     result += U"\n";
                     result += U"#LINE_ID";
@@ -65,7 +71,7 @@ namespace O {
 		        continue;
             }
 
-            if(!bufferLoad && (i == ';' || i == '}' || i == '{')){
+            if(!bufferLoad && ((i == ';' && !string) || i == '}' || i == '{')){
                 result += i;
                 result += U"\n";
                 result += U"\n";

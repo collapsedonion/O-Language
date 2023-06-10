@@ -19,6 +19,11 @@ struct:String{
         return(me);
     }
     
+    [method [void Delete()]]{
+        [me[_data] Delete()];
+        free(me);
+    }
+    
     init(char~ source){
         [me init()];
         

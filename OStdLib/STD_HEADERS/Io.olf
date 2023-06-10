@@ -13,22 +13,18 @@ func io_link(){
     @nf_c_put_char = extractDLMember(c_std_lib_handler, put_c_name);
     @real_name = getRelativePointer(RPointer(put_c_name));
     free(real_name);
-    free(put_name);
 
     var:char~ put_args = "c";
     @nf_c_put_char_args = strToCstr(put_args);
-    free(put_args);
 
     var:char~ took_name = "getchar";
     var:RPChar took_c_name = strToCstr(took_name);
     @nf_c_get_char = extractDLMember(c_std_lib_handler, took_c_name);
     @real_name = getRelativePointer(RPointer(took_c_name));
     free(real_name);
-    free(took_name);
 
     var:char~ took_args = "";
-    @nf_c_get_char_args = strToCstr(took_args);
-    free(took_args);    
+    @nf_c_get_char_args = strToCstr(took_args);  
 }
 
 io_link();

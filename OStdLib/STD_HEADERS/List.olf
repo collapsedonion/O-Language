@@ -14,6 +14,11 @@ struct:List{
         return(me);
     }
     
+    [method [void Delete()]]{
+        [me[_content] Delete()];
+        free(me);
+    }
+    
     [method [void Copy(List[T] source)]]{
         @me[_size] = source[_size];
         @me[_count] = source[_count];

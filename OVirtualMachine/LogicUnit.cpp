@@ -47,7 +47,14 @@ namespace O {
             std::cin >> command;
             if(command == "continue" || command == "c"){
                 break;
-            }else if(command == "variables" || command == "vs"){
+            }else if(command == "step" || command == "s"){
+                auto scenary = O::Scenary::generateScript(_mem->getMem(), *(_mem->GetRegisterAccess(O::Memory::Registers::eip)));
+                *(_mem->GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
+                O::Scenary::EvaluateWord(scenary.second, this, _mem);
+                auto scenary_new = O::Scenary::generateScript(_mem->getMem(), *(_mem->GetRegisterAccess(O::Memory::Registers::eip)));
+                std::cout << "\t(0x" << std::hex << *(_mem->GetRegisterAccess(O::Memory::Registers::eip)) << ")" << scenary_new.second.toString() << "\n";
+            }
+            else if(command == "variables" || command == "vs"){
                 char flag;
                 if(command == "variables"){       
                     std::cin >> flag;      

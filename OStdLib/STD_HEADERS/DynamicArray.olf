@@ -56,4 +56,9 @@ struct:DynamicArray{
         }
         return(T(0));
     }
+    
+    [method [void Delete()]]{
+        free(me[_content]);
+        free(me);
+    }
 }

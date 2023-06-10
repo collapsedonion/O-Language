@@ -64,6 +64,7 @@ namespace O {
         int localSize = 0;
         int popSystemCOunt = 0;
         int bodyStart = 0;
+        int allocated_array = 1;
 
         std::vector<int>* Instructions;
         std::vector<int> mainFlow;

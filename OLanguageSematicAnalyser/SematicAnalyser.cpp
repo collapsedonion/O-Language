@@ -494,11 +494,13 @@ Instruction O::SematicAnalyser::proccessString(Analyser::Token token)
 		newC.type = Analyser::Type::Char;
 		if (token.token[i] == '\\'){
 			newC.token = U"\\";
-            newC.token  += token.token[i + 1];
+            newC.token += token.token[i + 1];
 			i++;
 		}
 		else {
-			newC.token = token.token[i];
+			newC.token = U"'";
+            newC.token += token.token[i];
+            newC.token += U"'";
 		}
         newC.line_id = token.line_id;
         newC.file_name = token.file_name;
@@ -506,7 +508,7 @@ Instruction O::SematicAnalyser::proccessString(Analyser::Token token)
 	}
 	Analyser::Token newC;
 	newC.type = Analyser::Type::Char;
-	newC.token= U"\\0";
+	newC.token= U"'\\0'";
 	t.childToken.push_back(newC);
     t.file_name = token.file_name;
     t.line_id = token.line_id;

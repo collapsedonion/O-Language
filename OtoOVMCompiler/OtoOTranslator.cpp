@@ -310,7 +310,8 @@ namespace O {
             newFT.addOffset += 1;
             newFT.LoadVariables(fun.variables, false, true);
             newFT.Instructions = &newFT.mainFlow;
-
+            newFT.allocated_array = allocated_array;
+            
             int countOfLocalVariable = newFT.addOffset - fun.arguments.size() - 1;
 
             newFT.localSize = countOfLocalVariable;
@@ -340,8 +341,14 @@ namespace O {
             newF.stackSize = addOffset;
             storedFunctions.push_back(newF);
             debug_info.insert(debug_info.end(), newFT.debug_info.begin(), newFT.debug_info.end());
-
             addSectors.insert({fName, std::vector<int>(*newFT.Instructions)});
+            
+            for(auto elem : newFT.addSectors){
+                if(addSectors.find(elem.first) == addSectors.end()){
+                    addSectors.insert(elem);
+                }
+            }
+            allocated_array = newFT.allocated_array;
             ComponentSymbol cs;
 
             for(auto a : newFT.additionalVariables){
@@ -589,15 +596,22 @@ namespace O {
                 ADDVTV(Instructions, mov);
             }
             else if(inst.name == ARRAY_CREATION_NAME){
-                auto malloc = G::malloc((int)inst.Parameters[0].name[0]);
-                ADDVTV(Instructions, malloc);
-                auto movRes = G::mov(reg, GR::eax);
+                std::u32string a_name = U"C_ARRAY_UN";
+                a_name += std::to_ustring((int)inst.Parameters[0].name[0]);
+                addSectors.insert({a_name, std::vector<int>()});
+                addSectors[a_name].resize((int)inst.Parameters[0].name[0]);
+            
+                auto ga = G::ga(a_name, 0, GR::NULLREG);
+                ADDVTV(Instructions, ga);
+                auto movRes = G::mov(reg, GR::mc3);
                 ADDVTV(Instructions, movRes)
                 for(int i = 1; i < inst.Parameters.size(); i++){
                     LoadInstToReg(inst.Parameters[i], GR::aa1);
                     auto mov = G::mov(U"", i - 1, reg, GR::aa1);
                     ADDVTV(Instructions, mov);
                 }
+                
+                allocated_array++;
             }else if(inst.name == STRUCTURE_ELEMENT_ACCESS_NAME){
                 LoadInstToReg(inst.Parameters[1], GR::edi);
                 Structure structure;

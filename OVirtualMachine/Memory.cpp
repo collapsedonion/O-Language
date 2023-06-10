@@ -48,6 +48,10 @@ namespace O {
         long long * registerSource = GetRegisterAccess(reg);
         long long * esp = GetRegisterAccess(Registers::esp);
         (*esp)--;
+        if((*esp) < 20){
+            int a = 0;
+        }
+        
         if((*esp) < stackStart){
             throw std::exception();
         }
