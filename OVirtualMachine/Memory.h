@@ -51,6 +51,7 @@ namespace O {
         SectorDescription registerSectionDescriptor;
         std::map<std::string, SectorDescription> _sectors;
         int stackStart = -1;
+        long long loadSegmenet = -1;
 
     public:
         Memory(int stackSize);
@@ -76,6 +77,7 @@ namespace O {
         void pops();
         MEM_POINTER getMemPointer();
         long long* getMem();
+        long long* getHeap(int i);
     };
 
     std::string toString(Memory::Registers reg);

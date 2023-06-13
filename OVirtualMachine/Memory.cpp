@@ -19,18 +19,25 @@ namespace O {
         sd.start = _mem.size();
         _sectors.insert({"__STACK__",  sd});
         _mem.resize(stackSize + _mem.size());
-        stackStart = sd.start;
+        stackStart = (int)sd.start;
         long long* esp = GetRegisterAccess(Registers::esp);
         *esp = sd.start + sd.size;
     }
 
     long long Memory::LoadProgram(std::string sectorName, std::vector<long long> content) {
-        long long lastId = _mem.size();
+        
+        if(loadSegmenet == -1 || std::pow(2, 32) - _heap[(int)loadSegmenet].size() <= content.size()){
+            loadSegmenet = getFreeHeap();
+            _heap.insert({loadSegmenet, std::vector<long long>()});
+        }
+        
+        long long lastId = loadSegmenet << 32;
+        lastId += _heap[(int)loadSegmenet].size();
         SectorDescription sd;
         sd.start = lastId;
         sd.size = content.size();
 
-        _mem.insert(_mem.end(), content.begin(), content.end());
+        _heap[(int)loadSegmenet].insert(_heap[(int)loadSegmenet].end(), content.begin(), content.end());
 
         _sectors.insert({sectorName,sd});
 
@@ -116,6 +123,10 @@ namespace O {
         return _mem.data();
     }
 
+    long long* Memory::getHeap(int i){
+        return _heap[i].data();
+    }
+
     long long Memory::GetIdByMAD(Memory::MemoryAddressDescriptor mad) {
         SectorDescription sd;
         if(mad.sectorName == ""){
@@ -164,7 +175,7 @@ namespace O {
         auto start = getFreeHeap();
         _heap.insert({start, std::vector<long long>()});
 
-        _heap[start].resize(value);
+        _heap[(int)start].resize(value);
 
         SectorDescription sd;
         sd.size = value;

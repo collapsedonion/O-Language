@@ -267,7 +267,7 @@ int main(int argc, char* args[]) {
 
     std::ifstream f(loadFile, std::ios::binary);
 
-    O::Memory mem(20000);
+    O::Memory mem(5 * 1024 * 1024);
     O::LogicUnit lu(&mem);
 
     lu.AddNewInterrupt("getHighFloat", GetHighFloat);

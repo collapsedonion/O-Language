@@ -34,7 +34,7 @@ namespace O {
 
         struct StopLine{
             std::string sector;
-            int stop_address;
+            long long stop_address;
         };
         
 

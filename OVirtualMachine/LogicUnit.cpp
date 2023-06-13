@@ -23,13 +23,18 @@ namespace O {
         this->mov(O::Memory::Registers::eip, mainSector.start);
 
         while (true){
+            long long adress = *(_mem->GetRegisterAccess(O::Memory::Registers::eip));
+            
             for(int i = 0; i < stop_lines.size(); i++){
-                if(stop_lines[i].stop_address+1 == *_mem->GetRegisterAccess(O::Memory::Registers::eip)){
+                if(stop_lines[i].stop_address+1 == adress){
                     DebugMode(stop_lines[i]);
                 }
             }
             
-            auto scenary = O::Scenary::generateScript(_mem->getMem(), *(_mem->GetRegisterAccess(O::Memory::Registers::eip)));
+            int sector_id = adress >> 32;
+            int sector_offset = (int)adress;
+                        
+            auto scenary = O::Scenary::generateScript(sector_id == 0 ? _mem->getMem() : _mem->getHeap(sector_id), sector_offset);
             *(_mem->GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
             O::Scenary::EvaluateWord(scenary.second, this, _mem);
             if(*(_mem->GetRegisterAccess(O::Memory::Registers::eip)) == mainSector.start + mainSector.size){
@@ -48,10 +53,22 @@ namespace O {
             if(command == "continue" || command == "c"){
                 break;
             }else if(command == "step" || command == "s"){
-                auto scenary = O::Scenary::generateScript(_mem->getMem(), *(_mem->GetRegisterAccess(O::Memory::Registers::eip)));
+                
+                long long adress = *(_mem->GetRegisterAccess(O::Memory::Registers::eip));
+                
+                int sector_id = adress >> 32;
+                int sector_offset = (int)adress;
+                
+                auto scenary = O::Scenary::generateScript(sector_id == 0 ? _mem->getMem() : _mem->getHeap(sector_id), sector_offset);
                 *(_mem->GetRegisterAccess(O::Memory::Registers::eip)) += scenary.first;
                 O::Scenary::EvaluateWord(scenary.second, this, _mem);
-                auto scenary_new = O::Scenary::generateScript(_mem->getMem(), *(_mem->GetRegisterAccess(O::Memory::Registers::eip)));
+                
+                adress = *(_mem->GetRegisterAccess(O::Memory::Registers::eip));
+                
+                sector_id = adress >> 32;
+                sector_offset = (int)adress;
+                
+                auto scenary_new = O::Scenary::generateScript(sector_id == 0 ? _mem->getMem() : _mem->getHeap(sector_id), sector_offset);
                 std::cout << "\t(0x" << std::hex << *(_mem->GetRegisterAccess(O::Memory::Registers::eip)) << ")" << scenary_new.second.toString() << "\n";
             }
             else if(command == "variables" || command == "vs"){
@@ -167,8 +184,11 @@ namespace O {
                 long long max_adress = _mem->getSectorDescription(sl.sector).start +  _mem->getSectorDescription(sl.sector).size;
                 std::cin >> c;
                 
+                int sector_id = adress >> 32;
+                int sector_offset = (int)adress;
+                
                 for(int i = 0; i < c && adress < max_adress; i++){
-                    auto scenary = O::Scenary::generateScript(_mem->getMem(), adress);
+                    auto scenary = O::Scenary::generateScript(sector_id == 0 ? _mem->getMem() : _mem->getHeap(sector_id), sector_offset);
                     adress+=scenary.first;
                     std::cout << "\t(0x" << std::hex << adress << ")" << scenary.second.toString() << "\n";
                 }
@@ -182,7 +202,7 @@ namespace O {
     void LogicUnit::AddBreakPoint(std::u32string path, int line){
         for(auto sym : debug_symbols){
             if(sym.file == path && sym.line >= line){
-                int path = _mem->getSectorDescription(sym.sector).start;
+                long long path = _mem->getSectorDescription(sym.sector).start;
                 path += sym.esp_min;
                 StopLine sl;
                 sl.sector = sym.sector;
@@ -619,7 +639,7 @@ namespace O {
             throw std::exception();
         }
 
-        std::vector<Interrupt> newInterrupts = main(registeredInterrupts.size());
+        std::vector<Interrupt> newInterrupts = main((int)registeredInterrupts.size());
 
         for(auto i : newInterrupts){
             std::vector<long long> b = {17, 0, i.id, 0, 0,5,0,0,0,0};
@@ -1024,7 +1044,7 @@ namespace O {
         _mem->LoadProgram(name, b);
 
         Interrupt inter;
-        inter.id = registeredInterrupts.size();
+        inter.id = (int)registeredInterrupts.size();
         inter.name = name;
         inter.hInt = interrupt;
         registeredInterrupts.push_back(inter);

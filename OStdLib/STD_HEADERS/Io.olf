@@ -32,7 +32,6 @@ io_link();
 func putChar(char c){
     var:char~ arguments = [c];
     nativeInvoke(nf_c_put_char, 1, int~(arguments), nf_c_put_char_args);
-    free(arguments);
 }
 
 func:char tookChar(){
