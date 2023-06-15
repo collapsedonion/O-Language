@@ -183,11 +183,10 @@ namespace O {
                 long long adress = *_mem->GetRegisterAccess(O::Memory::Registers::eip);
                 long long max_adress = _mem->getSectorDescription(sl.sector).start +  _mem->getSectorDescription(sl.sector).size;
                 std::cin >> c;
-                
-                int sector_id = adress >> 32;
-                int sector_offset = (int)adress;
-                
+                                
                 for(int i = 0; i < c && adress < max_adress; i++){
+                    int sector_id = adress >> 32;
+                    int sector_offset = (int)adress;
                     auto scenary = O::Scenary::generateScript(sector_id == 0 ? _mem->getMem() : _mem->getHeap(sector_id), sector_offset);
                     adress+=scenary.first;
                     std::cout << "\t(0x" << std::hex << adress << ")" << scenary.second.toString() << "\n";

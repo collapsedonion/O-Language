@@ -371,7 +371,7 @@ namespace O {
 
     void OtoOTranslator::CallFunction(Instruction inst) {
         std::vector<DataTypes> argumentsDataTypes;
-
+        
         if(inst.name == U"__pointer_call"){
             LoadInstToReg(inst.Parameters[0], GR::edx);
             std::vector<Instruction> newParameters;

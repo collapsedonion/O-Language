@@ -123,25 +123,27 @@ struct:String{
     [method [int ParseInt()]]{
         var:int result = 0;
         
-        var:int multiplier = 10;
+        var:int multiplier = 1;
         
         var:int index = 0;
+        var:bool finding = true;
         var:int start = [me size()];
         
-        while(index < [me size()]){
+        while(index < [me size()] & finding){
             if(isDigit([me get(index)]) ? false){
-                return(result);
+                @finding = false;
+                @start = index
             }
-            var:int new_elem = int([me get(start - 1)] - '0');
-            
-            if(index ? 0){
-                @result = new_elem;
-            }else{
-                @result += new_elem * multiplier;
-                @multiplier *= 10;
-            }
-            
             @index += 1;
+        }
+        
+        while(start > 0){
+            var:int new_elem = int([me get(start - 1)] - '0');
+
+            @result += new_elem * multiplier;
+            @multiplier *= 10;
+            
+            
             @start -= 1;
         }
         

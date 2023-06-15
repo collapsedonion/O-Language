@@ -1,0 +1,38 @@
+#include Io.olf
+#include String.olf
+
+
+struct:STD_CONSOLE{
+    
+    [method [String readLine()]]{
+        var:String to_ret = [[to_ret alloc()] init()];
+        
+        var:char new_c;
+        
+        var:bool reading = true;
+        
+        while(reading){
+            @new_c = tookChar();
+            if(new_c ? '\n'){
+                @reading = false;
+            }else{
+                [to_ret Add(new_c)];
+            }
+        }
+        
+        return(to_ret);
+    }
+    
+    [method [void printLine(String str)]]{
+        var:int index = 0;
+        
+        while(index < [str size()]){
+            putChar([str get(index)]);
+            @index += 1;
+        }
+    }
+    
+}
+
+
+global:STD_CONSOLE Console = [[Console alloc()] init()];

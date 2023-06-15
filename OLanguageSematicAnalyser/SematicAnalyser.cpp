@@ -929,9 +929,36 @@ Instruction O::SematicAnalyser::proccessFuncInstrucion(Analyser::TokenisedFile t
             func.body = subSematicAnalyser.instructions;
         }
         if (containsFunction(func.name, dt) != DataTypes::Error) {
-            std::u32string message = U"Function redefinition \"" + func.name + U"\"";
-            throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, message);
+            if(isExternFunction(func.name, dt) == false){
+                std::u32string message = U"Function redefinition \"" + func.name + U"\"";
+                throw CompilationException(funcFirstDescriptor.line_id, funcFirstDescriptor.file_name, message);
+            }else{
+                for(int i = 0; i < functions.size(); i++){
+                    auto elem = functions[i];
+                    if(elem.name == func.name && elem.getArgumentsDataTypes() == dt){
+                        bool fielded = false;
+                        for(int j = 0; j < functionsCreatedAtThatField.size(); j++){
+                            auto sub_elem = functionsCreatedAtThatField[j];
+                            if(sub_elem.name == func.name && sub_elem.getArgumentsDataTypes() == dt){
+                                functionsCreatedAtThatField[j] = func;
+                                fielded = true;
+                                break;
+                            }
+                        }
+                        functions[i] = func;
+                        if(!fielded){
+                            functionsCreatedAtThatField.push_back(func);
+                        }
+                        toRet.name = func.name;
+                        toRet.type = func.returnType;
+                        toRet.file_name = token.name.file_name;
+                        toRet.line = token.name.line_id;
+                        return toRet;
+                    }
+                }
+            }
         }
+        
         if (!isExtern) {
             if (isOperator) {
                 if (func.arguments.size() != 2) {
@@ -1347,8 +1374,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
         U"  @me = malloc(" + dataTypeToString(newStruct.myDt, adt, true) + U", sizeof(" + dataTypeToString(newStruct.myDt,adt) + U"));\n" +
         U" [me methods_init()];\n" +
         U"   return(me);\n" + U"}";
-        auto main_tf = Analyser::quickProcess(allocator);
-        methods.push_back(main_tf.subToken[0]);
+        methods.push_back(Analyser::quickProcess(allocator).subToken[0]);
     }
     
     if(!init_exists){
