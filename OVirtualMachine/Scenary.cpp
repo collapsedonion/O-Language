@@ -42,25 +42,30 @@ namespace O{
         "get adress",
     };
 
+    std::pair<Scenary::InstructionType, std::pair<Scenary::OperandType, Scenary::OperandType>> Scenary::breakInstType(int type){
+        int dType = type >> 16;
+        short opTypes = (short)type;
+        char opType = opTypes >> 8;
+        char opType1 = (char)opTypes;
+        
+        return {(Scenary::InstructionType)dType, {(OperandType)opType, (OperandType)opType1}};
+    }
+
     std::pair<int, Scenary::ScriptWord> Scenary::generateScript(long long *a, long long id) {
         long long readSize = 0;
-        auto type = (InstructionType)a[id];
+        int encodedType = (int)a[id];
         readSize += 1;
-        auto opT1 = (OperandType)a[id + readSize];
-        readSize += 1;
-        auto op1 = readOperand(opT1, a, id + readSize);
+        auto decoded = breakInstType(encodedType);
+        auto op1 = readOperand(decoded.second.first, a, id + readSize);
         readSize += op1.first;
-        auto opT2 = (OperandType)a[id + readSize];
-        readSize += 1;
-        auto op2 = readOperand(opT2, a, id + readSize);
+        auto op2 = readOperand(decoded.second.second, a, id + readSize);
         readSize += op2.first;
-
         Scenary::ScriptWord sw;
-        sw.instruction = type;
+        sw.instruction = decoded.first;
         sw.op1 = op1.second;
         sw.op2 = op2.second;
-        sw.top1 = opT1;
-        sw.top2 = opT2;
+        sw.top1 = decoded.second.first;
+        sw.top2 = decoded.second.second;
         return {readSize, sw};
     }
 

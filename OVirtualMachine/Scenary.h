@@ -68,7 +68,7 @@ namespace O {
         };
         
 
-
+        static std::pair<InstructionType, std::pair<OperandType, OperandType>> breakInstType(int type);
         static std::pair<int, Operand> readOperand(OperandType opT, long long* a, long long id);
         static std::pair<int, ScriptWord> generateScript(long long* a, long long id);
         static void EvaluateWord(ScriptWord sw, LogicUnit* lu, Memory* memoryUnit);

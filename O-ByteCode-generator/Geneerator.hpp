@@ -38,6 +38,7 @@ public:
     static std::vector<int> generateMad(std::u32string sectorName, Registers anchor, int offset);
     static std::vector<int> generateRegister(Registers reg);
     static std::vector<int> generateValue(int value);
+    static int generateName(int id, bool reg, bool mad, bool v, bool reg1, bool mad1, bool v1);
 
     GENERATETWOPARAMETERSDEF(add)
     GENERATETWOPARAMETERSDEF(mov)

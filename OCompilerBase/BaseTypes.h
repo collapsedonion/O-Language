@@ -49,7 +49,7 @@ inline DataTypes stringToDataType(std::u32string str, AdditionalDataType adt) {
 			}
 		}
         
-        for(int i = adt.temp.size() - 1; i>=0;i--){
+        for(int i = (int)adt.temp.size() - 1; i>=0;i--){
             if(adt.name_temp[i] == str){
                 return (DataTypes)adt.temp[i];
             }
@@ -316,7 +316,7 @@ inline bool isStringEndsWith(std::u32string wStr, std::u32string ending){
         return false;
     }
 
-    for(int i = ending.size() - 1; i >= 0; i--){
+    for(int i = (int)ending.size() - 1; i >= 0; i--){
         if(wStr[i+wStr.size() - ending.size()] != ending[i]){
             return false;
         }

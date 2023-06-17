@@ -638,7 +638,7 @@ Instruction O::SematicAnalyser::proccessArrayCreationInstruction(Analyser::Token
 		Instruction toRet;
 		toRet.name = ARRAY_CREATION_NAME;
 		Instruction instSize;
-		instSize.name = tokens.size();
+		instSize.name = (int)tokens.size();
 		instSize.type = DataTypes::Integer;
 		toRet.Parameters.push_back(instSize);
 
@@ -1494,7 +1494,7 @@ Instruction O::SematicAnalyser::proccessInstCall(Analyser::Token token) {
             else {
                 if (token.token == MATH_SET) {
                     std::u32string firstDt = dataTypeToString(t1.type, adt);
-                    if (firstDt[0] == '~' && stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt) == t2.type || can_be_auto_casted(t2.type, stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt), {})) {
+                    if ((firstDt[0] == '~' && stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt) == t2.type) || can_be_auto_casted(t2.type, stringToDataType(firstDt.substr(1, firstDt.size() - 1), adt), {})) {
                         res.name = U"SET_VALUE";
                         res.ArithmeticProccess = true;
                         res.type = DataTypes::ServiceInstruction;

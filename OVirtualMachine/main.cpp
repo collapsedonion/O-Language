@@ -85,7 +85,7 @@ void CallCFunction(MEM_POINTER mem){
 	long long pCount = *getObjectReferenceByAddress(mem, mem.ebp - 1);
 	long long* arguments = getObjectReferenceByAddress(mem, *getObjectReferenceByAddress(mem, mem.ebp - 2));
 	char* arg_types = (char*)*getObjectReferenceByAddress(mem, mem.ebp - 3);
-	*mem.eax = cdc_invoke(fPointer, pCount, arguments, arg_types);
+	*mem.eax = cdc_invoke(fPointer, (int)pCount, arguments, arg_types);
 }
 
 void ExtractPackage(MEM_POINTER mem){
@@ -128,7 +128,7 @@ void ExtractPackage(MEM_POINTER mem){
 void Reallocate(MEM_POINTER mem){
     int pageIndex = ((*mem._mem)[mem.ebp]) >> 32;
     std::vector<long long>* page = &(*mem._heap)[pageIndex];
-    int newSize = ((*mem._mem))[mem.ebp - 1];
+    int newSize = (int)((*mem._mem))[mem.ebp - 1];
 
     page->resize(newSize);
 }

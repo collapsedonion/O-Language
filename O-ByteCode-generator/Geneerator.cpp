@@ -18,19 +18,19 @@
 #define MADVAL(name) HEADER(name, MADINIT(sectOP1, offsetOP1, anchorOP1), int value)
 #define MADREG(name) HEADER(name, MADINIT(sectOP1, offsetOP1, anchorOP1), Registers source)
 #define MADMAD(name) HEADER(name, MADINIT(sectOP1, offsetOP1, anchorOP1), MADINIT(sectOP2, offsetOP2, anchorOP2))
+#define T true
+#define F false
 
-#define CREATEFIRSTOPREG2op(name, index)REGREG(name){std::vector<int> toRet;toRet.push_back(index); LOADREG(o1, op1) LOADREG(o2, op2) ADDVECTORTOVECTOR(toRet, o1) ADDVECTORTOVECTOR(toRet, o2) return toRet;} REGVAL(name){TORET toRet.push_back(index);LOADREG(r0, op1)LOADVALUE(o2, value)ADDVECTORTOVECTOR(toRet, r0)ADDVECTORTOVECTOR(toRet, o2)return toRet;}REGMAD(name){TORET toRet.push_back(index); LOADREG(r0, op1) LOADMAD(m0, sect, anchor, off) ADDVECTORTOVECTOR(toRet, r0) ADDVECTORTOVECTOR(toRet, m0) return toRet;}
+#define CREATEFIRSTOPREG2op(name, index)REGREG(name){std::vector<int> toRet; toRet.push_back(generateName(index,T,F,F,T,F,F)); LOADREG(o1, op1) LOADREG(o2, op2) ADDVECTORTOVECTOR(toRet, o1) ADDVECTORTOVECTOR(toRet, o2) return toRet;} REGVAL(name){TORET toRet.push_back(generateName(index,T,F,F,F,F,T));LOADREG(r0, op1)LOADVALUE(o2, value)ADDVECTORTOVECTOR(toRet, r0)ADDVECTORTOVECTOR(toRet, o2)return toRet;}REGMAD(name){TORET toRet.push_back(generateName(index,T,F,F,F,T,F)); LOADREG(r0, op1) LOADMAD(m0, sect, anchor, off) ADDVECTORTOVECTOR(toRet, r0) ADDVECTORTOVECTOR(toRet, m0) return toRet;}
 
-#define CREATEFIRSTOPMAD2op(name, index) MADVAL(name){TORET toRet.push_back(index);LOADMAD(m0, sectOP1, anchorOP1, offsetOP1)LOADVALUE(v0, value)ADDVECTORTOVECTOR(toRet, m0)ADDVECTORTOVECTOR(toRet, v0)return toRet;}MADREG(name){TORET toRet.push_back(index);LOADMAD(m0, sectOP1, anchorOP1, offsetOP1)LOADREG(r0, source);ADDVECTORTOVECTOR(toRet, m0)ADDVECTORTOVECTOR(toRet, r0)return toRet;}MADMAD(name){TORET toRet.push_back(index);LOADMAD(m0, sectOP1, anchorOP1, offsetOP1)LOADMAD(m1, sectOP2, anchorOP2, offsetOP2)ADDVECTORTOVECTOR(toRet, m0)ADDVECTORTOVECTOR(toRet, m1)return toRet;}
+#define CREATEFIRSTOPMAD2op(name, index) MADVAL(name){TORET toRet.push_back(generateName(index,F,T,F,F,F,T));LOADMAD(m0, sectOP1, anchorOP1, offsetOP1)LOADVALUE(v0, value)ADDVECTORTOVECTOR(toRet, m0)ADDVECTORTOVECTOR(toRet, v0)return toRet;}MADREG(name){TORET toRet.push_back(generateName(index,F,T,F,T,F,F));LOADMAD(m0, sectOP1, anchorOP1, offsetOP1)LOADREG(r0, source);ADDVECTORTOVECTOR(toRet, m0)ADDVECTORTOVECTOR(toRet, r0)return toRet;}MADMAD(name){TORET toRet.push_back(generateName(index,F,T,F,F,T,F));LOADMAD(m0, sectOP1, anchorOP1, offsetOP1)LOADMAD(m1, sectOP2, anchorOP2, offsetOP2)ADDVECTORTOVECTOR(toRet, m0)ADDVECTORTOVECTOR(toRet, m1)return toRet;}
 
-#define CREATEZEROPARAM(name, index)std::vector<int> Geneerator::name(){return {index,0,0,0,0};}
+#define CREATEZEROPARAM(name, index)std::vector<int> Geneerator::name(){return {generateName(index,F,F,F,F,F,F),0,0};}
 
-#define CREATEONEPARAM(name, index) std::vector<int> Geneerator::name(int value){return {index, 0, value,0,0};}std::vector<int> Geneerator::name(Geneerator::Registers value){TORET toRet.push_back(index);LOADREG(r0, value)ADDVECTORTOVECTOR(toRet, r0)toRet.push_back(0);toRet.push_back(0);return toRet;}std::vector<int> Geneerator::name(std::u32string sector, int offset, Registers anchor){TORET toRet.push_back(index);LOADMAD(m0, sector, anchor, offset)ADDVECTORTOVECTOR(toRet, m0)toRet.push_back(0);toRet.push_back(0);return toRet;}
+#define CREATEONEPARAM(name, index) std::vector<int> Geneerator::name(int value){return {generateName(index,F,F,T,F,F,F), value, 0};}std::vector<int> Geneerator::name(Geneerator::Registers value){TORET toRet.push_back(generateName(index,T,F,F,F,F,F));LOADREG(r0, value)ADDVECTORTOVECTOR(toRet, r0)toRet.push_back(0);return toRet;}std::vector<int> Geneerator::name(std::u32string sector, int offset, Registers anchor){TORET toRet.push_back(generateName(index,F,T,F,F,F,F));LOADMAD(m0, sector, anchor, offset)ADDVECTORTOVECTOR(toRet, m0)toRet.push_back(0);return toRet;}
 
 std::vector<int> Geneerator::generateMad(std::u32string sectorName, Geneerator::Registers anchor, int offset) {
     std::vector<int> toRet;
-
-    toRet.push_back(2);
 
     for(auto c : sectorName){
         toRet.push_back(c);
@@ -45,11 +45,38 @@ std::vector<int> Geneerator::generateMad(std::u32string sectorName, Geneerator::
 }
 
 std::vector<int> Geneerator::generateRegister(Geneerator::Registers reg) {
-    return {1, (int)reg};
+    return {(int)reg};
 }
 
 std::vector<int> Geneerator::generateValue(int value) {
-    return {0, value};
+    return {value};
+}
+
+int Geneerator::generateName(int id, bool reg, bool mad, bool v, bool reg1, bool mad1, bool v1){
+    int result = id << 16;
+    short fOp = 0;
+    short sOp = 0;
+    if(reg){
+        fOp = 1;
+        fOp <<= 8;
+    }else if(mad){
+        fOp = 2;
+        fOp <<= 8;
+    }else if(v){
+        fOp = 0;
+        fOp <<= 8;
+    }
+    
+    if(reg1){
+        sOp = 1;
+    }else if(mad1){
+        sOp = 2;
+    }else if(v1){
+        sOp = 0;
+    }
+    
+    result += fOp + sOp;
+    return result;
 }
 
 CREATEFIRSTOPREG2op(add, 1)

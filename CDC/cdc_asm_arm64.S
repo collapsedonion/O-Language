@@ -1,5 +1,6 @@
 
 .global _cdc_invoke
+.balign 4
 _cdc_invoke:
 	str x9, [sp, #-16]!
 	str x10, [sp, #-16]!

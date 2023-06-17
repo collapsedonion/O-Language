@@ -29,7 +29,7 @@
 #define LOADMATH(reg) G::mov(reg, GR::mc0)
 #define PUSH(reg) G::push(GR::reg)
 #define POP(reg) G::pop(GR::reg)
-#define ISINSTTYPEEQU(inst1, inst2, TYPE) inst1.type == TYPE && inst2.type == TYPE
+#define ISINSTTYPEEQU(inst1, inst2, TYPE) (inst1.type == TYPE && inst2.type == TYPE)
 
 namespace O {
     void OtoOTranslator::Build(File f) {
@@ -45,7 +45,7 @@ namespace O {
 
         LoadFunctions(f.functions);
 
-        bodyStart = this->Instructions->size();
+        bodyStart = (int)this->Instructions->size();
 
         Instructions->insert(Instructions->end(), mov.begin(), mov.end());
 
@@ -133,7 +133,7 @@ namespace O {
         new_info.file = inst.file_name;
         new_info.line = inst.line;
         new_info.sector = sectorName;
-        new_info.esp_min = Instructions->size() - 1;
+        new_info.esp_min = (int)Instructions->size() - 1;
 
         if(inst.name == FREE_INSTRUCTION_NAME){
             FreeInstruction(inst);
@@ -162,18 +162,18 @@ namespace O {
             MathematicalProccess(inst);
         }
 
-        new_info.esp_max = Instructions->size() - 1;
+        new_info.esp_max = (int)Instructions->size() - 1;
         debug_info.push_back(new_info);
     }
 
     OtoOTranslator::VariableStored OtoOTranslator::getVar(std::u32string name) {
-        for(int i = additionalVariables.size()-1; i >= 0; i--){
+        for(int i = (int)additionalVariables.size()-1; i >= 0; i--){
             if(additionalVariables[i].name == name){
                 return additionalVariables[i];
             }
         }
 
-        for(int i = variables.size()-1; i >= 0; i--){
+        for(int i = (int)variables.size()-1; i >= 0; i--){
             if(variables[i].name == name){
                 return variables[i];
             }
@@ -205,25 +205,25 @@ namespace O {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
         std::ofstream f(convertor.to_bytes(filepath), std::ios::binary);
 
-        int sectorCount = this->addSectors.size() + 1;
+        int sectorCount = (int)this->addSectors.size() + 1;
 
         f.write((char *)&sectorCount, sizeof(int) / sizeof(char));
 
         for(auto sector : addSectors){
-            int name_size = sector.first.size();
+            int name_size = (int)sector.first.size();
             f.write((char*)&name_size, sizeof(int) / sizeof(char));
             f.write((char*)sector.first.c_str(), name_size * sizeof(char32_t) / sizeof(char));
 
-            int sector_size = sector.second.size();
+            int sector_size = (int)sector.second.size();
             f.write((char *)&sector_size, sizeof(int) / sizeof(char));
             f.write((char *)sector.second.data(), sector.second.size() * sizeof(int) / sizeof(char));
         }
 
-        int name_size = sectorName.size();
+        int name_size = (int)sectorName.size();
         f.write((char*)&name_size, sizeof(int) / sizeof(char));
         f.write((char *)sectorName.c_str(), name_size * sizeof(char32_t) / sizeof(char));
 
-        int sector_size = Instructions->size();
+        int sector_size = (int)Instructions->size();
         f.write((char *)&sector_size, sizeof(int) / sizeof(char));
         f.write((char *)Instructions->data(), Instructions->size() * sizeof(int) / sizeof(char));
 
@@ -234,29 +234,29 @@ namespace O {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convertor;
         std::ofstream f(convertor.to_bytes(path), std::ios::binary);
 
-        int break_point_count = breakPoints.size();
+        int break_point_count = (int)breakPoints.size();
         f.write((char*)&break_point_count, sizeof(int) / sizeof(char));
         for(auto bp : breakPoints){
-            int name_size = bp.first.size();
+            int name_size = (int)bp.first.size();
             f.write((char*)&name_size, sizeof(int) / sizeof(char));
             f.write((char*)bp.first.c_str(), name_size * sizeof(char32_t) / sizeof(char));
             f.write((char*)&bp.second, sizeof(int) / sizeof(char));
         }
 
-        int components_count = components.size();
+        int components_count = (int)components.size();
         f.write((char*)&components_count, sizeof(int) / sizeof(char));
 
         for(auto component : components){
-            int sector_size = component.sector.size();
+            int sector_size = (int)component.sector.size();
             f.write((char*)&sector_size, sizeof(int) / sizeof(char));
             f.write((char*)component.sector.c_str(), sector_size * sizeof(char32_t) / sizeof(char));
 
-            int variables_count = component.vs.size();
+            int variables_count = (int)component.vs.size();
             f.write((char*)&variables_count, sizeof(int) / sizeof(char));
 
             for(auto variable : component.vs){
-                int name_size = variable.name.size();
-                int sector_size = variable.sector.size();
+                int name_size = (int)variable.name.size();
+                int sector_size = (int)variable.sector.size();
 
                 f.write((char*)&name_size, sizeof(int) / sizeof(char));
                 f.write((char*)variable.name.c_str(), name_size * sizeof(char32_t) / sizeof(char));
@@ -267,12 +267,12 @@ namespace O {
             }
         }
 
-        int symbol_count = this->debug_info.size();
+        int symbol_count = (int)this->debug_info.size();
         f.write((char*)&symbol_count, sizeof(int) / sizeof(char));
 
         for(auto symbol : debug_info){
-            int sector_name_size = symbol.sector.size();
-            int path_size = symbol.file.size();
+            int sector_name_size = (int)symbol.sector.size();
+            int path_size = (int)symbol.file.size();
 
             f.write((char*)&path_size, sizeof(int) / sizeof(char));
             f.write((char*)symbol.file.c_str(), path_size * sizeof(char32_t) / sizeof(char));
@@ -312,7 +312,7 @@ namespace O {
             newFT.Instructions = &newFT.mainFlow;
             newFT.allocated_array = allocated_array;
             
-            int countOfLocalVariable = newFT.addOffset - fun.arguments.size() - 1;
+            int countOfLocalVariable = newFT.addOffset - (int)fun.arguments.size() - 1;
 
             newFT.localSize = countOfLocalVariable;
 
@@ -403,7 +403,7 @@ namespace O {
         if(inst.Parameters.size() != 0) {
             auto m0 = G::mov(GR::ebp, GR::esp);
             ADDVTV(Instructions, m0);
-            auto a0 = G::add(GR::ebp, inst.Parameters.size() - 1);
+            auto a0 = G::add(GR::ebp, (int)inst.Parameters.size() - 1);
             ADDVTV(Instructions, a0);
         }else{
             auto m0 = G::mov(GR::ebp, GR::esp);
@@ -423,7 +423,7 @@ namespace O {
         Instructions->insert(Instructions->end(), c.begin(), c.end());
 
         if(inst.Parameters.size() != 0){
-            auto addEsp = G::add(GR::esp, inst.Parameters.size());
+            auto addEsp = G::add(GR::esp, (int)inst.Parameters.size());
             ADDVTV(Instructions, addEsp);
         }
 
@@ -762,8 +762,8 @@ namespace O {
     void OtoOTranslator::IfFunction(Instruction inst) {
         auto jmpToEndBody = Geneerator::jmp(U"", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
-        int jumpOffsetId = Instructions->size() - 1 - 2;
-        int oldSize = Instructions->size();
+        int jumpOffsetId = (int)Instructions->size() - 2;
+        int oldSize = (int)Instructions->size();
         auto saveFlag = G::push(GR::flag);
         ADDVTV(Instructions, saveFlag)
         popSystemCOunt += 1;
@@ -775,22 +775,22 @@ namespace O {
         ADDVTV(Instructions, loadFlag)
         jmpToEndBody = Geneerator::jmp(U"", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
-        int offsetOfExit = Instructions->size() - 1 - 2;
-        int exitSize = Instructions->size();
-        (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
+        int offsetOfExit = (int)Instructions->size() - 2;
+        int exitSize = (int)Instructions->size();
+        (*Instructions)[jumpOffsetId] = (int)Instructions->size() - oldSize;
         LoadInstToReg(inst.Parameters[0], GR::mc3);
         auto cm = G::cmp(GR::mc3, 1);
-        auto je = G::jme(sectorName, jumpOffsetId + 3, GR::NULLREG);
+        auto je = G::jme(sectorName, jumpOffsetId + 2, GR::NULLREG);
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
-        (*Instructions)[offsetOfExit] = Instructions->size() - exitSize;
+        (*Instructions)[offsetOfExit] = (int)Instructions->size() - exitSize;
     }
 
     void OtoOTranslator::ElseInstruction(Instruction inst) {
         auto jmpIfT = Geneerator::jme(U"", 123456, GR::eip);
         ADDVTV(Instructions, jmpIfT);
-        int jumpOffset = Instructions->size() - 1 - 2;
-        int oldSize = Instructions->size();
+        int jumpOffset = (int)Instructions->size() - 2;
+        int oldSize = (int)Instructions->size();
         auto saveFlag = G::push(GR::flag);
         ADDVTV(Instructions, saveFlag)
         popSystemCOunt++;
@@ -800,16 +800,16 @@ namespace O {
         popSystemCOunt--;
         auto loadFlag = G::pop(GR::flag);
         ADDVTV(Instructions, loadFlag)
-        (*Instructions)[jumpOffset] = Instructions->size() - oldSize;
+        (*Instructions)[jumpOffset] = (int)Instructions->size() - oldSize;
     }
 
     void OtoOTranslator::ElifInstruction(Instruction inst) {
         auto jmpIfT = Geneerator::jme(U"", 123456, GR::eip);
         ADDVTV(Instructions, jmpIfT);
-        int jumpOffset = Instructions->size() - 1 - 2;
-        int oldSize = Instructions->size();
+        int jumpOffset = (int)Instructions->size() - 2;
+        int oldSize = (int)Instructions->size();
         IfFunction(inst);
-        (*Instructions)[jumpOffset] = Instructions->size() - oldSize;
+        (*Instructions)[jumpOffset] = (int)Instructions->size() - oldSize;
     }
 
     void OtoOTranslator::FreeInstruction(Instruction inst) {
@@ -821,8 +821,8 @@ namespace O {
     void OtoOTranslator::WhileInstruction(Instruction inst) {
         auto jmpToEndBody = Geneerator::jmp(U"", 123456, GR::eip);
         ADDVTV(Instructions, jmpToEndBody)
-        int jumpOffsetId = Instructions->size() - 1 - 2;
-        int oldSize = Instructions->size();
+        int jumpOffsetId = (int)Instructions->size() - 2;
+        int oldSize = (int)Instructions->size();
         auto saveFlag = G::push(GR::flag);
         ADDVTV(Instructions, saveFlag)
         popSystemCOunt++;
@@ -832,10 +832,10 @@ namespace O {
         popSystemCOunt--;
         auto loadFlag = G::pop(GR::flag);
         ADDVTV(Instructions, loadFlag)
-        (*Instructions)[jumpOffsetId] = Instructions->size() - oldSize;
+        (*Instructions)[jumpOffsetId] = (int)Instructions->size() - oldSize;
         LoadInstToReg(inst.Parameters[0], GR::mc3);
         auto cm = G::cmp(GR::mc3, 1);
-        auto je = G::jme(sectorName, jumpOffsetId + 3, GR::NULLREG);
+        auto je = G::jme(sectorName, jumpOffsetId + 2, GR::NULLREG);
         ADDVTV(Instructions, cm);
         ADDVTV(Instructions, je);
     }

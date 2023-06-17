@@ -1039,7 +1039,12 @@ namespace O {
     }
 
     void LogicUnit::AddNewInterrupt(std::string name, InterruptHandler interrupt) {
-        std::vector<long long> b = {17, 0, (long long)registeredInterrupts.size(), 0, 0,5,0,0,0,0};
+        long long inst_int = 17;
+        inst_int <<= 16;
+        long long inst_ret = 5;
+        inst_ret <<= 16;
+        
+        std::vector<long long> b = {inst_int, (long long)registeredInterrupts.size(), 0, inst_ret,0,0};
         _mem->LoadProgram(name, b);
 
         Interrupt inter;

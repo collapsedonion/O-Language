@@ -152,7 +152,7 @@ std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBr
 
     std::u32string operatorContentRight = U"";
 
-    for (int i = str.size() - 1; i >= 0; i--) {
+    for (int i = (int)str.size() - 1; i >= 0; i--) {
         if (str[i] == right) {
             level++;
         }
@@ -166,7 +166,7 @@ std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBr
         operatorContent += str[i];
     }
 
-    for (int i = operatorContent.size() - 1; i >= 0; i--) {
+    for (int i = (int)operatorContent.size() - 1; i >= 0; i--) {
         operatorContentRight += operatorContent[i];
     }
 
