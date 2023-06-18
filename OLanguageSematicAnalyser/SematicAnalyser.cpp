@@ -1141,7 +1141,7 @@ std::pair<bool, Structure> O::SematicAnalyser::containsStructureByDataType(DataT
 File O::SematicAnalyser::getFileRepresantation()
 {
 	File f;
-	f.functions = std::vector<Function>(functionsCreatedAtThatField);
+	f.functions = std::vector<Function>(functions);
 	f.instructions = std::vector<Instruction>(instructions);
 	f.variables = std::vector<Variable>(variablesCreatedAtThatField);
     f.operators = std::vector<Operator>(operators);
@@ -1368,6 +1368,22 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     
     methods.push_back(Analyser::quickProcess(methods_init).subToken[0]);
     
+    Variable me_variable_sing;
+    me_variable_sing.type = newStruct.myDt;
+    me_variable_sing.name = U"me";
+    
+    Function methods_init_descriptor;
+    methods_init_descriptor.name = U"methods_init";
+    methods_init_descriptor.arguments = {me_variable_sing};
+    methods_init_descriptor.IsExtern = true;
+    methods_init_descriptor.returnType = newStruct.myDt;
+    
+    Function std_allocator_descriptor;
+    std_allocator_descriptor.name = U"alloc";
+    std_allocator_descriptor.arguments = {me_variable_sing};
+    std_allocator_descriptor.IsExtern = true;
+    std_allocator_descriptor.returnType = newStruct.myDt;
+    
     if(!allocator_exists){
         std::u32string allocator =
         U"func:" + dataTypeToString(newStruct.myDt, adt) + U" alloc(){\n" +
@@ -1425,6 +1441,14 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
     }
 
     definedStructures.push_back(newStruct);
+    
+    functions.push_back(methods_init_descriptor);
+    functionsCreatedAtThatField.push_back(methods_init_descriptor);
+    
+    if(!allocator_exists){
+        functions.push_back(std_allocator_descriptor);
+        functionsCreatedAtThatField.push_back(std_allocator_descriptor);
+    }
 
     for(auto newMethod : methods){
         if(newMethod.name.token == FUNCTION_CALL){

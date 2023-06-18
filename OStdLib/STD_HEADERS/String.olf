@@ -121,30 +121,32 @@ struct:String{
     }
     
     [method [int ParseInt()]]{
-        var:int result = 0;
-        
-        var:int multiplier = 1;
+        var:String buffer = [[buffer alloc()] init()];
         
         var:int index = 0;
-        var:bool finding = true;
-        var:int start = [me size()];
-        
-        while(index < [me size()] & finding){
-            if(isDigit([me get(index)]) ? false){
-                @finding = false;
-                @start = index
+        var:bool active = true;
+        while(index < [me size()] & active){
+            var:char new_c = [me get(index)];
+            if(isDigit(new_c)){
+                [buffer Add(new_c)];
+            }else{
+                @active = false;
             }
             @index += 1;
         }
         
-        while(start > 0){
-            var:int new_elem = int([me get(start - 1)] - '0');
-
-            @result += new_elem * multiplier;
-            @multiplier *= 10;
-            
-            
-            @start -= 1;
+        [buffer Reverse()];
+        
+        @index = 0;
+        
+        var:int mul = 1;
+        var:int result = 0;
+        
+        while(index < [buffer size()]){
+            @result += int([buffer get(index)] - '0') * mul;
+        
+            @mul *= 10;
+            @index += 1;
         }
         
         return(result);

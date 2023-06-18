@@ -290,82 +290,93 @@ namespace O {
 
         for(auto fun : functions) {
             std::u32string fName = fun.name;
-
-            for(auto var : fun.arguments){
-                fName += dataTypeToString(var.type, adtTable);
-            }
-
-            FunctionStored newF;
-            newF.sector = fName;
-            newF.fromZeroOffset = 0;
-            OtoOTranslator newFT;
-
-            newFT.sectorName = fName;
-            newFT.addOffset = addOffset;
-            newFT.variables = std::vector<VariableStored>(this->variables);
-            newFT.structs = std::vector<Structure>(this->structs);
-            newFT.storedFunctions = std::vector<FunctionStored>(this->storedFunctions);
-            newFT.adtTable = this->adtTable;
-            newFT.LoadVariables(fun.arguments, false, true);
-            newFT.addOffset += 1;
-            newFT.LoadVariables(fun.variables, false, true);
-            newFT.Instructions = &newFT.mainFlow;
-            newFT.allocated_array = allocated_array;
-            
-            int countOfLocalVariable = newFT.addOffset - (int)fun.arguments.size() - 1;
-
-            newFT.localSize = countOfLocalVariable;
-
-            if(countOfLocalVariable >= 0){
-                auto sub0 = G::sub(GR::esp, countOfLocalVariable);
-                ADDVTV(newFT.Instructions, sub0);
-            }
-
-            for(auto argument : fun.arguments){
-                newF.parameters.push_back(argument.type);
-            }
-
-            for(auto inst : fun.body){
-                newFT.ProccessInstruction(inst);
-            }
-
-            if(fun.returnType == DataTypes::Void){
-                if(countOfLocalVariable >= 0) {
-                    auto add0 = G::add(GR::esp, countOfLocalVariable);
-                    ADDVTV(newFT.Instructions, add0);
+            if(!fun.IsExtern){
+                for(auto var : fun.arguments){
+                    fName += dataTypeToString(var.type, adtTable);
                 }
-                auto retCommand = Geneerator::ret();
-                newFT.Instructions->insert(newFT.Instructions->end(), retCommand.begin(), retCommand.end());
-            }
-            newF.name = fun.name;
-            newF.stackSize = addOffset;
-            storedFunctions.push_back(newF);
-            debug_info.insert(debug_info.end(), newFT.debug_info.begin(), newFT.debug_info.end());
-            addSectors.insert({fName, std::vector<int>(*newFT.Instructions)});
-            
-            for(auto elem : newFT.addSectors){
-                if(addSectors.find(elem.first) == addSectors.end()){
-                    addSectors.insert(elem);
+                
+                FunctionStored newF;
+                newF.sector = fName;
+                newF.fromZeroOffset = 0;
+                OtoOTranslator newFT;
+                
+                newFT.sectorName = fName;
+                newFT.addOffset = addOffset;
+                newFT.variables = std::vector<VariableStored>(this->variables);
+                newFT.structs = std::vector<Structure>(this->structs);
+                newFT.storedFunctions = std::vector<FunctionStored>(this->storedFunctions);
+                newFT.adtTable = this->adtTable;
+                newFT.LoadVariables(fun.arguments, false, true);
+                newFT.addOffset += 1;
+                newFT.LoadVariables(fun.variables, false, true);
+                newFT.Instructions = &newFT.mainFlow;
+                newFT.allocated_array = allocated_array;
+                
+                int countOfLocalVariable = newFT.addOffset - (int)fun.arguments.size() - 1;
+                
+                newFT.localSize = countOfLocalVariable;
+                
+                if(countOfLocalVariable >= 0){
+                    auto sub0 = G::sub(GR::esp, countOfLocalVariable);
+                    ADDVTV(newFT.Instructions, sub0);
                 }
+                
+                for(auto argument : fun.arguments){
+                    newF.parameters.push_back(argument.type);
+                }
+                
+                for(auto inst : fun.body){
+                    newFT.ProccessInstruction(inst);
+                }
+                
+                if(fun.returnType == DataTypes::Void){
+                    if(countOfLocalVariable >= 0) {
+                        auto add0 = G::add(GR::esp, countOfLocalVariable);
+                        ADDVTV(newFT.Instructions, add0);
+                    }
+                    auto retCommand = Geneerator::ret();
+                    newFT.Instructions->insert(newFT.Instructions->end(), retCommand.begin(), retCommand.end());
+                }
+                newF.name = fun.name;
+                newF.stackSize = addOffset;
+                storedFunctions.push_back(newF);
+                debug_info.insert(debug_info.end(), newFT.debug_info.begin(), newFT.debug_info.end());
+                addSectors.insert({fName, std::vector<int>(*newFT.Instructions)});
+                
+                for(auto elem : newFT.addSectors){
+                    if(addSectors.find(elem.first) == addSectors.end()){
+                        addSectors.insert(elem);
+                    }
+                }
+                allocated_array = newFT.allocated_array;
+                ComponentSymbol cs;
+                
+                for(auto a : newFT.additionalVariables){
+                    VariableSymbol vs;
+                    vs.name = a.name;
+                    vs.sector = a.sector;
+                    vs.offset_registor = a.useEbp ? GR::ebp : GR::NULLREG;
+                    vs.offset = a.fromEbpOffset;
+                    cs.vs.push_back(vs);
+                }
+                
+                cs.sector = fName;
+                
+                components.push_back(cs);
+                
+                addOffset = 0;
+                additionalVariables.clear();
+            }else{
+                FunctionStored newF;
+                newF.sector = fName;
+                newF.fromZeroOffset = 0;
+                newF.name = fun.name;
+                newF.stackSize = 0;
+                for(auto argument : fun.arguments){
+                    newF.parameters.push_back(argument.type);
+                }
+                storedFunctions.push_back(newF);
             }
-            allocated_array = newFT.allocated_array;
-            ComponentSymbol cs;
-
-            for(auto a : newFT.additionalVariables){
-                VariableSymbol vs;
-                vs.name = a.name;
-                vs.sector = a.sector;
-                vs.offset_registor = a.useEbp ? GR::ebp : GR::NULLREG;
-                vs.offset = a.fromEbpOffset;
-                cs.vs.push_back(vs);
-            }
-
-            cs.sector = fName;
-
-            components.push_back(cs);
-
-            addOffset = 0;
-            additionalVariables.clear();
         }
     }
 
@@ -418,7 +429,12 @@ namespace O {
         }else if(inst.name == U"__pointer_call"){
             c = Geneerator::call(GR::edx);
         }else{
-            c = Geneerator::call(inst.name, 0, GR::NULLREG);
+            std::u32string name = inst.name;
+            for(auto var : inst.Parameters){
+                name += dataTypeToString(var.type, adtTable);
+            }
+            
+            c = Geneerator::call(name, 0, GR::NULLREG);
         }
         Instructions->insert(Instructions->end(), c.begin(), c.end());
 
@@ -588,8 +604,18 @@ namespace O {
                 
                 auto function = getFun(name, argument_type);
                 
-                auto ga = G::ga(function.sector, 0, GR::NULLREG);
-                ADDVTV(Instructions, ga);
+                if(function.sector != U""){
+                    auto ga = G::ga(function.sector, 0, GR::NULLREG);
+                    ADDVTV(Instructions, ga);
+                }else{
+                    std::u32string fun_sector = name;
+                    for(auto element :argument_type){
+                        fun_sector += dataTypeToString(element,  adtTable);
+                    }
+                    auto ga = G::ga(fun_sector, 0, GR::NULLREG);
+                    ADDVTV(Instructions, ga);
+                }
+                
                 auto add = G::add(GR::mc3, function.fromZeroOffset);
                 ADDVTV(Instructions, add);
                 auto mov = G::mov(reg, GR::mc3);
