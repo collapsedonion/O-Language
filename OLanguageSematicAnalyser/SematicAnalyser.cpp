@@ -1902,13 +1902,7 @@ Instruction O::SematicAnalyser::getSizeOf(Analyser::Token token) {
 
 int O::SematicAnalyser::getSize(DataTypes dt) { 
     if(dataTypeIsStructure(dt)){
-        int total = 0;
-        
-        for(auto elem : containsStructureByDataType(dt).second.variables){
-            total += getSize(elem.type);
-        }
-        
-        return total;
+        return (int)containsStructureByDataType(dt).second.variables.size();
     }
     return 1;
 }

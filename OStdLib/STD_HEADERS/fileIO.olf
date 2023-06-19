@@ -1,7 +1,7 @@
 #include dynamic_lib.olf
 #include stdTypes.olf
 
-struct:File{
+struct:File_Pointer{
 }
 
 global:NativeFunction nf_c_fopen_file;
@@ -17,6 +17,7 @@ global:NativeFunction nf_c_fread;
 global:NativeFunction nf_c_fput;
 global:RPChar nf_c_fput_args;
 
+global:NativeFunction nf_c_fflush;
 
 func file_io_link(){ 
     var:void~ real_name;
@@ -56,6 +57,12 @@ func file_io_link(){
     @nf_c_fput = extractDLMember(c_std_lib_handler, put_char_c_name);
     @real_name = getRelativePointer(RPointer(put_char_c_name));
     free(real_name);
+    
+    var:char~ fflush_char_name = "fflush";
+    var:RPChar fflush_char_c_name = strToCstr(fflush_char_name);
+    @nf_c_fflush = extractDLMember(c_std_lib_handler, fflush_char_c_name);
+    @real_name = getRelativePointer(RPointer(fflush_char_c_name));
+    free(real_name);
 
     var:char~ put_args = "lc";
     @nf_c_fput_args = strToCstr(put_args);
@@ -63,7 +70,7 @@ func file_io_link(){
 
 file_io_link();
 
-func:File openFile(char~ path, char~ mode){
+func:File_Pointer openFile(char~ path, char~ mode){
     var:void~ real_name;
     var:int~ arguments = malloc(int~, 2);
     var:RPChar c_path = strToCstr(path);
@@ -80,10 +87,10 @@ func:File openFile(char~ path, char~ mode){
     free(real_name);
 
     free(arguments);
-    return(File(file));
+    return(File_Pointer(file));
 }
 
-func:bool endOfFile(File file){
+func:bool endOfFile(File_Pointer file){
     var:int~ arguments = malloc(int~, 1);
     @arguments[0] = int(file);
     var:int endOf = nativeInvoke(nf_c_eof, 1, arguments, nf_c_fclose_file_args);
@@ -91,7 +98,7 @@ func:bool endOfFile(File file){
     return(bool(endOf));
 }
 
-func:char fReadChar(File file){
+func:char fReadChar(File_Pointer file){
     var:int~ arguments = malloc(int~, 1);
     @arguments[0] = int(file);
     var:int res = nativeInvoke(nf_c_fread, 1, arguments, nf_c_fclose_file_args);
@@ -99,7 +106,7 @@ func:char fReadChar(File file){
     return(char(res));
 }
 
-func fPutChar(File file, char ch){
+func fPutChar(File_Pointer file, char ch){
     var:int~ arguments = malloc(int~, 2);
     @arguments[1] = int(file);
     @arguments[0] = int(ch);
@@ -109,14 +116,21 @@ func fPutChar(File file, char ch){
     free(arguments);
 }
 
-func closeFile(File file){
+func closeFile(File_Pointer file){
     var:int~ arguments = malloc(int~, 1);
     @arguments[0] = int(file);
     nativeInvoke(nf_c_fclose_file, 1, arguments, nf_c_fclose_file_args);
     free(arguments);
-}  
+}
 
-func fReadToString(File file, char~ str, int stringSize){
+func flushFile(File_Pointer file){
+    var:int~ arguments = malloc(int~, 1);
+    @arguments[0] = int(file);
+    nativeInvoke(nf_c_fflush, 1, arguments, nf_c_fclose_file_args);
+    free(arguments);
+}
+
+func fReadToString(File_Pointer file, char~ str, int stringSize){
 
     var:int index = 0;
 
@@ -136,7 +150,7 @@ func fReadToString(File file, char~ str, int stringSize){
     @str[index] = '\0';
 }
 
-func fWriteString(File file, char~ str){
+func fWriteString(File_Pointer file, char~ str){
     var:bool notComplete = true;
 
     var:int index = 0;

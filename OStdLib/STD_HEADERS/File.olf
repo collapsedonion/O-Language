@@ -1,0 +1,136 @@
+#include fileIO.olf
+#include String.olf
+
+enum {
+    NotExist = 0;
+    Read = 1;
+    Write = 2;
+    Append = 3;
+    WritePlus = 4;
+    ReadPlus = 5;
+    AppendPlus = 6;
+}
+
+func:bool isTypeWriteable(int type){
+    return(type ? Write | type ? Append | type ? WritePlus | type ? ReadPlus | type ? AppendPlus);
+}
+
+func:String toString(int type){
+    var:String result = [result alloc()];
+    if(type ? Read){
+        return([result init("r")]);
+    }else if(type ? Write){
+        return([result init("w")]);
+    }else if(type ? Append){
+        return([result init("a")]);
+    }else if(type ? WritePlus){
+        return([result init("w+")]);
+    }else if(type ? ReadPlus){
+        return([result init("r+")]);
+    }else if(type ? AppendPlus ){
+        return([result init("a+")]);
+    }
+    
+    return([result init()]);
+}
+
+struct:File{
+    bool ready;
+    File_Pointer file_handler;
+    int type;
+    
+    
+    init(){
+        @me[ready] = false;
+        return(me);
+    }
+    
+    init(String path, int type, bool binary){
+        var:String file_type = toString(type);
+        @me[type] = type;
+        
+        if(binary){
+            [file_type Add('b')];
+        }
+        
+        var:File_Pointer p = openFile([path c_style()], [file_type c_style()]);
+        
+        if((int(p) ? 0) ? false){
+            @me[file_handler] = p;
+            @me[ready] = true;
+        }else{
+            @me[ready] = false;
+        }
+
+        [file_type Delete()];
+        return(me);
+    }
+    
+    init(String path){
+        [me init(path, Read, false)];
+        return(me);
+    }
+    
+    [method [int getType()]{
+        if(ready){
+            return(me[type]);
+        }
+        return(NotExist);
+    }
+    
+    [method [bool eof()]]{
+        if(me[ready] ? false){
+            return(true);
+        }
+        return(endOfFile(me[file_handler]));
+    }
+    
+    [method [char readByte()]]{
+        if(me[ready] ? false){
+            return('\0');
+        }
+    
+        var:char c = fReadChar(me[file_handler]);
+        if([me eof()] ? false){
+            return(c);
+        }
+        return('\0');
+    }
+    
+    [method [void writeByte(char c)]]{
+        if(isTypeWriteable(me[type]) & me[ready]){
+            fPutChar(me[file_handler], c);
+            flushFile(me[file_handler]);
+        }
+    }
+    
+    [method [String readString()]]{
+        var:String ret = [[ret alloc()] init()];
+        
+        var:char c = [me readByte()];
+        
+        while([me eof()] ? false & (c ? '\n') ? false){
+            [ret Add(c)];
+            @c = [me readByte()];
+        }
+        return(ret);
+    }
+    
+    [method [void writeString(String str)]]{
+        if(isTypeWriteable(me[type]) & me[ready]){
+            var:int index = 0;
+            while(index < [str size()]){
+                var:char n_c = [str get(index)];
+                [me writeByte(n_c)];
+                @index += 1;
+            }
+        }
+    }
+    
+    [method [void close()]]{
+        if(me[ready]){
+            closeFile(me[file_handler]);
+            @me[ready] = false;
+        }
+    }
+}
