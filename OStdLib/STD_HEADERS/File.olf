@@ -120,8 +120,7 @@ struct:File{
         if(isTypeWriteable(me[type]) & me[ready]){
             var:int index = 0;
             while(index < [str size()]){
-                var:char n_c = [str get(index)];
-                [me writeByte(n_c)];
+                [me writeByte([str get(index)])];
                 @index += 1;
             }
         }
