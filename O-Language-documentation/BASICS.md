@@ -35,6 +35,8 @@ O language provides several literal types:
 
 ## Documentation place holders
 
+Place holder may be combined with "or" or "and"
+
 + \[data-type\] (place-holder for data-type name)
 + <name> (place-holder for any-text)
 + \[body\] (place-holder for instructions)
