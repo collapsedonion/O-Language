@@ -38,6 +38,7 @@ O language provides several literal types:
 + \[data-type\] (place-holder for data-type name)
 + <name> (place-holder for any-text)
 + \[body\] (place-holder for instructions)
++ \[value (\[data-type\])\] (place-holder for value or literal)
 
 ## Naming rules
 
