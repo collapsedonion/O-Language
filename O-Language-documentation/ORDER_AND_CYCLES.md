@@ -5,7 +5,7 @@ In O language exists 3 order structures and 1 cycle structure
 ## Order structures
 
 ### IF
-"if" blocks excepts boolean value, and if it's "true" evaluates it's "body", if "false" gives control to next else block
+"if" blocks excepts boolean value, and if it's "true" evaluates it's "body", if "false" gives control to next "else" block
 
 Description
 ```
@@ -21,7 +21,7 @@ if(true){
 }
 ```
 ### ELSE
-"else" block evaluates if previous if skiped
+"else" block evaluates if previous "if" skiped
 
 Description
 ```
@@ -61,7 +61,7 @@ if(c){
 ```
 ### WHILE
 
-"while" is a cycle that will evaluate it's body all over again while it's argument is true
+"while" is a cycle that will evaluate it's body all over again while it's argument is "true"
 
 Description
 ```
