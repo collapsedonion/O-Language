@@ -38,7 +38,7 @@ O language provides several literal types:
 Place holder may be combined with "or" or "and"
 
 + \[data-type\] (place-holder for data-type name)
-+ <name> (place-holder for any-text)
++ \<name\> (place-holder for any-text)
 + \[body\] (place-holder for instructions)
 + \[value (\[data-type\])\] (place-holder for value or literal)
 + \^block-name\^ (place-holder for any block, "block-name" can be replaced)
