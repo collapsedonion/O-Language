@@ -39,6 +39,7 @@ O language provides several literal types:
 + <name> (place-holder for any-text)
 + \[body\] (place-holder for instructions)
 + \[value (\[data-type\])\] (place-holder for value or literal)
++ \^block-name\^ (place-holder for any block, "block-name" can be replaced)
 
 ## Naming rules
 
