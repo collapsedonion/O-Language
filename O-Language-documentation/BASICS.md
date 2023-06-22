@@ -4,7 +4,7 @@
 
 In O language all instructions must end with ";"
 
-### Example:
+### Example
     someFunction();
     
 In O language theres no entry point like main function, evaluating starts from top of the file
