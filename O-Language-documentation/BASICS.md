@@ -42,6 +42,7 @@ Place holder may be combined with "or" or "and"
 + \[body\] (place-holder for instructions)
 + \[value (\[data-type\])\] (place-holder for value or literal)
 + \^block-name\^ (place-holder for any block, "block-name" can be replaced)
++ Any of other place holders \+ %comment% 
 
 ## Naming rules
 
