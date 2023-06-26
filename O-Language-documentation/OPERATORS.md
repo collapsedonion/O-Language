@@ -39,3 +39,9 @@ Scope operators tooks as operator data from left to right scopes
 5. "%" - Binary, modulo
 6. "()" - Scope, calling
 7. "[]" - Scope, square
+
+## Unary operators
+1. "@" - get pointer
+2. "~" - access pointer
+3. "!" - not
+4. "-" - minus
