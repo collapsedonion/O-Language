@@ -6,3 +6,4 @@
 + [Operator](OPERATORS.md)
 + [Functions](FUNCTIONS.md)
 + [Pointers](POINTERS.md)
++ [Structures](STRUCTURES.md)
