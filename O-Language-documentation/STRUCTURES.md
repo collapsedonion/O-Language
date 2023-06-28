@@ -192,3 +192,23 @@ To create instance of template use "<Template-name>\[\[data-type\]\]" at data-ty
 var:ES[char] ti = [[ti alloc()] init()];
 ```
 
+# Enumerations
+
+Enumerations creates named placeholders for any value type
+
+## Definition
+```
+enum{
+    <name> = <value>;
+}
+```
+
+### Example
+
+```
+enum{
+    INTE = 1;
+    BOOLE = false;
+    FLOATE = 1.2;
+}
+```

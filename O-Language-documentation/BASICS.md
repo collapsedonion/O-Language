@@ -33,6 +33,16 @@ O language provides several literal types:
 + (pre-defined array) \[1,2,3, ...\] (allocated space cannot be freed, when code execution hits that literal all previous data in it vanishing)
 + (c-style string) "123abc" (pre-defined array, null-terminated, char-pointer type) 
 
+Literals and any value can be casted to every other type, for that use target type name with "()" operator
+
+### Example
+
+```
+bool(1);
+int(false);
+void~(999);
+```
+
 ## Documentation place holders
 
 Place holder may be combined with "or" or "and"

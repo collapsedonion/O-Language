@@ -23,6 +23,18 @@ To define variable must be used "var" or "global" compiler instruction
 
 ### GLOBAL prototype
 
+```
+Can be accesed from any function and using it in function is prohibited
+global:[data-type] <name>
+```
+
+### Example
+
+```
+global:bool boolGlobal;
+global:int intGlobal;
+```
+
 Also variable can have initialisation data
 
 ### Description
