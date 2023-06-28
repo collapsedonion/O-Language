@@ -6,7 +6,7 @@ Variable can be every of existing type, data for variable allocated at the stack
 
 ## Variable definition
 
-To define variable must be used "var" compiler instruction
+To define variable must be used "var" or "global" compiler instruction
 
 ### VAR prototype
  ```
@@ -20,6 +20,8 @@ To define variable must be used "var" compiler instruction
     var:int intTypeVar;
         
     var:float floatTypeVar;
+
+### GLOBAL prototype
 
 Also variable can have initialisation data
 
