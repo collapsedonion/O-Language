@@ -87,13 +87,18 @@ int O::Analyser::charNotInBrackets(std::u32string str, char32_t c)
 int O::Analyser::charNotInQuets(std::u32string str, char32_t c)
 {
     bool inQuets = false;
+    bool singleQuets = false;
 
     for (int i = 0; i < str.size(); i++) {
         if (str[i] == '\"') {
             inQuets = !inQuets;
         }
+        
+        if(str[i] == '\'' && !inQuets){
+            singleQuets = !singleQuets;
+        }
 
-        if (str[i] == c && !inQuets) {
+        if (str[i] == c && !inQuets && !singleQuets) {
             return i;
         }
     }
@@ -106,31 +111,38 @@ int O::Analyser::charNotInFunction(std::u32string str, char32_t c)
     int level = -1;
     int levelInCube = -1;
     bool inQuets = false;
+    bool singleQuets = false;
 
     for (int i = 0; i < str.size(); i++) {
         if (str[i] == '\"') {
             inQuets = !inQuets;
         }
+        
+        if(str[i] == '\'' && !inQuets){
+            if((singleQuets && i - 1 > 0 && str[i - 1] != '\\') || !singleQuets){
+                singleQuets = !singleQuets;
+            }
+        }
 
-        if (str[i] == '[' && !inQuets) {
+        if (str[i] == '[' && !inQuets && !singleQuets) {
             levelInCube++;
         }
 
-        if (str[i] == ']' && !inQuets) {
+        if (str[i] == ']' && !inQuets && !singleQuets) {
             levelInCube--;
         }
 
-        if (str[i] == '(' && !inQuets) {
+        if (str[i] == '(' && !inQuets && !singleQuets) {
             level++;
             continue;
         }
 
-        if (str[i] == ')' && !inQuets) {
+        if (str[i] == ')' && !inQuets && !singleQuets) {
             level--;
             continue;
         }
 
-        if (str[i] == c && level == -1 && !inQuets && levelInCube == -1) {
+        if (str[i] == c && level == -1 && !inQuets && !singleQuets && levelInCube == -1) {
             if(i - 1 >= 0 && i + 1 < str.size() && str[i - 1] == '\'' && str[i + 1] == '\''){
                 continue;
             }
@@ -152,11 +164,22 @@ std::pair<bool, std::pair<std::u32string, std::u32string>> O::Analyser::doubleBr
 
     std::u32string operatorContentRight = U"";
 
+    bool quets = false;
+    bool sq = false;
+    
     for (int i = (int)str.size() - 1; i >= 0; i--) {
-        if (str[i] == right) {
+        if(str[i] == '"') {
+            quets = !quets;
+        }
+        
+        if(str[i] == '\'' && !quets){
+            sq = !sq;
+        }
+        
+        if (str[i] == right && !quets && !sq) {
             level++;
         }
-        else if (str[i] == left) {
+        else if (str[i] == left && !quets && !sq) {
             level--;
         }
         if (level == -1) {
@@ -377,8 +400,8 @@ O::Analyser::Token O::Analyser::getMathematicExpression(std::u32string str, int 
 
 O::Analyser::Token O::Analyser::ProccessNameOrCreation(std::u32string str, int line_id, std::u32string file_name)
 {
-    int idOfVar = stringNotInFunction(str, U"var");
-    int idOfGlobal = stringNotInFunction(str, U"global");
+    int idOfVar = stringNotInFunction(str, U"var:");
+    int idOfGlobal = stringNotInFunction(str, U"global:");
     int idOfFunc = stringNotInFunction(str, U"func");
 
     Token res;
@@ -601,28 +624,35 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
     int line = prevLine;
     std::u32string current_file_name = file_name;
     bool inQouets = false;
+    bool singleQouets = false;
 
     for (int i = 0; i < str.size(); i++) {
         if (str[i] == '\"' && levelCurly == -1) {
             inQouets = !inQouets;
         }
+        
+        if (str[i] == '\'' && levelCurly == -1 && !inQouets) {
+            if((singleQouets && i - 1 > 0 && str[i - 1] != '\\') || !singleQouets){
+                singleQouets = !singleQouets;
+            }
+        }
 
-        if (str[i] == '(' && !inQouets && levelCurly == -1) {
+        if (str[i] == '(' && !inQouets && !singleQouets && levelCurly == -1) {
             level++;
         }
 
-        if (str[i] == ')' && !inQouets && levelCurly == -1) {
+        if (str[i] == ')' && !inQouets && !singleQouets && levelCurly == -1) {
             level--;
         }
 
-        if (str[i] == '{' && level == -1 && !inQouets) {
+        if (str[i] == '{' && level == -1 && !inQouets && !singleQouets) {
 
             levelCurly++;
             if (levelCurly == 0) {
                 continue;
             }
         }
-        if (str[i] == '}' && level == -1 && !inQouets) {
+        if (str[i] == '}' && level == -1 && !inQouets && !singleQouets) {
             levelCurly--;
             if (levelCurly == -1) {
                 main.subFile.push_back(StructuriseFile(newBody, last, line, current_file_name));
@@ -641,7 +671,7 @@ O::Analyser::StructurisedFile O::Analyser::StructuriseFile(std::u32string str, s
             continue;
         }
 
-        if (inQouets || level != -1) {
+        if (singleQouets || inQouets || level != -1) {
             last += str[i];
         }
         else {

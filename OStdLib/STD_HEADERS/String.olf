@@ -100,6 +100,22 @@ struct:String{
                 }
                 @counter += 1;
             }
+            return(true);
+        }
+        return(false);
+    }
+    
+    [method [bool cmp(char~ str)]]{
+        if(stringSize(str) ? [me size()]){
+            var:int counter = 0;
+        
+            while(counter < [me size()]){
+                if(([me get(counter)] ? str[counter]) ? false){
+                    return(false);
+                }
+                @counter += 1;
+            }
+            return(true);
         }
         return(false);
     }
@@ -118,6 +134,10 @@ struct:String{
             @first += 1;
             @last -= 1;
         }
+    }
+    
+    [method [char Pop()]]{
+        return([me[_data] Pop()]);
     }
     
     [method [int ParseInt()]]{

@@ -4,6 +4,7 @@
 
 #include "Preproccesor.h"
 #include <codecvt>
+#include <iostream>
 
 namespace O {
 
@@ -182,7 +183,7 @@ namespace O {
 	   this->file_name = filePath.substr(indexOfLast + 1, filePath.size() - (indexOfLast+1));
         }
 	else{
-	   this->filePath = filePath;
+	   this->filePath = U"";
 	   this->file_name = filePath;
 	}
 

@@ -69,6 +69,24 @@ struct:List{
         return(T(0));
     }
     
+    [method [T Pop()]]{
+        if(me[_count] ? 0){
+            return(T(0));
+        }
+        
+        var:T to_ret = [me get(0)];
+        
+        var:int i = 1;
+        
+        while(i < me[_count] - 1){
+            [me set(i - 1, [me get(i)])];
+        }
+        
+        [me Pick()];
+        
+        return(to_ret);
+    }
+    
     [method [T Pick()]]{
         if(me[_count] ? 0){
             return(T(0));

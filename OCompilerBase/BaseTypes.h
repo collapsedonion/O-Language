@@ -122,30 +122,30 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
                 }
                 
                 if(name_formated){
-                    for(int i = 0; i < to_ret.size(); i++){
+                    for(int j = 0; j < to_ret.size(); j++){
                         
-                        if(to_ret[i] == '~'){
-                            to_ret[i] = 'p';
+                        if(to_ret[j] == '~'){
+                            to_ret[j] = 'p';
                             continue;
                         }
                         
-                        if(to_ret[i] == '('){
-                            to_ret = to_ret.replace(i, 1, U"\\CBS");
+                        if(to_ret[j] == '('){
+                            to_ret = to_ret.replace(j, 1, U"\\CBS");
                             continue;
                         }
                         
-                        if(to_ret[i] == ')'){
-                            to_ret = to_ret.replace(i, 1, U"\\CBE");
+                        if(to_ret[j] == ')'){
+                            to_ret = to_ret.replace(j, 1, U"\\CBE");
                             continue;
                         }
                         
-                        if(to_ret[i] == '['){
-                            to_ret = to_ret.replace(i, 1, U"\\SBS");
+                        if(to_ret[j] == '['){
+                            to_ret = to_ret.replace(j, 1, U"\\SBS");
                             continue;
                         }
                         
-                        if(to_ret[i] == ']'){
-                            to_ret = to_ret.replace(i, 1, U"\\SBE");
+                        if(to_ret[j] == ']'){
+                            to_ret = to_ret.replace(j, 1, U"\\SBE");
                             continue;
                         }
                     }
@@ -155,11 +155,10 @@ inline std::u32string dataTypeToString(DataTypes dt, AdditionalDataType adt = Ad
 			}
 		}
         for(int i = adt.temp.size() - 1; i>=0;i--){
-            if(adt.additionalNumber[i] == (int)dt){
+            if(adt.temp[i] == (int)dt){
                 if(!code_formated && !name_formated){
                     return adt.name_temp[i];
                 }
-                
                 auto to_ret = adt.name_temp[i];
                 
                 while(to_ret[0] == '~'){

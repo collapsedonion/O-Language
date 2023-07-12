@@ -414,7 +414,12 @@ DataTypes O::SematicAnalyser::getDataType(Analyser::Token token)
         auto types = getComma(token.childToken[1]);
         
         for(int i = 0; i < types.size(); i++){
-            name += dataTypeToString(getDataType(types[i]));
+            
+            if(getDataType(types[i]) == DataTypes::Error){
+                int a = 0;
+            }
+            
+            name += dataTypeToString(getDataType(types[i]), adt);
             if(i < types.size()-1){
                 name += U",";
             }
@@ -1262,6 +1267,7 @@ Instruction O::SematicAnalyser::proccessStructureCreation(O::Analyser::Tokenised
                     type += newStruct.name + (arguments.size() == 0 ? U"" : U",");
                     for(int i = 0; i < arguments.size(); i++){
                         type += dataTypeToString(getDataType(arguments[i].childToken[0]), adt);
+                        
                         if(i != arguments.size() - 1){
                             type += U",";
                         }
