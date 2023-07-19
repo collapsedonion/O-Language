@@ -3,6 +3,7 @@
 //
 
 #include "Memory.h"
+#include <math.h>
 
 namespace O {
     int Memory::registersCount = 17;
@@ -26,7 +27,7 @@ namespace O {
 
     long long Memory::LoadProgram(std::string sectorName, std::vector<long long> content) {
         
-        if(loadSegmenet == -1 || std::pow(2, 32) - _heap[(int)loadSegmenet].size() <= content.size()){
+        if(loadSegmenet == -1 || pow(2, 32) - _heap[(int)loadSegmenet].size() <= content.size()){
             loadSegmenet = getFreeHeap();
             _heap.insert({loadSegmenet, std::vector<long long>()});
         }
